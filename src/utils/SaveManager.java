@@ -9,14 +9,16 @@ import java.io.ObjectOutputStream;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.mygdx.actor.PartyHard_Monster;
+import com.partyhard.actor.PartyHard_Monster;
+import com.partyhard.actor.PartyHard_Player_Map;
 
 public class SaveManager {
 	 private FileHandle file;
 	
 	 public SaveManager(String filename)
 	 {
-		 file = Gdx.files.local(filename);
+			 file = Gdx.files.internal(filename);
+			 
 	 }
 	 
 	 public void SaveMonster(PartyHard_Monster objectToSave, boolean append)
@@ -56,7 +58,7 @@ public class SaveManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-			// création d'un "flux objet" avec le flux fichier
+			// creating the object stored in the file
 			try {
 				ObjectInputStream ois= new ObjectInputStream(fis);
 		
@@ -79,6 +81,30 @@ public class SaveManager {
 		 
 		return monster;
 		 
+	 }
+	 
+	 public void SavePlayer_Map(PartyHard_Player_Map player, boolean append)
+	 {
+		 FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(file.file(), append);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+				// used to write the object
+				try {
+					ObjectOutputStream oos= new ObjectOutputStream(fos);
+					
+					oos.writeObject(player);
+					
+					oos.close();
+					fos.close();	
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	 }
 }
 	    
