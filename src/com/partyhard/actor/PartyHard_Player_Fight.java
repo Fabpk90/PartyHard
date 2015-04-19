@@ -128,6 +128,18 @@ public class PartyHard_Player_Fight{
 		
 	}
 	
+	public void Damage(int amount)
+	{
+		if(amount > Hp)
+		{
+			Hp = 0;
+			isDead = true;
+		}
+		else
+			Hp -= amount;
+			
+	}
+	
 	public int getclass()
 	{
 		return Class;
@@ -200,6 +212,9 @@ public class PartyHard_Player_Fight{
 		
 	}
 	
+	/*
+	 * @ param object An object deriving from Object
+	 */	
 	public boolean addToBag(PartyHard_Object object)
 	{
 		if((bag.size() + 1) > bagSpace)

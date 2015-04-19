@@ -684,10 +684,18 @@ public class PartyHard_Fight implements Screen {
 				 *Calculating which player monsters have to attack randomly
 				 */
 				
-				for(int p = 0; p < enemySquad.size(); p++)
+				for(int p = 0; p < enemySquad.size();)
 				{
 					Random r = new Random();
-					enemySquad.get(p).setIdTarget(r.nextInt(playerSquad.size()));
+					
+					int random = r.nextInt(playerSquad.size());
+					
+					if(!playerSquad.get(random).isDead())
+					{
+						enemySquad.get(p).setIdTarget(random);
+						p++;
+					}
+					
 				}
 				
 				/*
@@ -835,7 +843,7 @@ public class PartyHard_Fight implements Screen {
 						if(damagetoplayer <= 0)
 							damagetoplayer = 1;
 						
-						playerSquad.get(enemySquad.get(o).getIdTarget()).setLife(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() - damagetoplayer);
+						playerSquad.get(enemySquad.get(o).getIdTarget()).Damage(damagetoplayer);
 						
 						//controlling if the player is dead
 						if(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() <= 0)
