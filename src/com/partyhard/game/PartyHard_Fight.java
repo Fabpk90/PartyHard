@@ -251,18 +251,22 @@ public class PartyHard_Fight implements Screen {
 		             * Creating the list of abilities that can be used against the monster
 		             */		            				 		
 				 	Table tableCap = null;
-					try {
+					
+				 	//tableCap already exist
+					if(searchTable("tableCap") != null)
+					{
 						tableCap = searchTable("tableCap");
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
-				 	
-				 	if(tableCap.getChildren().size != -1)
-				 	{				 		
-				 		tableCap.clear();
+					else
+						tableCap = new Table();
+					
+				 				 						 		
 				 		List<TextButton> list = new List<TextButton>(listStyle);
 			            list.setName("capacity");				           
+			            
+			            /*
+			             * this set the selected cap and show up the list of chara if needed (if heal)
+			             */
 			            
 			            list.addListener(new ClickListener(){
 			             public void clicked(InputEvent event, float x, float y){
@@ -282,8 +286,7 @@ public class PartyHard_Fight implements Screen {
 			            		 tableListChara.center();
 			            		 
 			            		 List<TextButton> listChara = new List<TextButton>(listStyle);
-			            		 
-			            		 
+			            		 		            		 
 			            		 for(int l = 0; l < playerSquad.size(); l++)
 			            		 {
 			            			 TextButton chara = new TextButton(""+l, buttonStyle);
@@ -301,8 +304,9 @@ public class PartyHard_Fight implements Screen {
 			             
 			            		 });
 			            		             		 
-			            		 
-			            		 try {
+			            		 /*
+			            		  * Displaying the list of chara
+			            		  */
 									Table cap = searchTable("tableCap");								
 									
 									ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            	
@@ -311,18 +315,12 @@ public class PartyHard_Fight implements Screen {
 					            	scroll.setPosition(cap.getChildren().get(0).getX() + cap.getChildren().get(0).getWidth() + 50, cap.getChildren().get(0).getY());
 									
 									tableListChara.addActor(scroll);
-									stage.addActor(tableListChara);
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-			            		 
+									stage.addActor(tableListChara);		            		 
 			            	 }
 			            	 
 			            	}
-			            });
-			            	
-			                
+			            });		            	
+			            
 		            	for(int u = 0; u < playerSquad.get(turn).capacity.size(); u++)
 			            	{
 		            			//the list use the name to display, so i used the text to know which cap has been selected
@@ -332,16 +330,10 @@ public class PartyHard_Fight implements Screen {
 			            		list.getItems().add(cap);
 			            	}
 		            	
-		            		tableCap.center();
-		            		
-		            		Table label = null;
-		            		
-		            		try {
-							  label = searchTable("tableTurn");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								
-							}		                      		
+		            		tableCap.center();	            		
+		            		            				            		
+							Table label = searchTable("tableTurn");
+							                    		
 		            		
 		            	 	list.setPosition(label.getChildren().get(0).getX(), label.getChildren().get(0).getY() + list.getHeight() + 40);
 		            	
@@ -368,19 +360,19 @@ public class PartyHard_Fight implements Screen {
 			  	            	tableTarget.addActor(label1);
 			  	            	
 			  	            	stage.getActors().add(tableTarget);
-		  	            	}
-		  	            	
-		  	            	
-		  	            	
-		  	            	stage.getActors().removeIndex(getTableIndex("tableCap"));
-			            	stage.getActors().add(tableCap);
-			            	
-				 	}
+		  	            	}		
+		  	            		if(getTableIndex("tableCap") != -1)	  	            	
+		  	            			stage.getActors().removeIndex(getTableIndex("tableCap"));	
+		  	            		stage.getActors().add(tableCap);
+				 	
 				 				 			 
 				 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
 				 if(!win && !loose && playerSquad.get(turn).getCapacitySelected() != -1 && playerSquad.get(turn).getTarget() != -1)
-					fight();
-
+				 {
+					 System.out.println("test");
+					 fight();
+				 }
+					
 			 }
 		});
 		
@@ -395,6 +387,13 @@ public class PartyHard_Fight implements Screen {
 		buttonBack.addListener(new ClickListener(){
 	            @Override 
 	            public void clicked(InputEvent event, float x, float y){
+	            	
+	            	//disabling the menus
+	    			stage.getActors().removeIndex(getTableIndex("tableCap"));
+	    			//if a cap healing selected we need to erase the list of chara from the screen
+	    			if(getTableIndex("tableListChara") != -1)
+	    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
+	    			stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
 	            	
 	               stage.getActors().get(1).setVisible(false);
 	               stage.getActors().get(2).setVisible(true);
@@ -548,7 +547,7 @@ public class PartyHard_Fight implements Screen {
 		            		}
 		            	}
 		            	//id of the selected monster
-		            	monsterSelected = Integer.parseInt(event.getTarget().getName());
+		            	playerSquad.get(turn).setTarget(Integer.parseInt(event.getTarget().getName()));
 		            	
 	            	}//end if not heal
 		          }//end if not cap
@@ -661,10 +660,14 @@ public class PartyHard_Fight implements Screen {
 		if(playerSquad.get(turn).getCapacitySelected() > -1)
 		{						
 			//disabling the menus
-			stage.getActors().removeIndex(getTableIndex("tableCap"));
+			stage.getActors().get(getTableIndex("tableCap")).setVisible(false);;
 			//if a cap healing selected we need to erase the list of chara from the screen
 			if(playerSquad.get(turn).capacity.get(playerSquad.get(turn).getCapacitySelected()).isHeal)
 				stage.getActors().removeIndex(getTableIndex("tableListChara"));
+			//if not heal then need to remove the arrowMonster
+			else
+				stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);;
+				
 			stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
 								
 			//turning off the arrow
@@ -764,17 +767,14 @@ public class PartyHard_Fight implements Screen {
 								
 								//the monster is dead
 								if(enemySquad.get(monsterIndex).actualHp <= 0)
-								{															
-											
+								{																										
 									expgained += enemySquad.get(monsterIndex).actualExp; 
-																											
-									Table monsterName = null;
-									try {
-										monsterName = searchTable("monsterTableName");
-									} catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
+											
+									/*
+									 * TO DO level up
+									 */
+									
+									Table monsterName = searchTable("monsterTableName");									
 									
 									/*
 									 * fading out the monster that has been kill
@@ -823,73 +823,66 @@ public class PartyHard_Fight implements Screen {
 						{
 							playerSquad.get(playerSquad.get(i).getTarget()).setLife(playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).amount);
 						}
-				}																				
+				}
+					/*
+					 * Monster turn
+					 */
+					int damagetoplayer;
+					for(int o = 0; o < enemySquad.size(); o++)
+					{
+						damagetoplayer = enemySquad.get(o).actualAtk - playerSquad.get(enemySquad.get(o).getIdTarget()).getDef();
+						
+						if(damagetoplayer <= 0)
+							damagetoplayer = 1;
+						
+						playerSquad.get(enemySquad.get(o).getIdTarget()).setLife(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() - damagetoplayer);
+						
+						//controlling if the player is dead
+						if(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() <= 0)
+						{
+							playerSquad.get(enemySquad.get(o).getIdTarget()).setDead(true);
+							playerAlive--;
+							
+							if(playerAlive == 0)
+							{
+								gameOver();
+								loose = true;
+							}
+								
+						}
+						
+					}								
 								/*
 								 * Updating the label that show the life
 								 */
-								Table tableLife = null;
-								try {
-									tableLife = searchTable("tableLife");
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
 								
-								//update label
-								Label labellife = (Label) tableLife.getChildren().get(i);
-								labellife.setText(""+playerSquad.get(i).getLife());
+								Table tableLife = searchTable("tableLife");
+								
+								
+								
 								
 								//update table
-								for(int p = 0; p < tableLife.getChildren().size; p++)
+								/*
+								 * getting the label, updating and setting back to the array
+								 */
+								for(int p = 0; p < playerSquad.size(); p++)
 								{
-									if(tableLife.getChildren().get(p).getName() == ""+i)
-									{
-										tableLife.getChildren().removeIndex(p);
-										tableLife.getChildren().add(labellife);
-										break;
-									}
-								}
-								
+								 Label labelLife = (Label) tableLife.getChildren().get(p);
+								 labelLife.setText(""+playerSquad.get(p).getLife());
+								 
+								 tableLife.getChildren().items[p] = labelLife;
+								}							
 								
 								//update stage
 								stage.getActors().removeIndex(getTableIndex("tableLife"));
-								stage.addActor(tableLife);
+								stage.addActor(tableLife);							
 								
-								
-					//setting the selected capacity back to default
-					playerSquad.get(i).setCapacitySelected(-1);		
+					//setting the fight setting back to default
+					playerSquad.get(i).setCapacitySelected(-1);	
+					playerSquad.get(i).setTarget(-1);
 			}
-				/*
-				 * Monster turn
-				 */
-				int damagetoplayer;
-				for(int o = 0; o < enemySquad.size(); o++)
-				{
-					damagetoplayer = enemySquad.get(o).actualAtk - playerSquad.get(enemySquad.get(o).getIdTarget()).getDef();
-					
-					if(damagetoplayer <= 0)
-						damagetoplayer = 1;
-					
-					playerSquad.get(enemySquad.get(o).getIdTarget()).setLife(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() - damagetoplayer);
-					
-					//controlling if the player is dead
-					if(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() <= 0)
-					{
-						playerSquad.get(enemySquad.get(o).getIdTarget()).setDead(true);
-						playerAlive--;
-						
-						if(playerAlive == 0)
-						{
-							gameOver();
-							loose = true;
-						}
 							
-					}
-					
-				}			
 			turn = -1;
-			
-			
 			
 		}
 			
@@ -904,6 +897,7 @@ public class PartyHard_Fight implements Screen {
 				{
 					if(!playerSquad.get(y).isDead())
 					{
+						
 						labelTurn.setText(playerSquad.get(y).getName()+"'s turn");					
 						break;
 					}
@@ -981,7 +975,7 @@ public class PartyHard_Fight implements Screen {
  * 
  * @return The table or an exception if null
  */
-	private Table searchTable(String name) throws Exception
+	private Table searchTable(String name)
 	{
 		for(int i = 0; i < stage.getActors().size; i++)
 		{
@@ -990,7 +984,7 @@ public class PartyHard_Fight implements Screen {
 		}
 		
 		//hopefully will never be 
-		throw new Exception();
+		return null;
 	}
 /*
  * @param name The name of the table
