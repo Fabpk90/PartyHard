@@ -418,6 +418,7 @@ public class PartyHard_Fight implements Screen {
        
 
 		Table tableLabelName = new Table();
+		tableLabelName.setName("tableName");
 		
 		//loading labels and setting a proper name to update life through function
 		for(int i = 0; i < playerSquad.size(); i++)
@@ -755,6 +756,7 @@ public class PartyHard_Fight implements Screen {
 									 */
 									Label labelDamage = new Label(""+damage, labelstyle);
 									labelDamage.setFontScale(scale * 2);
+									labelDamage.setColor(Color.RED);
 									
 									//setting the value before animation
 									Image monsterimage = (Image) monsterTable.getChildren().get(monsterIndexTable);		
@@ -763,7 +765,7 @@ public class PartyHard_Fight implements Screen {
 									stage.addActor(labelDamage);
 									
 									/*
-									 * Animation work like that: value SET to value TO in x seconds
+									 * Animations work like that: value SET to value TO in x seconds
 									 */
 									
 									Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).start(tweenManager);
@@ -829,21 +831,68 @@ public class PartyHard_Fight implements Screen {
 							}//closing if not heal
 						else
 						{
+							/*
+							 * Animation for health
+							 */
 							playerSquad.get(playerSquad.get(i).getTarget()).setLife(playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).amount);
+							
+							Label labelHealth = new Label(""+playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).amount, labelstyle);
+							labelHealth.setFontScale(scale * 2);
+							labelHealth.setColor(Color.GREEN);
+							
+							/*
+							 * getting the coordinate of the player's label healed
+							 */
+							
+							Table tableName = searchTable("tableName");
+							
+							Label labelName = (Label) tableName.getChildren().get(i);
+							
+							labelHealth.setPosition(labelName.getX(), labelName.getY() + 150);
+							
+							Tween.set(labelHealth, LabelAccessor.Y).target(labelHealth.getY()).start(tweenManager);
+							Tween.set(labelHealth, LabelAccessor.ALPHA).target(1).start(tweenManager);
+							
+							Tween.to(labelHealth, LabelAccessor.Y, 2f).target(labelHealth.getY() + 100).start(tweenManager);
+							Tween.to(labelHealth, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
+							
+							stage.addActor(labelHealth);
 						}
 				}
 					/*
 					 * Monster turn
 					 */
-					int damagetoplayer;
+					int damageToPlayer;
 					for(int o = 0; o < enemySquad.size(); o++)
 					{
-						damagetoplayer = enemySquad.get(o).actualAtk - playerSquad.get(enemySquad.get(o).getIdTarget()).getDef();
+						damageToPlayer = enemySquad.get(o).actualAtk - playerSquad.get(enemySquad.get(o).getIdTarget()).getDef();
 						
-						if(damagetoplayer <= 0)
-							damagetoplayer = 1;
+						if(damageToPlayer <= 0)
+							damageToPlayer = 1;
 						
-						playerSquad.get(enemySquad.get(o).getIdTarget()).Damage(damagetoplayer);
+						Label labelDamage = new Label(""+damageToPlayer, labelstyle);
+						labelDamage.setFontScale(scale * 2);
+						labelDamage.setColor(Color.RED);
+						
+						/*
+						 * getting the coordinate of the player's label healed
+						 */
+						
+						Table tableName = searchTable("tableName");
+						
+						Label labelName = (Label) tableName.getChildren().get(i);
+						
+						labelDamage.setPosition(labelName.getX(), labelName.getY() + 150);
+						
+						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(1).start(tweenManager);
+						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(1).start(tweenManager);
+						
+						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(2).start(tweenManager);
+						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(3).start(tweenManager);
+						
+						stage.addActor(labelDamage);
+						
+						playerSquad.get(enemySquad.get(o).getIdTarget()).Damage(damageToPlayer);
 						
 						//controlling if the player is dead
 						if(playerSquad.get(enemySquad.get(o).getIdTarget()).getLife() <= 0)
@@ -865,10 +914,7 @@ public class PartyHard_Fight implements Screen {
 								 */
 								
 								Table tableLife = searchTable("tableLife");
-								
-								
-								
-								
+			
 								//update table
 								/*
 								 * getting the label, updating and setting back to the array
