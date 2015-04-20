@@ -193,8 +193,6 @@ public class PartyHard_Fight implements Screen {
 		
 		 backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_sound.mp3"));
 		
-
-		
 		final TextButton buttonFlee = new TextButton("Flee!", buttonStyle);
 		
 		buttonFlee.pad(20);
@@ -374,9 +372,7 @@ public class PartyHard_Fight implements Screen {
 				 }
 					
 			 }
-		});
-		
-		
+		});		
 		
 		final TextButton buttonBack = new TextButton("Back", buttonStyle);
 		
@@ -566,10 +562,7 @@ public class PartyHard_Fight implements Screen {
 				monsterTable.addActor(monsterImage);
 				monsterTableName.addActor(monsterName);
 	    }	       		
-	            	
-		
 	
-		
 		//creating the label that indicates who need to attack with the first alive character
 		Label labelTurn = null;
 		for(int y = 0; y < playerSquad.size(); y++)
@@ -609,9 +602,7 @@ public class PartyHard_Fight implements Screen {
 		Button monsterchoose = new Button(styleRight);
 		
 		tableMonsterSelected.setVisible(false);
-		tableMonsterSelected.addActor(monsterchoose);
-		
-		
+		tableMonsterSelected.addActor(monsterchoose);	
 		
        stage.addActor(background);
        stage.addActor(tableFight);
@@ -633,10 +624,8 @@ public class PartyHard_Fight implements Screen {
          */
         //set alpha to 0 and then go to 1
               
-        stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));
-        
+        stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));     
 	}
-
 
 	@Override
 	public void render(float delta) {
@@ -747,8 +736,7 @@ public class PartyHard_Fight implements Screen {
 									int damage = playerSquad.get(i).getAtk() - enemySquad.get(monsterIndex).actualDef;
 									if(damage <= 0)						
 										damage = 1;
-													
-							
+																				
 									enemySquad.get(monsterIndex).actualHp -= damage;
 											
 									/*
@@ -904,10 +892,8 @@ public class PartyHard_Fight implements Screen {
 							{
 								gameOver();
 								loose = true;
-							}
-								
-						}
-						
+							}							
+						}						
 					}								
 								/*
 								 * Updating the label that show the life
@@ -921,10 +907,10 @@ public class PartyHard_Fight implements Screen {
 								 */
 								for(int p = 0; p < playerSquad.size(); p++)
 								{
-								 Label labelLife = (Label) tableLife.getChildren().get(p);
-								 labelLife.setText(""+playerSquad.get(p).getLife());
+									Label labelLife = (Label) tableLife.getChildren().get(p);
+									labelLife.setText(""+playerSquad.get(p).getLife());
 								 
-								 tableLife.getChildren().items[p] = labelLife;
+									tableLife.getChildren().items[p] = labelLife;
 								}							
 								
 								//update stage
@@ -936,10 +922,9 @@ public class PartyHard_Fight implements Screen {
 					playerSquad.get(i).setTarget(-1);
 			}
 							
-			turn = -1;
-			
+			turn = -1;			
 		}
-			
+			//next turn
 			turn++;
 			
 			Label labelTurn = (Label) tableTurn.getChildren().get(0);
@@ -950,8 +935,7 @@ public class PartyHard_Fight implements Screen {
 				for(int y = 0; y < playerSquad.size(); y++)
 				{
 					if(!playerSquad.get(y).isDead())
-					{
-						
+					{					
 						labelTurn.setText(playerSquad.get(y).getName()+"'s turn");					
 						break;
 					}
@@ -1051,9 +1035,7 @@ public class PartyHard_Fight implements Screen {
 		{
 			if(stage.getActors().get(i).getName() == name)
 				return i;
-		}
-		
-		
+		}	
 		return -1;
 	}
 	
@@ -1116,9 +1098,7 @@ public class PartyHard_Fight implements Screen {
 			
 			 StringWriter stringwriter = new StringWriter();
 			 XmlWriter xml = new XmlWriter(stringwriter);
-			 
-			 
-			 
+		 
 				xml.element("root");	
 				for(int i = 0;i < playerSquad.size(); i++)
 				{
