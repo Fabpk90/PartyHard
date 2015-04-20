@@ -31,6 +31,10 @@ public class PartyHard_Monster extends Sprite {
 	
 	private int idTarget;
 	
+	private int damage = 0;
+	
+	private boolean Dead = false;
+	
 	public PartyHard_Monster(String monster) {
 		
 		//the id of the monster (used for the fight)
@@ -85,5 +89,30 @@ public class PartyHard_Monster extends Sprite {
 	 */
 	public void setIdTarget(int idTarget) {
 		this.idTarget = idTarget;
+	}
+
+	public int getDamage() {
+		return damage;
+	}
+	/*
+	 * @param damage The damages that the monster takes
+	 * @note Remember to check the state after dealing damages
+	 */
+
+	public void setDamage(int damage) {
+		this.damage += damage;
+		if(damage >= actualHp)
+		{
+			setDead(true);
+			actualHp = 0;
+		}
+	}
+
+	public boolean isDead() {
+		return Dead;
+	}
+
+	public void setDead(boolean dead) {
+		Dead = dead;
 	}
 }
