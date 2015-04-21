@@ -136,15 +136,15 @@ public class PartyHard_Player_Map extends Sprite{
 	{
 		if(movingLeft) // going left
 			collisionXLeft = collidesLeft();
-		if(collisionXLeft)// checking left collision if exist going 32 pixel before
-			setX(destination.x + 32);
-		 if(movingRight) // going right
+			if(collisionXLeft)// checking left collision if exist going 32 pixel before
+				setX(destination.x + 32);
+		if(movingRight) // going right
 			collisionXRight = collidesRight();
-		 if(collisionXRight)
-				setX(destination.x - 32);
+		 	if(collisionXRight)
+		 		setX(destination.x - 32);
 
 		// react to x collision
-		if(collisionXRight || collisionXLeft ) 
+		if(collisionXRight || collisionXLeft) 
 		{
 			stopMovement();
 			destination.x = getX();
@@ -177,15 +177,16 @@ public class PartyHard_Player_Map extends Sprite{
 		// move on y
 		if(movingDown) // going down
 			collisionYDown = collidesBottom();
-		if(collisionYDown)
-			setY(destination.y + 32);
+			if(collisionYDown)
+				setY(destination.y + 32);
 		if(movingTop) // going up
 			collisionYTop = collidesTop();
-		if(collisionYTop)
-			setY(destination.y - 32);
+			if(collisionYTop)
+				setY(destination.y - 32);
 
 		// react to y collision
-		if(collisionYTop || collisionYDown) {
+		if(collisionYTop || collisionYDown) 
+		{
 			stopMovement();
 			destination.x = getX();
 			destination.y = getY();
@@ -215,7 +216,6 @@ public class PartyHard_Player_Map extends Sprite{
 		}
 	}
 		
-
 	}
 	
 	private void resetCollision() {
@@ -247,12 +247,11 @@ public class PartyHard_Player_Map extends Sprite{
        
         for (int i = 0; i < 4; i++) 
         {      	
-        	
+        	for(int x = 0; x < 4; x++)
+        	{
         		// loading animation frame by frame
-            	walkFrames[0] = tmp[i][0];
-            	walkFrames[1] = tmp[i][1];
-            	walkFrames[2] = tmp[i][2];
-            	walkFrames[3] = tmp[1][3];
+            	walkFrames[x] = tmp[i][x];
+        	}           	
            
             //loading animation for each direction
             switch(i)
@@ -281,7 +280,7 @@ public class PartyHard_Player_Map extends Sprite{
 	}
 	/**
 	 * @param direction 0 for backward, 1 for left, 2 for right, 3 for toward
-	 * @param frame the frame to find using getKeyFrame
+	 * @param frame The frame to find, using getKeyFrame()
 	 */
 	public TextureRegion getFrame(int direction, float frame)
 	{
@@ -314,8 +313,8 @@ public class PartyHard_Player_Map extends Sprite{
 		boolean ok = false;
 		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
 		{
-			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);
-			Cell cell =  layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
+			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
+			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
 			//check the cell for collisions
 			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey))
 				ok = true;					
