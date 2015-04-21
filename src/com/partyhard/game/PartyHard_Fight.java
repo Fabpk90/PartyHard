@@ -1094,8 +1094,7 @@ public class PartyHard_Fight implements Screen {
 	
 		try {
 		FileHandle file = Gdx.files.local("player_Fight.xml");
-			
-			
+				
 			 StringWriter stringwriter = new StringWriter();
 			 XmlWriter xml = new XmlWriter(stringwriter);
 		 
@@ -1147,7 +1146,7 @@ public class PartyHard_Fight implements Screen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
+		save();
 		
 	}
 

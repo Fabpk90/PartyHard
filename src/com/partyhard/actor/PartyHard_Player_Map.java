@@ -21,7 +21,7 @@ public class PartyHard_Player_Map extends Sprite{
 	private Animation walk_right;
 	private Animation walk_toward;
 	
-	//used to know in which direction the player is going
+	//used to know in which direction the player is going to
 	private boolean movingRight = false;
 	private boolean movingLeft = false;
 	private boolean movingTop = false;
@@ -358,6 +358,11 @@ public class PartyHard_Player_Map extends Sprite{
 			if(isCellBlocked(getX() + step, getY()))
 				return true;
 		return false;
+	}
+
+	public void dispose() {
+		
+		collisionLayer.dispose();
 	}
 
 	

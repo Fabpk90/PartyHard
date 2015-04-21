@@ -1,7 +1,6 @@
 package com.partyhard.actor;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;

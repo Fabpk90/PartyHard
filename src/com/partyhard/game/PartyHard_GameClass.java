@@ -39,7 +39,7 @@ public class PartyHard_GameClass extends Game {
 		Pixmap pm = new Pixmap(Gdx.files.internal("ui/cursorHand.png"));
 		Gdx.input.setCursorImage(pm, 0, 0);
 		pm.dispose();
-		
+		/*
 		ArrayList<PartyHard_Monster> monsters = new ArrayList<PartyHard_Monster>();
 		 monsters.add(new PartyHard_Monster("blob"));
 		 monsters.add(new PartyHard_Monster("bear"));
@@ -55,17 +55,18 @@ public class PartyHard_GameClass extends Game {
 		PartyHard_Fight fight = new PartyHard_Fight(playerSquad, monsters, null, this);
 		setScreen(fight);
 	
-		/*
+		*/
 		
 		PartyHard_ScreenSplash screensplash = new PartyHard_ScreenSplash(this);
 		this.setScreen(screensplash);
-		*/
+		
 		
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
+		Gdx.app.exit();
 		
 	}
 

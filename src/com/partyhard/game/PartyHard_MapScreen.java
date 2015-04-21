@@ -358,6 +358,7 @@ public class PartyHard_MapScreen implements Screen{
 		mapSound.dispose();
 		spriteBatch.dispose();	
 		stage.dispose();
+		playerMap.dispose();
 	}
 
 	public void moveRight()
