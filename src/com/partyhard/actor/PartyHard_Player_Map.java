@@ -345,7 +345,7 @@ public class PartyHard_Player_Map extends Sprite{
 	}
 
 	private boolean collidesTop() {
-		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
+		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileHeight())
 			if(isCellBlocked(getX() + step, getY() + getHeight()))
 				return true;
 		return false;
@@ -353,7 +353,7 @@ public class PartyHard_Player_Map extends Sprite{
 	}
 
 	private boolean collidesBottom() {
-		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
+		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileHeight())
 			if(isCellBlocked(getX() + step, getY()))
 				return true;
 		return false;
