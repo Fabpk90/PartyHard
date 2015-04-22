@@ -11,7 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
 
-public class PartyHard_Player_Map extends Sprite{
+public class PartyHard_Player_Map {
 	
 	
 	private String imagePath;
@@ -32,6 +32,12 @@ public class PartyHard_Player_Map extends Sprite{
 	
 	private boolean collisionYDown = false;
 	private boolean collisionYTop = false;
+	
+	private float x;
+	private float y;
+	
+	private float Height = 0;
+	private float Width = 0;
 	
 	//store the destination
 	private Vector2 destination;
@@ -54,6 +60,14 @@ public class PartyHard_Player_Map extends Sprite{
 		destination = new Vector2(x,y);
 	}
 	
+	private void setX(float f) {
+		this.x = f;
+	}
+
+	private void setY(float y) {
+		this.y = y;
+	}
+
 	//special constructor without the tiledlayer
 	public PartyHard_Player_Map(int x, int y, String imagePath)
 	{
@@ -63,7 +77,7 @@ public class PartyHard_Player_Map extends Sprite{
 		this.imagePath = imagePath;
 	}
 	
-	
+	/*
 	@Override 
 	public void setPosition(float x, float y)
 	{
@@ -71,17 +85,15 @@ public class PartyHard_Player_Map extends Sprite{
 		destination.x = x;
 		destination.y = y;
 	}
-	
+	*/
 	public void moveRight()
 	{
 		
 			//stopping all previous movement before the new one
 			stopMovement();
 			moving = true;
-			movingRight = true;
-			//setting the position of the destination
-			destination.x += + 32;
-		
+			movingRight = true;	
+			destination.x += 32;
 		
 	}
 	
@@ -135,20 +147,23 @@ public class PartyHard_Player_Map extends Sprite{
 	if(moving)
 	{
 		if(movingLeft) // going left
+		{
 			collisionXLeft = collidesLeft();
-			if(collisionXLeft)// checking left collision if exist going 32 pixel before
-				setX(destination.x + 32);
+			
+						
+		}
 		if(movingRight) // going right
+		{
 			collisionXRight = collidesRight();
-		 	if(collisionXRight)
-		 		setX(destination.x - 32);
-
+		 	
 		// react to x collision
+		}
 		if(collisionXRight || collisionXLeft) 
 		{
 			stopMovement();
 			destination.x = getX();
 			destination.y = getY();
+			resetCollision();
 		}
 		else
 		{
@@ -177,19 +192,17 @@ public class PartyHard_Player_Map extends Sprite{
 		// move on y
 		if(movingDown) // going down
 			collisionYDown = collidesBottom();
-			if(collisionYDown)
-				setY(destination.y + 32);
+			
 		if(movingTop) // going up
 			collisionYTop = collidesTop();
-			if(collisionYTop)
-				setY(destination.y - 32);
-
+			
 		// react to y collision
 		if(collisionYTop || collisionYDown) 
 		{
 			stopMovement();
 			destination.x = getX();
 			destination.y = getY();
+			resetCollision();
 		}
 		else
 		{
@@ -218,6 +231,32 @@ public class PartyHard_Player_Map extends Sprite{
 		
 	}
 	
+	public float getY() {
+		return y;
+	}
+
+	public float getX() {
+		return x;
+	}
+	
+	public float getWidth() {	
+		return Width;
+	}
+
+	public float getHeight() {		
+		return Height;
+	}
+	
+	public void setWidth(float Width)
+	{
+		this.Width = Width;
+	}
+	
+	public void setHeight(float Height)
+	{
+		this.Height = Height;
+	}
+
 	private void resetCollision() {
 		collisionXRight = false;
 		 collisionXLeft = false;
@@ -240,10 +279,12 @@ public class PartyHard_Player_Map extends Sprite{
 		Texture walkSheet = new Texture(Gdx.files.internal(getSprite())); 
 		walkSheet.bind();
 		
-        TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/4, walkSheet.getHeight()/4);
+        TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/4, walkSheet.getHeight()/4);             
         
        TextureRegion[] walkFrames = new TextureRegion[4 * 4];
-     
+      
+       setWidth(walkSheet.getWidth() / 4);
+       setHeight(walkSheet.getHeight() / 8);
        
         for (int i = 0; i < 4; i++) 
         {      	
@@ -323,13 +364,6 @@ public class PartyHard_Player_Map extends Sprite{
 		return ok;
 	}
 	
-	private float getRightCell()
-	{
-		//getting a layer for getting the width 
-		TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(0);
-		return (this.getX() + layer.getTileWidth());
-	}
-
 	private boolean collidesRight() {
 		for(float step = 0; step <= getHeight(); step +=  ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
 			if(isCellBlocked(getX() + getWidth(), getY()))
@@ -354,8 +388,10 @@ public class PartyHard_Player_Map extends Sprite{
 
 	private boolean collidesBottom() {
 		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileHeight())
+		{		
 			if(isCellBlocked(getX() + step, getY()))
 				return true;
+		}
 		return false;
 	}
 
