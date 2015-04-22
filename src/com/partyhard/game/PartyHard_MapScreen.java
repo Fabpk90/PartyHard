@@ -64,10 +64,7 @@ public class PartyHard_MapScreen implements Screen{
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapPath+".tmx");
-	}
-	
-	
-	
+	}			
 	
 	@Override
 	public void render(float delta) {
@@ -83,8 +80,7 @@ public class PartyHard_MapScreen implements Screen{
        
         
         spriteBatch.setProjectionMatrix(camera.combined);
-        spriteBatch.begin();
-        spriteBatch.enableBlending();        
+        spriteBatch.begin();      
         
        
         playerMap.update(delta);
@@ -176,7 +172,7 @@ public class PartyHard_MapScreen implements Screen{
 		if(Gdx.app.getType() == Gdx.app.getType().Android)
 		{
 			/*
-			 * Loading the skin wich contains the arrows info
+			 * Loading the skin which contains the arrows info
 			 */						
 			TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
 			
