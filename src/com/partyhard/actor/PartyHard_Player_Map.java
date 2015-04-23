@@ -27,11 +27,9 @@ public class PartyHard_Player_Map {
 	private boolean movingTop = false;
 	private boolean movingDown = false;
 	
-	private boolean collisionXRight = false;
-	private boolean collisionXLeft = false;
+	private boolean collisionX = false;
 	
-	private boolean collisionYDown = false;
-	private boolean collisionYTop = false;
+	private boolean collisionY = false;
 	
 	private float x;
 	private float y;
@@ -69,6 +67,10 @@ public class PartyHard_Player_Map {
 	}
 
 	//special constructor without the tiledlayer
+	/*
+	 * @param imagePath The path of the image(Texture Atlas)
+	 * @see TextureAtlas
+	 */
 	public PartyHard_Player_Map(int x, int y, String imagePath)
 	{
 		this.setX(x);
@@ -77,15 +79,16 @@ public class PartyHard_Player_Map {
 		this.imagePath = imagePath;
 	}
 	
-	/*
-	@Override 
+	
 	public void setPosition(float x, float y)
 	{
-		super.setPosition(x, y);
+		setX(x);
+		setY(y);
+		
 		destination.x = x;
 		destination.y = y;
 	}
-	*/
+	
 	public void moveRight()
 	{
 		
@@ -142,23 +145,15 @@ public class PartyHard_Player_Map {
 	
 	public void update(float delta) {
 
-		resetCollision();
+		
 
 	if(moving)
 	{
-		if(movingLeft) // going left
-		{
-			collisionXLeft = collidesLeft();
-			
-						
-		}
-		if(movingRight) // going right
-		{
-			collisionXRight = collidesRight();
-		 	
-		// react to x collision
-		}
-		if(collisionXRight || collisionXLeft) 
+		resetCollision();
+		
+		collisionX = collidesX();
+		
+		if(collisionX) 
 		{
 			stopMovement();
 			destination.x = getX();
@@ -190,14 +185,10 @@ public class PartyHard_Player_Map {
 		}
 			
 		// move on y
-		if(movingDown) // going down
-			collisionYDown = collidesBottom();
-			
-		if(movingTop) // going up
-			collisionYTop = collidesTop();
+		collisionY = collidesY();
 			
 		// react to y collision
-		if(collisionYTop || collisionYDown) 
+		if(collisionY) 
 		{
 			stopMovement();
 			destination.x = getX();
@@ -258,11 +249,9 @@ public class PartyHard_Player_Map {
 	}
 
 	private void resetCollision() {
-		collisionXRight = false;
-		 collisionXLeft = false;
+		collisionX = false;
 		
-		 collisionYDown = false;
-		 collisionYTop = false;
+		collisionY = false;
 	}
 
 	public void stopMovement()
@@ -364,34 +353,17 @@ public class PartyHard_Player_Map {
 		return ok;
 	}
 	
-	private boolean collidesRight() {
-		for(float step = 0; step <= getHeight(); step +=  ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
-			if(isCellBlocked(getX() + getWidth(), getY()))
+	private boolean collidesX() {
+		for(float step = 0; step <= getWidth(); step +=  ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
+			if(isCellBlocked(destination.x, getY()))
 				return true;
 		return false;
 	}
 
-	private boolean collidesLeft() {
-		for(float step = 0; step <= getHeight(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
-			if(isCellBlocked(getX() - step, getY()))
+	private boolean collidesY() {
+		//using destination for knowing where 
+			if(isCellBlocked(getX(), destination.y))
 				return true;
-		return false;
-	}
-
-	private boolean collidesTop() {
-		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileHeight())
-			if(isCellBlocked(getX() + step, getY() + getHeight()))
-				return true;
-		return false;
-
-	}
-
-	private boolean collidesBottom() {
-		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileHeight())
-		{		
-			if(isCellBlocked(getX() + step, getY()))
-				return true;
-		}
 		return false;
 	}
 
