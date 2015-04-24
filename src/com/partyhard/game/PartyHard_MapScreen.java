@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -56,8 +57,8 @@ public class PartyHard_MapScreen implements Screen{
 	private TiledMapRenderer maprenderer;
 	private MapProperties prop;
 	
-	private int mapPixelWidth;
-	private int mapPixelHeight;
+	private float mapPixelWidth;
+	private float mapPixelHeight;
 	
 	public PartyHard_MapScreen(Game gameToKeep, String mapPath, PartyHard_Player_Map playerMap)
 	{	
@@ -72,7 +73,6 @@ public class PartyHard_MapScreen implements Screen{
 		animationTime += delta;
 		Gdx.gl.glClearColor(255, 255, 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        camera.update();
         maprenderer.setView(camera);
         maprenderer.render();
         
@@ -90,13 +90,26 @@ public class PartyHard_MapScreen implements Screen{
         if(playerMap.isMoving())
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
         else
-        	spriteBatch.draw(playerMap.getFrame(direction, 0), playerMap.getX(), playerMap.getY());
+        	spriteBatch.draw(playerMap.getFrame(direction, 0), playerMap.getX(), playerMap.getY());//idle animation
         
         spriteBatch.end();
         /*
          * TO DO:  camera 
          */
         
+        //if the camera is not going outside on the width
+   	 if(mapPixelWidth - camera.position.x > camera.viewportWidth && camera.viewportWidth + camera.position.x <  mapPixelWidth)
+   	 {
+   		 camera.position.set(playerMap.getX(), playerMap.getY(), 0);
+         camera.update();
+   	 }
+   	 		//same as above but for the height
+   	 else if(mapPixelHeight - camera.position.y > 0 && mapPixelHeight + camera.position.y < mapPixelHeight * 2)
+   	 {
+   		 camera.position.set(playerMap.getX(), playerMap.getY(), 0);
+         camera.update();
+   	 }
+       
         
         /*
 	     * Movement
@@ -151,6 +164,7 @@ public class PartyHard_MapScreen implements Screen{
 
 	@Override
 	public void show() {
+			
 		
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
@@ -159,6 +173,12 @@ public class PartyHard_MapScreen implements Screen{
 	camera.viewportWidth = camera.viewportWidth / 1.2f;
 		
 	camera.update();
+	
+	/*
+	 * Calculating the map dimension for the camera
+	 */
+	 TiledMapTileLayer layer = (TiledMapTileLayer) tiledmap.getLayers().get(0);	
+
 	
 	Table mapNameTable = new Table();
 	stage = new Stage();
@@ -280,6 +300,8 @@ public class PartyHard_MapScreen implements Screen{
 	        });
 			
 			Table androidarrow = new Table();
+			androidarrow.setName("androidArrow");//not used but settled for further uses
+			
 			androidarrow.addActor(topArrow);
 			androidarrow.addActor(leftArrow);
 			androidarrow.addActor(downArrow);
@@ -358,47 +380,30 @@ public class PartyHard_MapScreen implements Screen{
 	}
 
 	public void moveRight()
-	{
-		//if(playerMap.getX() + 32 < mapPixelWidth)
-        	//if((camera.position.x  + 632) + 32 < mapPixelWidth)
-        	{
+	{	
         		playerMap.stopMovement();
         		direction = 2;
         		playerMap.moveRight();
-        		//camera.translate(32,0);
-        	}
 	}
 	
 	public void moveLeft()
 	{
-		//if(camera.position.x - 32 >= Gdx.graphics.getWidth() / 2  )
-		//{
 				playerMap.stopMovement();
 				direction = 1;
 				playerMap.moveLeft();
-				//camera.translate(-32,0);
-		//}
 	}
 	
 	public void moveTop()
 	{
-		//if((camera.position.y + 392) < mapPixelHeight)
-    	//{
-    		//camera.translate(0,32);
 			playerMap.stopMovement();
     		direction = 3;
     		playerMap.moveTop();
-    	//}
 	}
 	
 	public void moveDown()
 	{
-		//if((camera.position.y - 328) - 32 > 0 )
-    	//{
-    		//camera.translate(0,-32);
 			playerMap.stopMovement();
     		direction = 0;
     		playerMap.moveDown();
-    	//}	
 	}
 }

@@ -219,6 +219,8 @@ public class PartyHard_Player_Map {
 			}	
 		}
 	}
+	
+	
 		
 	}
 	
@@ -340,17 +342,30 @@ public class PartyHard_Player_Map {
 	}
 	
 	private boolean isCellBlocked(float x, float y) {
-		boolean ok = false;
+		
 		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
 		{
 			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
 			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
 			//check the cell for collisions
 			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey))
-				ok = true;					
+				return true;					
 		}
 		
-		return ok;
+		return false;
+	}
+	
+	private boolean isCellTp(float x, float y)
+	{
+		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
+		{
+			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
+			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
+			//check the cell for collisions
+			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey("x"))
+				return true;					
+		}
+		return false;
 	}
 	
 	private boolean collidesX() {
