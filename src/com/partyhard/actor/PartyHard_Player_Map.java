@@ -341,6 +341,34 @@ public class PartyHard_Player_Map {
 		this.imagePath = imagePath;
 	}
 	
+	/**
+	 * * <p>
+	 * Note:  used for knowing if the player is moving on the x axe
+	 * </p>
+	 */
+	
+	public boolean isMovingX()
+	{
+		if(movingRight || movingLeft)
+			return true;
+		
+		return false;
+	}
+	
+	/**
+	 * * <p>
+	 * Note:  used for knowing if the player is moving on the y axe
+	 * </p>
+	 */
+	
+	public boolean isMovingY()
+	{
+		if(movingTop || movingDown)
+			return true;
+		
+		return false;
+	}
+	
 	private boolean isCellBlocked(float x, float y) {
 		
 		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
@@ -365,7 +393,7 @@ public class PartyHard_Player_Map {
 			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey("x"))
 				return true;					
 		}
-		return false;
+		return false; 
 	}
 	
 	private boolean collidesX() {
