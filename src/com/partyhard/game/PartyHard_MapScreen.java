@@ -1,5 +1,6 @@
 package com.partyhard.game;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -60,6 +61,8 @@ public class PartyHard_MapScreen implements Screen{
 	private float mapPixelWidth;
 	private float mapPixelHeight;
 	
+	private boolean blockedx = false;
+	
 	public PartyHard_MapScreen(Game gameToKeep, String mapPath, PartyHard_Player_Map playerMap)
 	{	
 		mainGame = gameToKeep;
@@ -94,23 +97,48 @@ public class PartyHard_MapScreen implements Screen{
         
         spriteBatch.end();
         /*
-         * TO DO:  camera 
+         * TO DO:  camera, maybe move the algo into functions
          */
+        //used for knowing if the player can go on the x axe
         
-        //if the camera is not going outside on the width
-   	 if(mapPixelWidth - camera.position.x > camera.viewportWidth && camera.viewportWidth + camera.position.x <  mapPixelWidth)
-   	 {
-   		 camera.position.set(playerMap.getX(), playerMap.getY(), 0);
-         camera.update();
-   	 }
-   	 		//same as above but for the height
-   	 else if(mapPixelHeight - camera.position.y > 0 && mapPixelHeight + camera.position.y < mapPixelHeight * 2)
-   	 {
-   		 camera.position.set(playerMap.getX(), playerMap.getY(), 0);
-         camera.update();
-   	 }
+        blockedx = false;
+ 
        
+        	 if(playerMap.getX() - (camera.viewportWidth / 2 )  < 0  || playerMap.getX() + (camera.viewportWidth / 2) > mapPixelWidth)
+   		   	 {
+        		 blockedx = true;       		       		       		 
+   		   	 }
+
+        	if(playerMap.isMovingOnX())
+        	{
+	        		//if the camera is not going outside on the width
+	   		   		if(!blockedx)
+	   		   		{
+	   		   			camera.position.set(playerMap.getX(), camera.position.y, 0);	   		   			
+	   		   		}
+	   		   		
+	   		   			
+	   		   	camera.update();
+        	}
+        	
+        	
+        	if(playerMap.isMovingOnY())
+        	{
+	        		//same as above but for the height
+	   		   	 if(playerMap.getY() - (camera.viewportHeight / 2 )  > 0 && playerMap.getY() + (camera.viewportHeight / 2) < mapPixelHeight)
+	   		   	 {
+	   		   		 //if the player cannot go on the x axe then move only on the y		   		
+	   		   			 camera.position.set(camera.position.x, playerMap.getY(), 0);
+	   		   		
+	   		   		camera.update();
+	   		   		
+	   		         
+	   		   	 }
+        	}
+		   	       
+        	  
         
+
         /*
 	     * Movement
 	     */
@@ -164,7 +192,6 @@ public class PartyHard_MapScreen implements Screen{
 
 	@Override
 	public void show() {
-			
 		
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
@@ -189,7 +216,7 @@ public class PartyHard_MapScreen implements Screen{
 		/*
 		 * Android Button initialization
 		 */
-		if(Gdx.app.getType() == Gdx.app.getType().Android)
+		if(Gdx.app.getType() == ApplicationType.Android)
 		{
 			/*
 			 * Loading the skin which contains the arrows info
@@ -308,7 +335,6 @@ public class PartyHard_MapScreen implements Screen{
 			androidarrow.addActor(rightArrow);
 			
 			stage.addActor(androidarrow);
-			Gdx.input.setInputProcessor(stage);
 
 		}
 		
@@ -351,6 +377,8 @@ public class PartyHard_MapScreen implements Screen{
 		
 		
 		maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
+		
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
