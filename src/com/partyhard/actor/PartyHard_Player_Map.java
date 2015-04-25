@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PartyHard_Player_Map {
 	
+	//used to store on which map the player is, so if the player tp just need to check the map
+	private String Map;
 	
 	private String imagePath;
 	
@@ -150,6 +152,11 @@ public class PartyHard_Player_Map {
 	if(moving)
 	{
 		resetCollision();
+		//if the player tp
+		if(isCellTp(x, y))
+		{
+			collisionLayer.getLayers().get("TPLayer");
+		}
 		
 		collisionX = collidesX();
 		
@@ -342,12 +349,12 @@ public class PartyHard_Player_Map {
 	}
 	
 	/**
-	 * * <p>
+	 * <p>
 	 * Note:  used for knowing if the player is moving on the x axe
 	 * </p>
 	 */
 	
-	public boolean isMovingX()
+	public boolean isMovingOnX()
 	{
 		if(movingRight || movingLeft)
 			return true;
@@ -356,12 +363,12 @@ public class PartyHard_Player_Map {
 	}
 	
 	/**
-	 * * <p>
+	 * <p>
 	 * Note:  used for knowing if the player is moving on the y axe
 	 * </p>
 	 */
 	
-	public boolean isMovingY()
+	public boolean isMovingOnY()
 	{
 		if(movingTop || movingDown)
 			return true;
@@ -385,7 +392,7 @@ public class PartyHard_Player_Map {
 	
 	private boolean isCellTp(float x, float y)
 	{
-		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
+		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++)
 		{
 			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
 			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
