@@ -35,8 +35,7 @@ public class PartyHard_MapScreen implements Screen{
 	public Game mainGame;
 	private SpriteBatch spriteBatch;  
 	
-	private Stage stage;
-	
+	private Stage stage;	
 	
 	//could be transfered into the player will see
 	private int direction = 0;
@@ -102,8 +101,7 @@ public class PartyHard_MapScreen implements Screen{
         //used for knowing if the player can go on the x axe
         
         blockedx = false;
- 
-       
+        
         	 if(playerMap.getX() - (camera.viewportWidth / 2 )  < 0  || playerMap.getX() + (camera.viewportWidth / 2) > mapPixelWidth)
    		   	 {
         		 blockedx = true;       		       		       		 
@@ -114,11 +112,9 @@ public class PartyHard_MapScreen implements Screen{
 	        		//if the camera is not going outside on the width
 	   		   		if(!blockedx)
 	   		   		{
-	   		   			camera.position.set(playerMap.getX(), camera.position.y, 0);	   		   			
-	   		   		}
-	   		   		
-	   		   			
-	   		   	camera.update();
+	   		   			camera.position.set(playerMap.getX(), camera.position.y, 0);
+	   		   			camera.update();
+	   		   		}		   				   		   	
         	}
         	
         	
@@ -128,22 +124,14 @@ public class PartyHard_MapScreen implements Screen{
 	   		   	 if(playerMap.getY() - (camera.viewportHeight / 2 )  > 0 && playerMap.getY() + (camera.viewportHeight / 2) < mapPixelHeight)
 	   		   	 {
 	   		   		 //if the player cannot go on the x axe then move only on the y		   		
-	   		   			 camera.position.set(camera.position.x, playerMap.getY(), 0);
-	   		   		
-	   		   		camera.update();
-	   		   		
-	   		         
+	   		   		 camera.position.set(camera.position.x, playerMap.getY(), 0);	   		   		
+	   		   	     camera.update(); 		         
 	   		   	 }
         	}
 		   	       
-        	  
-        
-
         /*
 	     * Movement
-	     */
-        
-      
+	     */             
         	 //for desktop
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
@@ -180,8 +168,7 @@ public class PartyHard_MapScreen implements Screen{
 		        	Gdx.app.exit();	
 		        }      	  
           }
-        }
-        
+        }     
 	        stage.draw();
 	}
 

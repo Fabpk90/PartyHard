@@ -6,9 +6,25 @@ public class PartyHard_Potion extends PartyHard_Consumable{
 
 	public PartyHard_Potion(String Name, String imagePath, String description, int amount, int type, int ObjectType) {
 		super(Name, imagePath, description,ObjectType);
-		this.amount = amount;
-		this.type = type;
+		this.setAmount(amount);
+		this.setType(type);
 
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
 	}
 
 }

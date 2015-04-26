@@ -3,8 +3,6 @@ package com.partyhard.actor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -92,14 +90,12 @@ public class PartyHard_Player_Map {
 	}
 	
 	public void moveRight()
-	{
-		
+	{	
 			//stopping all previous movement before the new one
 			stopMovement();
 			moving = true;
 			movingRight = true;	
-			destination.x += 32;
-		
+			destination.x += 32;		
 	}
 	
 	public void moveLeft()
@@ -146,8 +142,6 @@ public class PartyHard_Player_Map {
 
 	
 	public void update(float delta) {
-
-		
 
 	if(moving)
 	{
@@ -381,10 +375,11 @@ public class PartyHard_Player_Map {
 		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
 		{
 			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
-			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
+			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));		
 			//check the cell for collisions
 			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey))
-				return true;					
+				return true;	
+			
 		}
 		
 		return false;
@@ -422,5 +417,11 @@ public class PartyHard_Player_Map {
 		collisionLayer.dispose();
 	}
 
-	
+	public String getMap() {
+		return Map;
+	}
+
+	public void setMap(String map) {
+		Map = map;
+	}	
 }
