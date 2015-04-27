@@ -10,9 +10,8 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.object.PartyHard_Object;
 
 public class PartyHard_Player_Fight{
-
 	
-	private String Name;
+	public String Name;
 	
 	private int Class;
 	private int Exp = 0;
@@ -260,11 +259,6 @@ public class PartyHard_Player_Fight{
 		return Hp;
 	}
 	
-	public String getName()
-	{
-		return Name;
-	}
-
 	public boolean isDead() {
 		return isDead;
 	}

@@ -5,7 +5,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
-import utils.ErrorMessage;
 import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
@@ -288,7 +287,7 @@ public class PartyHard_Fight implements Screen {
 			            		 for(int l = 0; l < playerSquad.size(); l++)
 			            		 {
 			            			 TextButton chara = new TextButton(""+l, buttonStyle);
-			            			 chara.setName(playerSquad.get(l).getName());
+			            			 chara.setName(playerSquad.get(l).Name);
 			            			 
 			            			 listChara.getItems().add(chara);
 			            		 }
@@ -420,12 +419,12 @@ public class PartyHard_Fight implements Screen {
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
 			Label labelLife = new Label(""+playerSquad.get(i).getLife(), labelstyle);
-			labelLife.setName(playerSquad.get(i).getName());
+			labelLife.setName(playerSquad.get(i).Name);
 			labelLife.setFontScale(2f);
 			labelLife.setName(""+i);
 			
-			Label labelName = new Label(playerSquad.get(i).getName(), labelstyle);
-			labelName.setName(playerSquad.get(i).getName()+"name");
+			Label labelName = new Label(playerSquad.get(i).Name, labelstyle);
+			labelName.setName(playerSquad.get(i).Name+"name");
 			labelName.setFontScale(2f);
 				
 			if(i == 0)
@@ -569,7 +568,7 @@ public class PartyHard_Fight implements Screen {
 		{
 			if(!playerSquad.get(y).isDead())
 			{
-				labelTurn = new Label(playerSquad.get(y).getName()+"'s turn", labelstyle);
+				labelTurn = new Label(playerSquad.get(y).Name+"'s turn", labelstyle);
 				break;
 			}
 		}
@@ -936,13 +935,13 @@ public class PartyHard_Fight implements Screen {
 				{
 					if(!playerSquad.get(y).isDead())
 					{					
-						labelTurn.setText(playerSquad.get(y).getName()+"'s turn");					
+						labelTurn.setText(playerSquad.get(y).Name+"'s turn");					
 						break;
 					}
 				}	
 			}
 			else
-				labelTurn.setText(playerSquad.get(turn).getName()+"'s turn");	
+				labelTurn.setText(playerSquad.get(turn).Name+"'s turn");	
 				
 			//updating the table without the function addActor(object,index) the delete/insert is needed
 		
@@ -1102,7 +1101,7 @@ public class PartyHard_Fight implements Screen {
 				for(int i = 0;i < playerSquad.size(); i++)
 				{
 					xml.element("player_Fight").attribute("num", i)	       
-	                .element("name").attribute("value", playerSquad.get(i).getName()).pop()
+	                .element("name").attribute("value", playerSquad.get(i).Name).pop()
 	                .element("class").attribute("value", playerSquad.get(i).getclass()).pop()
 	                .element("hpmax").attribute("value", playerSquad.get(i).getHpMax()).pop()
 	                .element("hp").attribute("value", playerSquad.get(i).getLife()).pop()
