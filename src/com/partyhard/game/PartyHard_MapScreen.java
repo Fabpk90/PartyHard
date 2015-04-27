@@ -38,6 +38,8 @@ public class PartyHard_MapScreen implements Screen{
 	
 	private Stage stage;	
 	
+	public String Name;
+	
 	//could be transfered into the player will see
 	private int direction = 0;
 	/*
@@ -66,9 +68,11 @@ public class PartyHard_MapScreen implements Screen{
 	public PartyHard_MapScreen(Game gameToKeep, String mapPath, PartyHard_Player_Map playerMap)
 	{	
 		mainGame = gameToKeep;
+		Name = mapPath;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapPath+".tmx");
-		playerMap.setMap(mapPath);
+		this.playerMap.setMap(mapPath);
+		this.playerMap.setCollisionLayer(tiledmap);
 		
 	}			
 	
@@ -340,7 +344,7 @@ public class PartyHard_MapScreen implements Screen{
 		}
 		
 		
-		playerMap = new PartyHard_Player_Map(100,100, "player/test_player.png", tiledmap );
+		//playerMap = new PartyHard_Player_Map(100,100, "player/test_player.png", tiledmap );
 		playerMap.createPlayerAnimation();
 		
 		mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/map_sound_normal.mp3"));

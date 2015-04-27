@@ -4,8 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PartyHard_Tp {
 
-	public Vector2 position;
-	public Vector2 destination;
+	public Vector2 position = new Vector2();
+	public Vector2 destination = new Vector2();
 
 	public String NameMap;
 	

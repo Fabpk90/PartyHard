@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import utils.PartyHard_Tp;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -75,7 +74,6 @@ public class PartyHard_Player_Map {
 		this.collisionLayer = Map;
 		this.imagePath = imagePath;
 		destination = new Vector2(x,y);
-		loadTp();
 	}
 	
 	//special constructor without the tiledlayer
@@ -87,9 +85,9 @@ public class PartyHard_Player_Map {
 	{
 		this.setX(x);
 		this.setY(y);
+		destination = new Vector2(x,y);
 	
 		this.imagePath = imagePath;
-		loadTp();
 	}
 	
 	
@@ -401,8 +399,7 @@ public class PartyHard_Player_Map {
 			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));		
 			//check the cell for collisions
 			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey))
-				return true;	
-			
+				return true;			
 		}
 		
 		return false;
@@ -413,12 +410,15 @@ public class PartyHard_Player_Map {
 		//taking a random layer just for knowing how much the width is(maybe store that in a var could be better)
 		TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(0);
 		//scaling the x and y
-		x = x / layer.getTileWidth();
-		y = y / layer.getTileHeight();
-		for(int i = 0; i < Tp.size(); i++)
+		x = Math.round(x / layer.getTileWidth());
+		y = Math.round(y / layer.getTileHeight());		
+		
+		
+		for(int i = 0; i != Tp.size(); i++)
 		{
-			if(Tp.get(i).getPosition().x == x)
-			{			
+			if(Tp.get(i).getPosition().x == x && Tp.get(i).getPosition().y == y)
+			{	
+				tp = i;
 				return true;
 			}
 		}
@@ -458,28 +458,26 @@ public class PartyHard_Player_Map {
 	{
 		XmlReader xml = new XmlReader();
 		
-		Element root;
+		System.out.println("asdasdasd");
 		/*
 		 * getting first the map checking if the name is equal to the one the actor is, then adding all the tp into the array
 		 * next the array will be checked like collision
 		 */
 		try
 		{
-			root = xml.parse(Gdx.files.local("Tp.xml"));
+			Element	root = xml.parse(Gdx.files.local("Tp.xml"));
 			Array<Element> arrayOfMapTp = root.getChildrenByName("map");
 			
 			for(int i = 0; i != arrayOfMapTp.size; i++)
-			{
-				System.out.println(arrayOfMapTp.get(i).get("name"));
-				
+			{		
 				//found the right tps
-				if(arrayOfMapTp.get(i).get("name") == Map)
-				{
-					System.out.println(arrayOfMapTp.get(i).get("name"));
+				if(arrayOfMapTp.get(i).get("name").equals(Map))
+				{					
 					Array<Element> arrayOfTp =  arrayOfMapTp.get(i).getChildrenByName("tp");	
 					//getting all the tp
 					for(int p = 0; p< arrayOfTp.size; p++)
-					{
+					{									
+						
 						//first getting the position of the tp and then the destination, with the map
 						float xpos = arrayOfTp.get(p).getFloat("x");
 						float ypos = arrayOfTp.get(p).getFloat("y");
@@ -490,9 +488,10 @@ public class PartyHard_Player_Map {
 						float xDest = newMap.getFloat("x");
 						float yDest = newMap.getFloat("y");
 						
-						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));
+						System.out.println(Tp.size());
 						
-						System.out.println(xpos);
+						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));
+						System.out.println(Tp.size());		
 					}
 				}
 			}
@@ -501,6 +500,7 @@ public class PartyHard_Player_Map {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println(Tp.size());
 	}
 	
 	public PartyHard_Tp Tp()
