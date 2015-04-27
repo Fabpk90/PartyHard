@@ -17,6 +17,7 @@ public class PartyHard_Capacity {
 	
 	public PartyHard_Capacity(String Name,String description, int percentOfSucceed, boolean isHeal, int amount, int manaCost, int job, int id)
 	{
+		
 		this.Name = Name;
 		percent = percentOfSucceed;
 		this.isHeal = isHeal;
