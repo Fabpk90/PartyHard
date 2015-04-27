@@ -1,10 +1,11 @@
 package com.partyhard.game;
 
+import utils.PartyHard_Tp;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -67,6 +68,8 @@ public class PartyHard_MapScreen implements Screen{
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapPath+".tmx");
+		playerMap.setMap(mapPath);
+		
 	}			
 	
 	@Override
@@ -86,6 +89,17 @@ public class PartyHard_MapScreen implements Screen{
         
        
         playerMap.update(delta);
+        
+        if(playerMap.isTp)
+        {
+        	PartyHard_Tp tp = playerMap.Tp();
+        	
+        	playerMap.setPosition(tp.destination.x, tp.destination.y);
+        	
+        	PartyHard_MapScreen newMap = new PartyHard_MapScreen(mainGame, tp.NameMap, playerMap);
+        	mainGame.setScreen(newMap);
+        	this.dispose();
+        }
         
         if(animationTime + delta >= 1)
         	animationTime = 0;

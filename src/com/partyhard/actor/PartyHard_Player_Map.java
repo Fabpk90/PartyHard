@@ -1,5 +1,11 @@
 package com.partyhard.actor;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import utils.PartyHard_Tp;
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -8,6 +14,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class PartyHard_Player_Map {
 	
@@ -16,6 +25,7 @@ public class PartyHard_Player_Map {
 	
 	private String imagePath;
 	
+	//animation of the walks
 	private Animation walk_backward;
 	private Animation walk_left;
 	private Animation walk_right;
@@ -40,6 +50,15 @@ public class PartyHard_Player_Map {
 	//store the destination
 	private Vector2 destination;
 	
+	//store tp
+	private ArrayList<PartyHard_Tp> Tp = new ArrayList<PartyHard_Tp>();
+	
+	//for knowing which tp the player is doing
+	private int tp = -1;
+	
+	//the player is tping?
+	public boolean isTp = false;
+	
 	private TiledMap collisionLayer;
 	
 	//the key word that makes a cell blocked
@@ -56,16 +75,9 @@ public class PartyHard_Player_Map {
 		this.collisionLayer = Map;
 		this.imagePath = imagePath;
 		destination = new Vector2(x,y);
+		loadTp();
 	}
 	
-	private void setX(float f) {
-		this.x = f;
-	}
-
-	private void setY(float y) {
-		this.y = y;
-	}
-
 	//special constructor without the tiledlayer
 	/*
 	 * @param imagePath The path of the image(Texture Atlas)
@@ -77,6 +89,16 @@ public class PartyHard_Player_Map {
 		this.setY(y);
 	
 		this.imagePath = imagePath;
+		loadTp();
+	}
+	
+	
+	private void setX(float f) {
+		this.x = f;
+	}
+
+	private void setY(float y) {
+		this.y = y;
 	}
 	
 	
@@ -149,7 +171,8 @@ public class PartyHard_Player_Map {
 		//if the player tp
 		if(isCellTp(x, y))
 		{
-			collisionLayer.getLayers().get("TPLayer");
+			isTp = true;
+			stopMovement();
 		}
 		
 		collisionX = collidesX();
@@ -387,13 +410,17 @@ public class PartyHard_Player_Map {
 	
 	private boolean isCellTp(float x, float y)
 	{
-		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++)
+		//taking a random layer just for knowing how much the width is(maybe store that in a var could be better)
+		TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(0);
+		//scaling the x and y
+		x = x / layer.getTileWidth();
+		y = y / layer.getTileHeight();
+		for(int i = 0; i < Tp.size(); i++)
 		{
-			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
-			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));
-			//check the cell for collisions
-			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey("x"))
-				return true;					
+			if(Tp.get(i).getPosition().x == x)
+			{			
+				return true;
+			}
 		}
 		return false; 
 	}
@@ -423,5 +450,61 @@ public class PartyHard_Player_Map {
 
 	public void setMap(String map) {
 		Map = map;
+		loadTp();
 	}	
+	
+	//load all the tp point into an array
+	private void loadTp()
+	{
+		XmlReader xml = new XmlReader();
+		
+		Element root;
+		/*
+		 * getting first the map checking if the name is equal to the one the actor is, then adding all the tp into the array
+		 * next the array will be checked like collision
+		 */
+		try
+		{
+			root = xml.parse(Gdx.files.local("Tp.xml"));
+			Array<Element> arrayOfMapTp = root.getChildrenByName("map");
+			
+			for(int i = 0; i != arrayOfMapTp.size; i++)
+			{
+				System.out.println(arrayOfMapTp.get(i).get("name"));
+				
+				//found the right tps
+				if(arrayOfMapTp.get(i).get("name") == Map)
+				{
+					System.out.println(arrayOfMapTp.get(i).get("name"));
+					Array<Element> arrayOfTp =  arrayOfMapTp.get(i).getChildrenByName("tp");	
+					//getting all the tp
+					for(int p = 0; p< arrayOfTp.size; p++)
+					{
+						//first getting the position of the tp and then the destination, with the map
+						float xpos = arrayOfTp.get(p).getFloat("x");
+						float ypos = arrayOfTp.get(p).getFloat("y");
+						
+						Element newMap = arrayOfTp.get(p).getChildByName("newmap");
+						
+						String nameNewMap = newMap.get("name");
+						float xDest = newMap.getFloat("x");
+						float yDest = newMap.getFloat("y");
+						
+						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));
+						
+						System.out.println(xpos);
+					}
+				}
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public PartyHard_Tp Tp()
+	{
+		return Tp.get(tp);
+	}
 }
