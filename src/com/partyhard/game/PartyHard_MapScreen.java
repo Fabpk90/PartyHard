@@ -65,13 +65,13 @@ public class PartyHard_MapScreen implements Screen{
 	
 	private boolean blockedx = false;
 	
-	public PartyHard_MapScreen(Game gameToKeep, String mapPath, PartyHard_Player_Map playerMap)
+	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
 	{	
 		mainGame = gameToKeep;
-		Name = mapPath;
+		Name = mapName;
 		this.playerMap = playerMap;
-		tiledmap = new TmxMapLoader().load(mapPath+".tmx");
-		this.playerMap.setMap(mapPath);
+		tiledmap = new TmxMapLoader().load(mapName+".tmx");
+		this.playerMap.setMap(mapName);
 		this.playerMap.setCollisionLayer(tiledmap);
 		
 	}			
@@ -94,17 +94,7 @@ public class PartyHard_MapScreen implements Screen{
        
         playerMap.update(delta);
         
-        if(playerMap.isTp)
-        {
-        	PartyHard_Tp tp = playerMap.Tp();
-        	
-        	playerMap.setPosition(tp.destination.x, tp.destination.y);
-        	
-        	PartyHard_MapScreen newMap = new PartyHard_MapScreen(mainGame, tp.NameMap, playerMap);
-        	mainGame.setScreen(newMap);
-        	this.dispose();
-        }
-        
+     
         if(animationTime + delta >= 1)
         	animationTime = 0;
         if(playerMap.isMoving())
@@ -122,7 +112,7 @@ public class PartyHard_MapScreen implements Screen{
         
         	 if(playerMap.getX() - (camera.viewportWidth / 2 )  < 0  || playerMap.getX() + (camera.viewportWidth / 2) > mapPixelWidth)
    		   	 {
-        		 blockedx = true;       		       		       		 
+        		 blockedx = true;          		 
    		   	 }
 
         	if(playerMap.isMovingOnX())
@@ -188,6 +178,31 @@ public class PartyHard_MapScreen implements Screen{
           }
         }     
 	        stage.draw();
+	        
+	        //check if the player is tping
+	        if(playerMap.isTp)
+	        {
+	        	//getting the tp
+	        	PartyHard_Tp tp = playerMap.Tp();
+	        	
+	        	//setting the new pos
+	        	playerMap.setPosition(tp.destination.x, tp.destination.y);
+	        	
+	        	//changing the name of the map
+	        	Name = tp.NameMap;      		
+	        	
+	        	//reloading
+	        	tiledmap = new TmxMapLoader().load(Name+".tmx");
+	    		this.playerMap.setMap(Name);
+	    		this.playerMap.setCollisionLayer(tiledmap);
+	    			    		
+	    		
+	    		playerMap.isTp = false;
+	    		
+	    		mapSound.dispose();
+	    		load();
+	        }
+	        
 	}
 
 	@Override
@@ -203,6 +218,8 @@ public class PartyHard_MapScreen implements Screen{
 	
 	camera.viewportHeight = camera.viewportHeight / 1.2f;
 	camera.viewportWidth = camera.viewportWidth / 1.2f;
+	
+	camera.position.set(playerMap.getX(), playerMap.getY(), 0);
 		
 	camera.update();
 	
@@ -343,47 +360,34 @@ public class PartyHard_MapScreen implements Screen{
 
 		}
 		
-		
-		//playerMap = new PartyHard_Player_Map(100,100, "player/test_player.png", tiledmap );
 		playerMap.createPlayerAnimation();
 		
 		mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/map_sound_normal.mp3"));
 		mapSound.setPitch(mapSound.loop(), 2.3f);
 
-		 prop = tiledmap.getProperties();
-		 int mapWidth = prop.get("width", Integer.class);
-		 int mapHeight = prop.get("height", Integer.class);
-		 int tilePixelWidth = prop.get("tilewidth", Integer.class);
-		 int tilePixelHeight = prop.get("tileheight", Integer.class);
-		 
+		 prop = tiledmap.getProperties();		 
 		 String mapName = prop.get("Name", String.class);
 		 
-		 LabelStyle style1 = new LabelStyle();
-		 
+		 LabelStyle style1 = new LabelStyle();		 
 		 style1.font = new BitmapFont(Gdx.files.internal("font/font.fnt"),Gdx.files.internal("font/font_0.png"), false);
 		 
 		 //used for printing the map name
-		 Label labelname = new Label(mapName, style1);
-		
+		 Label labelname = new Label(mapName, style1);	
 		 	 
 		 // setting position of the label
-		 mapNameTable.center();
-		 mapNameTable.top();
-		 
+		 mapNameTable.center().top();
 		 mapNameTable.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		 mapNameTable.setName("name");
 			 
 		 labelname.setPosition(mapNameTable.getWidth(), mapNameTable.getHeight()); 
 		
 		 mapNameTable.add(labelname);
 		 stage.addActor(mapNameTable);
-
-		mapPixelWidth = mapWidth * tilePixelWidth;
-		mapPixelHeight = mapHeight * tilePixelHeight;
-		
-		
-		maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
+	
 		
 		Gdx.input.setInputProcessor(stage);
+		
+		load();
 	}
 
 	@Override
@@ -401,6 +405,28 @@ public class PartyHard_MapScreen implements Screen{
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
+	}
+	
+	public void load()
+	{
+		//calculating width and height of the map		
+		 int mapWidth = prop.get("width", Integer.class);
+		 int mapHeight = prop.get("height", Integer.class);
+		 int tilePixelWidth = prop.get("tilewidth", Integer.class);
+		 int tilePixelHeight = prop.get("tileheight", Integer.class);
+		 
+		 mapPixelWidth = mapWidth * tilePixelWidth;
+		 mapPixelHeight = mapHeight * tilePixelHeight;
+		 
+		 //loading the maprenderer
+		 maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
+		 
+		 //updating the label
+		 Label labelName = (Label) searchTable("name").getChildren().get(0);
+		 labelName.setText(Name);
+		 searchTable("name").getChildren().items[0] = labelName;
+		 
+		 playerMap.createPlayerAnimation();
 	}
 
 	@Override
@@ -438,5 +464,17 @@ public class PartyHard_MapScreen implements Screen{
 			playerMap.stopMovement();
     		direction = 0;
     		playerMap.moveDown();
+	}
+	
+	private Table searchTable(String name)
+	{
+		for(int i = 0; i < stage.getActors().size; i++)
+		{
+			if(stage.getActors().get(i).getName() == name)
+				return (Table) stage.getActors().get(i);
+		}
+		
+		//hopefully will never be 
+		return null;
 	}
 }

@@ -458,7 +458,6 @@ public class PartyHard_Player_Map {
 	{
 		XmlReader xml = new XmlReader();
 		
-		System.out.println("asdasdasd");
 		/*
 		 * getting first the map checking if the name is equal to the one the actor is, then adding all the tp into the array
 		 * next the array will be checked like collision
@@ -488,10 +487,8 @@ public class PartyHard_Player_Map {
 						float xDest = newMap.getFloat("x");
 						float yDest = newMap.getFloat("y");
 						
-						System.out.println(Tp.size());
 						
-						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));
-						System.out.println(Tp.size());		
+						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));		
 					}
 				}
 			}
