@@ -53,7 +53,7 @@ import com.partyhard.actor.PartyHard_Player_Fight;
 
 public class PartyHard_Fight implements Screen {
 	
-	private Screen mapscreen;
+	private PartyHard_MapScreen mapscreen;
 	
 	private SpriteBatch batch; 
     private Stage stage;
@@ -194,12 +194,25 @@ public class PartyHard_Fight implements Screen {
 		
 		final TextButton buttonFlee = new TextButton("Flee!", buttonStyle);
 		
-		buttonFlee.pad(20);
-		
-		buttonFlee.setSize(Gdx.graphics.getWidth()/2, 100);
-		
+		buttonFlee.pad(20);		
+		buttonFlee.setSize(Gdx.graphics.getWidth()/2, 100);		
 		buttonFlee.setHeight(100);	
 		
+		buttonFlee.addListener(new ClickListener(){
+            @Override 
+            public void clicked(InputEvent event, float x, float y){
+            	
+              Random r = new Random();
+              
+              if(r.nextInt(101) > 5)
+              {       	          	 
+            	  game.setScreen(mapscreen);
+            	  backToMap();
+              }
+             
+              
+            }
+        });
 
        /*
         * Creating button + table for the 2 state: 1 normal(before fight) 2 the fight
@@ -555,7 +568,7 @@ public class PartyHard_Fight implements Screen {
 	            }
 		        }});
 				
-				monsterImage.setPosition(monsterImage.getWidth() * (i + 1) + (i * 100), Gdx.graphics.getHeight() / 2);
+				monsterImage.setPosition(monsterImage.getWidth()  + (i * 100), Gdx.graphics.getHeight() / 2);
 				monsterName.setPosition(monsterImage.getX(), monsterImage.getY() + monsterImage.getHeight() + 10);
 				
 				monsterTable.addActor(monsterImage);
@@ -626,6 +639,18 @@ public class PartyHard_Fight implements Screen {
         stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));     
 	}
 
+	/*
+	 * Dispose all resources that are not needed for the map
+	 */
+	private void backToMap() {
+		
+		stage.dispose();
+		backgroundMusic.dispose();
+		
+		stage = new Stage();
+	}
+
+
 	@Override
 	public void render(float delta) {
 		 Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -649,13 +674,13 @@ public class PartyHard_Fight implements Screen {
 		if(playerSquad.get(turn).getCapacitySelected() > -1)
 		{						
 			//disabling the menus
-			stage.getActors().get(getTableIndex("tableCap")).setVisible(false);;
+			stage.getActors().get(getTableIndex("tableCap")).setVisible(false);
 			//if a cap healing selected we need to erase the list of chara from the screen
 			if(playerSquad.get(turn).capacity.get(playerSquad.get(turn).getCapacitySelected()).isHeal)
 				stage.getActors().removeIndex(getTableIndex("tableListChara"));
 			//if not heal then need to remove the arrowMonster
 			else
-				stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);;
+				stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);
 				
 			stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
 								
@@ -961,6 +986,11 @@ public class PartyHard_Fight implements Screen {
 		}
 	}
 	
+	private void flleFail()
+	{
+		
+	}
+	
 	private void gameOver() {
 		
 		//Sound gameOver = Gdx.audio.newSound()
@@ -1065,8 +1095,8 @@ public class PartyHard_Fight implements Screen {
             public void clicked(InputEvent event, float x, float y){
             	save();
             	
-            	dispose();
-            	Gdx.app.exit();
+            	 game.setScreen(mapscreen);
+           	  	backToMap();
             }
         });
 		win.button(btnWin);

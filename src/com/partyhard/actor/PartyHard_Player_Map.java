@@ -497,7 +497,6 @@ public class PartyHard_Player_Map {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(Tp.size());
 	}
 	
 	public PartyHard_Tp Tp()

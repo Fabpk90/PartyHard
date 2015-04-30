@@ -43,6 +43,8 @@ public class PartyHard_MapScreen implements Screen{
 	
 	public String Name;
 	
+	private PartyHard_Fight fightScreen;
+	
 	//could be transfered into the player will see
 	private int direction = 0;
 	/*
@@ -115,9 +117,8 @@ public class PartyHard_MapScreen implements Screen{
         	//begin fight
         	if(fightTime >=2)
         	{
-        		/*
-        		 * TO DO: call the fight class
-        		 */
+        		playerMap.stopMovement();
+        		        		
         		loadFight();
         		
         		fightTime = 0;
@@ -386,9 +387,7 @@ public class PartyHard_MapScreen implements Screen{
 		
 		playerMap.createPlayerAnimation();
 		
-		mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/map_sound_normal.mp3"));
-		mapSound.setPitch(mapSound.loop(), 2.3f);
-
+		
 		 prop = tiledmap.getProperties();		 
 		 Name = prop.get("Name", String.class);
 		 
@@ -446,6 +445,9 @@ public class PartyHard_MapScreen implements Screen{
 		 String monsterNameRaw = prop.get("Monsters", String.class);
 		 String name[] = monsterNameRaw.split(",");
 		 
+		 //making sure that the array is clean
+		 nameMonster = new ArrayList<String>();
+		 
 		 for(int i = 0; i < name.length; i++)
 		 {
 			 nameMonster.add(name[i]);
@@ -470,7 +472,13 @@ public class PartyHard_MapScreen implements Screen{
 		 camera.position.x = camera.viewportWidth / 2;
 		 camera.position.y = camera.viewportHeight / 2;
 		 
-		 camera.update();	 	
+		 camera.update();	
+		 
+		 //loading bg music
+		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/map_sound_normal.mp3"));
+		 mapSound.setPitch(mapSound.loop(), 2.3f);
+		 
+		
 	}
 
 	@Override
@@ -485,8 +493,6 @@ public class PartyHard_MapScreen implements Screen{
 	private void loadFight()
 	{
 		Random r = new Random();
-		
-		System.out.println("asd");
 		
 		//if pseudo-randomly the fight is happening
 		if(r.nextInt(101) < proba)
@@ -514,8 +520,11 @@ public class PartyHard_MapScreen implements Screen{
 			playerSquad.add(new PartyHard_Player_Fight(0));
 			playerSquad.add(new PartyHard_Player_Fight(1));
 			 
-			PartyHard_Fight fight = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame);
-			mainGame.setScreen(fight);			
+		    fightScreen = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame);
+			mainGame.setScreen(fightScreen);
+			
+			mapSound.dispose();
+			
 		}
 	}
 
