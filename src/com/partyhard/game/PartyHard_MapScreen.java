@@ -1,6 +1,7 @@
 package com.partyhard.game;
 
-import utils.PartyHard_Tp;
+import java.util.ArrayList;
+import java.util.Random;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
@@ -29,6 +30,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.partyhard.actor.PartyHard_Monster;
+import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
 
 public class PartyHard_MapScreen implements Screen{
@@ -65,10 +68,17 @@ public class PartyHard_MapScreen implements Screen{
 	
 	private boolean blockedx = false;
 	
+	//for randomly begin a fight
+	private float fightTime = 0;	
+	//probability of fight
+	private int proba = 0;
+	//array of monster name 
+	private ArrayList<String> nameMonster = new ArrayList<String>();
+	
+	
 	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
 	{	
 		mainGame = gameToKeep;
-		Name = mapName;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
 		this.playerMap.setMap(mapName);
@@ -98,7 +108,22 @@ public class PartyHard_MapScreen implements Screen{
         if(animationTime + delta >= 1)
         	animationTime = 0;
         if(playerMap.isMoving())
+        {
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
+        	
+        	fightTime += delta;
+        	//begin fight
+        	if(fightTime >=2)
+        	{
+        		/*
+        		 * TO DO: call the fight class
+        		 */
+        		loadFight();
+        		
+        		fightTime = 0;
+        	}
+        }
+        	
         else
         	spriteBatch.draw(playerMap.getFrame(direction, 0), playerMap.getX(), playerMap.getY());//idle animation
         
@@ -181,15 +206,12 @@ public class PartyHard_MapScreen implements Screen{
 	        
 	        //check if the player is tping
 	        if(playerMap.isTp)
-	        {
-	        	//getting the tp
-	        	PartyHard_Tp tp = playerMap.Tp();
-	        	
-	        	//setting the new pos
-	        	playerMap.setPosition(tp.destination.x, tp.destination.y);
+	        {	 	        		        	
+	        	//setting the new pos thanks to the tp (multiply by the width of a tile to have the same position as tiled)
+	        	playerMap.setPosition( playerMap.Tp().destination.x * 32,  playerMap.Tp().destination.y * 32);
 	        	
 	        	//changing the name of the map
-	        	Name = tp.NameMap;      		
+	        	Name =  playerMap.Tp().NameMap;      		
 	        	
 	        	//reloading
 	        	tiledmap = new TmxMapLoader().load(Name+".tmx");
@@ -200,7 +222,9 @@ public class PartyHard_MapScreen implements Screen{
 	    		playerMap.isTp = false;
 	    		
 	    		mapSound.dispose();
+	    		
 	    		load();
+	    		
 	        }
 	        
 	}
@@ -366,13 +390,13 @@ public class PartyHard_MapScreen implements Screen{
 		mapSound.setPitch(mapSound.loop(), 2.3f);
 
 		 prop = tiledmap.getProperties();		 
-		 String mapName = prop.get("Name", String.class);
+		 Name = prop.get("Name", String.class);
 		 
 		 LabelStyle style1 = new LabelStyle();		 
 		 style1.font = new BitmapFont(Gdx.files.internal("font/font.fnt"),Gdx.files.internal("font/font_0.png"), false);
 		 
 		 //used for printing the map name
-		 Label labelname = new Label(mapName, style1);	
+		 Label labelname = new Label(Name, style1);	
 		 	 
 		 // setting position of the label
 		 mapNameTable.center().top();
@@ -415,6 +439,19 @@ public class PartyHard_MapScreen implements Screen{
 		 int tilePixelWidth = prop.get("tilewidth", Integer.class);
 		 int tilePixelHeight = prop.get("tileheight", Integer.class);
 		 
+		 //probability for a fight
+		 proba = Integer.parseInt(prop.get("Proba", String.class));
+		 
+		 //getting the name of the monsters then splitting them(they are stored with a comma)
+		 String monsterNameRaw = prop.get("Monsters", String.class);
+		 String name[] = monsterNameRaw.split(",");
+		 
+		 for(int i = 0; i < name.length; i++)
+		 {
+			 nameMonster.add(name[i]);
+		 }
+		 
+		 //getting the dimension of the map
 		 mapPixelWidth = mapWidth * tilePixelWidth;
 		 mapPixelHeight = mapHeight * tilePixelHeight;
 		 
@@ -433,9 +470,7 @@ public class PartyHard_MapScreen implements Screen{
 		 camera.position.x = camera.viewportWidth / 2;
 		 camera.position.y = camera.viewportHeight / 2;
 		 
-		 camera.update();
-		 
-		
+		 camera.update();	 	
 	}
 
 	@Override
@@ -445,6 +480,43 @@ public class PartyHard_MapScreen implements Screen{
 		spriteBatch.dispose();	
 		stage.dispose();
 		playerMap.dispose();
+	}
+	
+	private void loadFight()
+	{
+		Random r = new Random();
+		
+		System.out.println("asd");
+		
+		//if pseudo-randomly the fight is happening
+		if(r.nextInt(101) < proba)
+		{
+			//loading the monsters
+			ArrayList<PartyHard_Monster> monster = new ArrayList<PartyHard_Monster>();
+			
+			for(int i = 0; i < nameMonster.size(); i++)
+			{
+				//used for knowing how much monster of each type is fighting
+				int numberOfMonster = r.nextInt(3) + 1;
+				for(int p = 0; p < numberOfMonster; p++)
+				{
+					monster.add(new PartyHard_Monster(nameMonster.get(i)));
+				}
+			}
+			
+			/*
+			 * TO DO: maybe make the loading dynamic
+			 */
+			
+			//preparing fighters
+			ArrayList<PartyHard_Player_Fight> playerSquad = new ArrayList<PartyHard_Player_Fight>();
+			
+			playerSquad.add(new PartyHard_Player_Fight(0));
+			playerSquad.add(new PartyHard_Player_Fight(1));
+			 
+			PartyHard_Fight fight = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame);
+			mainGame.setScreen(fight);			
+		}
 	}
 
 	public void moveRight()
