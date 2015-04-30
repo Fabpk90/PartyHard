@@ -60,13 +60,13 @@ public class PartyHard_Monster extends Sprite {
 			
 			//calculating all the stats from the xml base stats
 			
-			actualHp = r.nextInt(monsterRoot.getChildByName("Hp").getInt("hpMax") - monsterRoot.getChildByName("Hp").getInt("hpMin") + monsterRoot.getChildByName("Hp").getInt("hpMin"));
+			actualHp = r.nextInt(monsterRoot.getChildByName("Hp").getInt("hpMax")) + monsterRoot.getChildByName("Hp").getInt("hpMin");
 			
-			actualAtk =  r.nextInt(monsterRoot.getChildByName("Atk").getInt("atkMax") - monsterRoot.getChildByName("Atk").getInt("atkMin") + monsterRoot.getChildByName("Atk").getInt("atkMin"));
+			actualAtk =  r.nextInt(monsterRoot.getChildByName("Atk").getInt("atkMax")) + monsterRoot.getChildByName("Atk").getInt("atkMin");
 			
-			actualDef =  r.nextInt(monsterRoot.getChildByName("Def").getInt("defMax") - monsterRoot.getChildByName("Def").getInt("defMin") + monsterRoot.getChildByName("Def").getInt("defMin"));
+			actualDef =  r.nextInt(monsterRoot.getChildByName("Def").getInt("defMax")) + monsterRoot.getChildByName("Def").getInt("defMin");
 			
-			actualExp =  r.nextInt(monsterRoot.getChildByName("Exp").getInt("expMax") - monsterRoot.getChildByName("Exp").getInt("expMin") +  monsterRoot.getChildByName("Exp").getInt("expMin"));
+			actualExp =  r.nextInt(monsterRoot.getChildByName("Exp").getInt("expMax")) +  monsterRoot.getChildByName("Exp").getInt("expMin");
 			
 			
 		} catch (IOException e) {
