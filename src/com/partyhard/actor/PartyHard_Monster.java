@@ -30,7 +30,7 @@ public class PartyHard_Monster extends Sprite {
 	
 	private int idTarget;
 	
-	private int damage = 0;
+	public int damage = 0;
 	
 	private boolean Dead = false;
 	
@@ -98,13 +98,13 @@ public class PartyHard_Monster extends Sprite {
 	 * @note Remember to check the state after dealing damages
 	 */
 
-	public void setDamage(int damage) {
+	public void setDamageTaken(int damage) {
+		int dmg = damage - actualDef;
+		
+		if(dmg < 0)
+			dmg = 1;
+		
 		this.damage += damage;
-		if(damage >= actualHp)
-		{
-			setDead(true);
-			actualHp = 0;
-		}
 	}
 
 	public boolean isDead() {

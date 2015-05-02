@@ -68,6 +68,8 @@ public class PartyHard_MapScreen implements Screen{
 	private float mapPixelWidth;
 	private float mapPixelHeight;
 	
+	private boolean isSafe;
+	
 	private boolean blockedx = false;
 	
 	//for randomly begin a fight
@@ -113,16 +115,21 @@ public class PartyHard_MapScreen implements Screen{
         {
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
         	
-        	fightTime += delta;
-        	//begin fight
-        	if(fightTime >=2)
-        	{
-        		playerMap.stopMovement();
-        		        		
-        		loadFight();
-        		
-        		fightTime = 0;
+        	//if the map is not safe
+        	if(!isSafe)
+        	{        	        	
+        		fightTime += delta;
+            	//begin fight
+            	if(fightTime >=2)
+            	{
+            		playerMap.stopMovement();
+            		        		
+            		loadFight();
+            		
+            		fightTime = 0;
+            	}
         	}
+        	
         }
         	
         else
@@ -215,9 +222,10 @@ public class PartyHard_MapScreen implements Screen{
 	        	Name =  playerMap.Tp().NameMap;      		
 	        	
 	        	//reloading
-	        	tiledmap = new TmxMapLoader().load(Name+".tmx");
-	    		this.playerMap.setMap(Name);
-	    		this.playerMap.setCollisionLayer(tiledmap);
+	        	tiledmap = new TmxMapLoader().load(Name+".tmx");	   
+	        	
+	    		playerMap.setMap(Name);
+	    		playerMap.setCollisionLayer(tiledmap);
 	    			    		
 	    		
 	    		playerMap.isTp = false;
@@ -241,8 +249,8 @@ public class PartyHard_MapScreen implements Screen{
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
 	
-	camera.viewportHeight = camera.viewportHeight / 1.2f;
-	camera.viewportWidth = camera.viewportWidth / 1.2f;
+	//camera.viewportHeight = camera.viewportHeight / 1.2f;
+	//camera.viewportWidth = camera.viewportWidth / 1.2f;
 	
 	camera.position.set(playerMap.getX(), playerMap.getY(), 0);
 		
@@ -432,26 +440,45 @@ public class PartyHard_MapScreen implements Screen{
 	
 	public void load()
 	{
+		 prop = tiledmap.getProperties();
+		
 		//calculating width and height of the map		
 		 int mapWidth = prop.get("width", Integer.class);
 		 int mapHeight = prop.get("height", Integer.class);
 		 int tilePixelWidth = prop.get("tilewidth", Integer.class);
 		 int tilePixelHeight = prop.get("tileheight", Integer.class);
 		 
-		 //probability for a fight
-		 proba = Integer.parseInt(prop.get("Proba", String.class));
+		Name = prop.get("Name", String.class);
 		 
-		 //getting the name of the monsters then splitting them(they are stored with a comma)
-		 String monsterNameRaw = prop.get("Monsters", String.class);
-		 String name[] = monsterNameRaw.split(",");
+		 //getting if the map is safe or not
+		String safe = prop.get("Safe", String.class);
+		
+		if(safe.equals("true"))
+			isSafe = true;
+		else
+			isSafe = false;
 		 
-		 //making sure that the array is clean
-		 nameMonster = new ArrayList<String>();
-		 
-		 for(int i = 0; i < name.length; i++)
+		 //getting ifght info only if the map is not safe
+		 if(!isSafe)
 		 {
-			 nameMonster.add(name[i]);
+			 //probability for a fight
+			 proba = Integer.parseInt(prop.get("Proba", String.class));
+			 
+			 
+			//getting the name of the monsters then splitting them(they are stored with a comma)
+			 String monsterNameRaw = prop.get("Monsters", String.class);
+			 String name[] = monsterNameRaw.split(",");
+			 
+			 //making sure that the array is clean
+			 nameMonster = new ArrayList<String>();
+			 
+			 for(int i = 0; i < name.length; i++)
+			 {
+				 nameMonster.add(name[i]);
+			 }
 		 }
+		 
+		 
 		 
 		 //getting the dimension of the map
 		 mapPixelWidth = mapWidth * tilePixelWidth;

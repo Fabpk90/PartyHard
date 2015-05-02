@@ -34,6 +34,9 @@ public class PartyHard_Player_Fight{
 	private int targetCapacity = -1;
 	private int capacitySelected = -1;
 	
+	public int damageTaken = 0;
+	public int healAmount = 0;
+	
 	public PartyHard_Player_Fight(int idplayer) 
 	{
 		XmlReader xml = new XmlReader();
@@ -281,6 +284,27 @@ public class PartyHard_Player_Fight{
 
 	public void setHpMax(int hpMax) {
 		HpMax = hpMax;
+	}
+
+	public int getDamageTaken() {
+		return damageTaken;
+	}
+
+	public void setDamageTaken(int damageTaken) {
+		int damage = damageTaken - Def;
+		
+		if(damage <0)
+			damage = 1;
+		
+		this.damageTaken += damage;
+	}
+
+	public int getHealAmount() {
+		return healAmount;
+	}
+
+	public void setHealAmount(int healAmount) {
+		this.healAmount += healAmount;
 	}
 	
 }
