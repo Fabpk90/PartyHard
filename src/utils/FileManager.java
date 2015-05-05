@@ -22,7 +22,7 @@ public class FileManager {
 			file.writeString(coder.encodeString(fileToSave.readString()), false);
 		}
 		else
-			file.writeString(fileToSave.readString(), false);		
+			file.writeString(fileToSave.readString(), false);	
 	}
 	
 	public void saveFile(boolean encoded, String fileToSave)

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.object.PartyHard_Object;
+import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Player_Fight{
 	
@@ -71,15 +72,17 @@ public class PartyHard_Player_Fight{
 					 bag = new ArrayList<PartyHard_Object>();
 					 capacity = new ArrayList<PartyHard_Capacity>();
 					
+					 
+					 Array<Element> items =	arrayOfPlayer.get(i).getChildrenByName("item");
 					//populating the inventory
 					for(int p = 0; p != bagSpace; p++)
 					{
-						/*
-						PartyHard_Weapon weapon = new PartyHard_Weapon("Test", "", 0);
-						bag.add(weapon);
-						/*
-						 * TO DO checking the attribute class to determine which object is 
-						 */
+						switch(items.get(p).getInt("type"))
+						{
+							case 0: //weapon
+								bag.add(new PartyHard_Weapon(items.get(p).getInt("id")));
+								break;
+						}
 					}
 					
 					/*

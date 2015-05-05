@@ -121,6 +121,7 @@ public class PartyHard_MapScreen implements Screen{
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
         	
         	//if the map is not safe
+        	/*
         	if(!isSafe)
         	{        	        	
         		fightTime += delta;
@@ -134,6 +135,7 @@ public class PartyHard_MapScreen implements Screen{
             		fightTime = 0;
             	}
         	}
+        	*/
         	
         }
         	
@@ -518,8 +520,8 @@ public class PartyHard_MapScreen implements Screen{
 		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
 		 mapSound.loop();
 		 
-		 FileManager fileManager = new FileManager("monster.xml");
-		 fileManager.readFile();
+		//FileManager fileManager = new FileManager("monster.xml");
+		// fileManager.saveFile(false, Gdx.files.internal("monster.xml"));
 		
 	}
 

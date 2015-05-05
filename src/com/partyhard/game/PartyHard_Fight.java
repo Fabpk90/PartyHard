@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
+import utils.FileManager;
 import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
@@ -17,7 +18,6 @@ import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -189,8 +189,17 @@ public class PartyHard_Fight implements Screen {
 			atk.setSize(Gdx.graphics.getWidth()/2, 100);
 			atk.setHeight(100);	
 
-		
-		 backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_sound.mp3"));
+			 backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_sound.mp3"));
+			
+		//searching if it's a boss fight
+			for(int i = 0; i < enemySquad.size(); i++)
+			{
+				if(enemySquad.get(i).isBoss())
+				{
+					backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_boss.mp3"));
+					break;
+				}					 				
+			}				
 		
 		final TextButton buttonFlee = new TextButton("Flee!", buttonStyle);
 		
@@ -641,7 +650,11 @@ public class PartyHard_Fight implements Screen {
          */
         //set alpha to 0 and then go to 1
               
-        stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));     
+        stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));    
+        
+        /*
+         * Applying the stuff that the player has equipped
+         */
 	}
 
 	/*
@@ -1166,7 +1179,7 @@ public class PartyHard_Fight implements Screen {
 	private void save() {
 	
 		try {
-		FileHandle file = Gdx.files.local("player_Fight.xml");
+		FileManager file = new FileManager("player_Fight.xml");
 				
 			 StringWriter stringwriter = new StringWriter();
 			 XmlWriter xml = new XmlWriter(stringwriter);
@@ -1203,7 +1216,7 @@ public class PartyHard_Fight implements Screen {
 				      //to be sure that all the element has been close  
 				   xml.close();                   
 			
-				   file.writeString(stringwriter.toString(), false);
+				   file.readFile().writeString(stringwriter.toString(), false);
 				   			 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
