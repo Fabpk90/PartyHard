@@ -62,6 +62,7 @@ public class PartyHard_Player_Map {
 	
 	//the key word that makes a cell blocked
 	private String blockedKey = "block";
+	private String blockedKey2 = "blocked";
 	
 	//used for movement smoothness
 	private boolean moving = false;
@@ -398,7 +399,7 @@ public class PartyHard_Player_Map {
 			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
 			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));		
 			//check the cell for collisions
-			if( cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey))
+			if( cell != null && cell.getTile() != null && (cell.getTile().getProperties().containsKey(blockedKey) || cell.getTile().getProperties().containsKey(blockedKey2)))
 				return true;			
 		}
 		

@@ -34,6 +34,8 @@ public class PartyHard_Monster extends Sprite {
 	
 	private boolean Dead = false;
 	
+	private boolean isBoss = false;
+	
 	public PartyHard_Monster(String monster) {
 		
 		//the id of the monster (used for the fight)
@@ -67,6 +69,8 @@ public class PartyHard_Monster extends Sprite {
 			actualDef =  r.nextInt(monsterRoot.getChildByName("Def").getInt("defMax")) + monsterRoot.getChildByName("Def").getInt("defMin");
 			
 			actualExp =  r.nextInt(monsterRoot.getChildByName("Exp").getInt("expMax")) +  monsterRoot.getChildByName("Exp").getInt("expMin");
+			
+			isBoss = monsterRoot.getChildByName("isBoss").getBoolean("value");
 			
 			
 		} catch (IOException e) {
@@ -113,5 +117,13 @@ public class PartyHard_Monster extends Sprite {
 
 	public void setDead(boolean dead) {
 		Dead = dead;
+	}
+
+	public boolean isBoss() {
+		return isBoss;
+	}
+
+	public void setBoss(boolean isBoss) {
+		this.isBoss = isBoss;
 	}
 }

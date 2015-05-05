@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -71,6 +72,8 @@ public class PartyHard_MapScreen implements Screen{
 	private boolean isSafe;
 	
 	private boolean blockedx = false;
+	
+	private float scale = 2f;
 	
 	//for randomly begin a fight
 	private float fightTime = 0;	
@@ -176,6 +179,7 @@ public class PartyHard_MapScreen implements Screen{
         	 //for desktop
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
+        	scale = 4f;
         	  if(!playerMap.isMoving())
           {	    
 		    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -404,7 +408,7 @@ public class PartyHard_MapScreen implements Screen{
 		 
 		 //used for printing the map name
 		 Label labelname = new Label(Name, style1);	
-		 	 
+		
 		 // setting position of the label
 		 mapNameTable.center().top();
 		 mapNameTable.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -477,9 +481,7 @@ public class PartyHard_MapScreen implements Screen{
 				 nameMonster.add(name[i]);
 			 }
 		 }
-		 
-		 
-		 
+		 	 	 
 		 //getting the dimension of the map
 		 mapPixelWidth = mapWidth * tilePixelWidth;
 		 mapPixelHeight = mapHeight * tilePixelHeight;
@@ -488,9 +490,18 @@ public class PartyHard_MapScreen implements Screen{
 		 maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
 		 
 		 //updating the label
-		 Label labelName = (Label) searchTable("name").getChildren().get(0);
-		 labelName.setText(Name);
-		 searchTable("name").getChildren().items[0] = labelName;
+		 Label labelName = (Label) searchTable("name").getChildren().get(0);	
+		 labelName.scaleBy(5);
+		 
+		 if(isSafe)
+			 labelName.setText(Name + " (Safe)");
+		 else
+			 labelName.setText(Name);	
+		 
+		 Table name = searchTable("name");
+		 name.getChildren().items[0] = labelName;
+		 
+		 stage.getActors().items[getTableIndex("name")] = name;
 		 
 		 //loading player anim
 		 playerMap.createPlayerAnimation();
@@ -502,9 +513,8 @@ public class PartyHard_MapScreen implements Screen{
 		 camera.update();	
 		 
 		 //loading bg music
-		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/map_sound_normal.mp3"));
-		 mapSound.setPitch(mapSound.loop(), 2.3f);
-		 
+		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
+		 mapSound.loop();
 		
 	}
 
@@ -594,4 +604,19 @@ public class PartyHard_MapScreen implements Screen{
 		//hopefully will never be 
 		return null;
 	}
+	
+	/*
+	 * @param name The name of the table
+	 * 
+	 * @return The index of the Table
+	 */
+		private int getTableIndex(String name)
+		{
+			for(int i = 0; i < stage.getActors().size; i++)
+			{
+				if(stage.getActors().get(i).getName() == name)
+					return i;
+			}	
+			return -1;
+		}
 }

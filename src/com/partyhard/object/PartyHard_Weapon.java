@@ -12,7 +12,7 @@ public class PartyHard_Weapon extends PartyHard_Object{
 	 */
 
 	
-	public PartyHard_Weapon(String Name, String imagePath, String description, int price, int type)
+	public PartyHard_Weapon(String Name, String imagePath, String description, int price, int type, int amount)
 	{
 		/*
 		 * TO DO load weapon from xml
@@ -20,7 +20,8 @@ public class PartyHard_Weapon extends PartyHard_Object{
 		//sending 0 because it's a weapon
 		super(Name, imagePath, description, 0);
 		this.price = price;
-		this.type = type;
+		this.weaponType = type;
+		this.amount = amount;
 	}
 
 
