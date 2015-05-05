@@ -3,6 +3,8 @@ package com.partyhard.game;
 import java.util.ArrayList;
 import java.util.Random;
 
+import utils.FileManager;
+
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -515,6 +517,9 @@ public class PartyHard_MapScreen implements Screen{
 		 //loading bg music
 		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
 		 mapSound.loop();
+		 
+		 FileManager fileManager = new FileManager("monster.xml");
+		 fileManager.readFile();
 		
 	}
 

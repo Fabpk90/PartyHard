@@ -1,7 +1,8 @@
 package com.partyhard.actor;
 
-import java.io.IOException;
 import java.util.Random;
+
+import utils.FileManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -50,8 +51,11 @@ public class PartyHard_Monster extends Sprite {
 		XmlReader xml = new XmlReader();
 		
 		Element root;
-		try {
-			root = xml.parse(Gdx.files.internal("monster.xml"));//loading the root
+		
+			//loading the encrypted file
+			FileManager fileManager = new FileManager("monster.xml");
+			
+			root = xml.parse(fileManager.readFile().readString());//loading the root
 			//loading the monster
 			Element monsterRoot = root.getChildByName(monster);
 			
@@ -70,14 +74,7 @@ public class PartyHard_Monster extends Sprite {
 			
 			actualExp =  r.nextInt(monsterRoot.getChildByName("Exp").getInt("expMax")) +  monsterRoot.getChildByName("Exp").getInt("expMin");
 			
-			isBoss = monsterRoot.getChildByName("isBoss").getBoolean("value");
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-				
+			isBoss = monsterRoot.getChildByName("isBoss").getBoolean("value");				
 	}
 
 	/**
@@ -126,4 +123,6 @@ public class PartyHard_Monster extends Sprite {
 	public void setBoss(boolean isBoss) {
 		this.isBoss = isBoss;
 	}
+	
+	
 }

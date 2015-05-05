@@ -25,6 +25,16 @@ public class FileManager {
 			file.writeString(fileToSave.readString(), false);		
 	}
 	
+	public void saveFile(boolean encoded, String fileToSave)
+	{
+		if(encoded)
+		{								
+			file.writeString(coder.encodeString(fileToSave), false);
+		}
+		else
+			file.writeString(fileToSave, false);		
+	}
+	
 	public FileHandle readFile()
 	{	
 	  fileToReturn.writeString(coder.decodeString(file.readString()), false);

@@ -3,6 +3,8 @@ package com.partyhard.actor;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import utils.FileManager;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
@@ -45,7 +47,9 @@ public class PartyHard_Player_Fight{
 		
 		try
 		{
-			root = xml.parse(Gdx.files.local("player_Fight.xml"));
+			FileManager fileManager = new FileManager("player_Fight.xml");
+			
+			root = xml.parse(fileManager.readFile().readString());
 			Array<Element> arrayOfPlayer =	root.getChildrenByName("player_Fight");	
 			for(int i = 0; i < arrayOfPlayer.size; i++)
 			{
