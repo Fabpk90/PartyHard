@@ -121,7 +121,7 @@ public class PartyHard_MapScreen implements Screen{
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
         	
         	//if the map is not safe
-        	/*
+        	
         	if(!isSafe)
         	{        	        	
         		fightTime += delta;
@@ -135,7 +135,7 @@ public class PartyHard_MapScreen implements Screen{
             		fightTime = 0;
             	}
         	}
-        	*/
+        	
         	
         }
         	

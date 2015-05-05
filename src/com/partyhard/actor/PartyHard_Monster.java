@@ -1,8 +1,7 @@
 package com.partyhard.actor;
 
+import java.io.IOException;
 import java.util.Random;
-
-import utils.FileManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -50,12 +49,17 @@ public class PartyHard_Monster extends Sprite {
 		
 		XmlReader xml = new XmlReader();
 		
-		Element root;
+		Element root = null;
 		
 			//loading the encrypted file
-			FileManager fileManager = new FileManager("monster.xml");
+			//FileManager fileManager = new FileManager("monster.xml");
 			
-			root = xml.parse(fileManager.readFile().readString());//loading the root
+			try {
+				root = xml.parse(Gdx.files.internal("monster.xml"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}//loading the root
 			//loading the monster
 			Element monsterRoot = root.getChildByName(monster);
 			

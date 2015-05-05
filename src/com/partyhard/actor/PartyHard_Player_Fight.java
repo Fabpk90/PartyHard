@@ -48,9 +48,9 @@ public class PartyHard_Player_Fight{
 		
 		try
 		{
-			FileManager fileManager = new FileManager("player_Fight.xml");
+			//FileManager fileManager = new FileManager("player_Fight.xml");
 			
-			root = xml.parse(fileManager.readFile().readString());
+			root = xml.parse(Gdx.files.internal("player_Fight.xml"));
 			Array<Element> arrayOfPlayer =	root.getChildrenByName("player_Fight");	
 			for(int i = 0; i < arrayOfPlayer.size; i++)
 			{
@@ -73,7 +73,7 @@ public class PartyHard_Player_Fight{
 					 capacity = new ArrayList<PartyHard_Capacity>();
 					
 					 
-					 Array<Element> items =	arrayOfPlayer.get(i).getChildrenByName("item");
+					 Array<Element> items =	arrayOfPlayer.get(i).getChildByName("bag").getChildrenByName("item");
 					//populating the inventory
 					for(int p = 0; p != bagSpace; p++)
 					{

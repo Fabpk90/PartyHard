@@ -7,17 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 public class MonsterCallBackTween implements TweenCallback {
 
-	public int monsterIndex;
-	public int monsterIndexTable;
-	public Table monsterTable;
-	public Table monsterName;
+	public int idMonster;
 	
-	public MonsterCallBackTween(int monsterIndex, int monsterIndexTable, Table monsterTable, Table monsterName) {
+	public MonsterCallBackTween( int idMonster) {
 		
-		this.monsterIndex = monsterIndex;
-		this.monsterIndexTable = monsterIndexTable;
-		this.monsterTable = monsterTable;
-		this.monsterName = monsterName;
+		this.idMonster = idMonster;
 	}
 
 	@Override

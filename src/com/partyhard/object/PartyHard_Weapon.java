@@ -13,6 +13,7 @@ public class PartyHard_Weapon extends PartyHard_Object{
 	public int price;
 	private int weaponType;
 	public boolean equip = false;
+	public int id;
 
 	/*
 	 * 0 sword
@@ -22,6 +23,10 @@ public class PartyHard_Weapon extends PartyHard_Object{
 	public PartyHard_Weapon(int id)
 	{
 		super("", "", "", 0);
+
+		
+		this.id = id;
+			
 		XmlReader xml = new XmlReader();
 		
 		Element root = null;
@@ -33,15 +38,15 @@ public class PartyHard_Weapon extends PartyHard_Object{
 			e.printStackTrace();
 		}//loading the root
 		
-		Array<Element> arrayOfPlayer =	root.getChildrenByName("weapon");	
-		for(int i = 0; i < arrayOfPlayer.size; i++)
+		Array<Element> arrayOfItem = root.getChildrenByName("weapon");	
+		for(int i = 0; i < arrayOfItem.size; i++)
 		{
 			//weapon found
-			if(arrayOfPlayer.get(i).getInt("num") == id)
+			if(arrayOfItem.get(i).getInt("id") == id)
 			{
-				String Name = arrayOfPlayer.get(i).getAttribute("name");
-				String imagePath = arrayOfPlayer.get(i).getAttribute("imagePath");
-				String description = arrayOfPlayer.get(i).getAttribute("description");
+				String Name = arrayOfItem.get(i).getAttribute("name");
+				String imagePath = arrayOfItem.get(i).getAttribute("imagePath");
+				String description = arrayOfItem.get(i).getAttribute("description");
 				
 				/*
 				 * Act like the super constructor
@@ -55,9 +60,9 @@ public class PartyHard_Weapon extends PartyHard_Object{
 				 * load info for the weapon
 				 */
 				
-				price = Integer.parseInt(arrayOfPlayer.get(i).getAttribute("price"));
-				weaponType = Integer.parseInt(arrayOfPlayer.get(i).getAttribute("type"));
-				amount = Integer.parseInt(arrayOfPlayer.get(i).getAttribute("amount"));
+				price = Integer.parseInt(arrayOfItem.get(i).getAttribute("price"));
+				weaponType = Integer.parseInt(arrayOfItem.get(i).getAttribute("type"));
+				amount = Integer.parseInt(arrayOfItem.get(i).getAttribute("amount"));
 				
 				//stop here the right weapon has been found, no nedd to go further
 				break;

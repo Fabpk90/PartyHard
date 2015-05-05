@@ -50,6 +50,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
+import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Fight implements Screen {
 	
@@ -65,7 +66,7 @@ public class PartyHard_Fight implements Screen {
 	private  Table tableLife;
 	
 	private Table tableTurn;
-	
+		
 	private Sound backgroundMusic;
 	
 	private ArrayList<PartyHard_Player_Fight> playerSquad;
@@ -655,6 +656,20 @@ public class PartyHard_Fight implements Screen {
         /*
          * Applying the stuff that the player has equipped
          */
+        
+        for(int i = 0; i < playerSquad.size(); i++)
+        {
+        	for(int p = 0; p != playerSquad.get(i).bagSpace; p++)
+        	{
+        		switch(playerSquad.get(i).bag.get(p).type)
+        		{
+        			case 0: //weapon
+        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
+        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() + weapon.getAmount());
+        			break;
+        		}
+        	}
+        }
 	}
 
 	/*
@@ -836,6 +851,10 @@ public class PartyHard_Fight implements Screen {
 									Tween.to(labelDamage, LabelAccessor.Y, 2f).target(monsterimage.getY() + monsterimage.getHeight() + 100).start(tweenManager);
 									Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
 									
+									//dealing damage and setting back to default the damage taken
+									enemySquad.get(monsterIndex).actualHp -= enemySquad.get(monsterIndex).getDamage();
+									enemySquad.get(monsterIndex).damage = 0;
+									
 									//the monster is dead
 									if(enemySquad.get(monsterIndex).actualHp <= 0)
 									{																										
@@ -853,9 +872,30 @@ public class PartyHard_Fight implements Screen {
 										
 										Tween.set((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA).target(1).start(tweenManager);
 										
-										Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBackTween(monsterIndex, monsterIndexTable, monsterTable, monsterName){										
+										Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBackTween(enemySquad.get(monsterIndex).monsterId){										
 											@Override
-											public void onEvent(int callbackType, BaseTween<?> callback) {		
+											public void onEvent(int callbackType, BaseTween<?> callback) {	
+
+												/*
+												 * recalculating indexes
+												 */
+												
+												Table monsterTable = searchTable("monsterTable");
+												Table monsterName = searchTable("monsterTableName");
+												
+												//used for finding the monster in the table
+												int monsterIndexTable = -1;
+												//finding the monster in the array
+												int monsterIndex = -1;
+												
+												//searching the right monster				
+													for(int x = 0; x != monsterTable.getChildren().size; x++)
+													{
+														if(Integer.parseInt(monsterTable.getChildren().get(x).getName()) == idMonster)
+														{
+															monsterIndexTable = x;
+														}
+													}	
 												
 												switch(callbackType)
 												{
@@ -1178,6 +1218,23 @@ public class PartyHard_Fight implements Screen {
 	
 	private void save() {
 	
+		/*
+		 * resetting the stats back before the items buff was applies
+		 */
+		 for(int i = 0; i < playerSquad.size(); i++)
+	        {
+	        	for(int p = 0; p != playerSquad.get(i).bagSpace; p++)
+	        	{
+	        		switch(playerSquad.get(i).bag.get(p).type)
+	        		{
+	        			case 0: //weapon
+	        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
+	        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - weapon.getAmount());
+	        			break;
+	        		}
+	        	}
+	        }
+		
 		try {
 		FileManager file = new FileManager("player_Fight.xml");
 				
@@ -1197,8 +1254,23 @@ public class PartyHard_Fight implements Screen {
 	                .element("exp").attribute("value", playerSquad.get(i).getExp()).pop()
 	                .element("money").attribute("value", playerSquad.get(i).getMoney()).pop()
 	                .element("level").attribute("value", playerSquad.get(i).getLevel()).pop()
-	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace()).pop()
-					.element("capacity").attribute("value", playerSquad.get(i).capacity.size());
+	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
+					
+					//populating the bag
+					for(int p = 0; p < playerSquad.get(i).bagSpace; p++)
+					{
+						xml.element("item").attribute("type", playerSquad.get(i).bag.get(p).type);	
+						
+						switch(playerSquad.get(i).bag.get(p).type)
+		        		{
+		        			case 0: //weapon
+		        				PartyHard_Weapon wep = (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
+		        				xml.attribute("id", wep.id).pop();
+		        			break;
+		        		}
+					}
+					xml.pop();//closing the bag
+					xml.element("capacity").attribute("value", playerSquad.get(i).capacity.size());
 					
 					for(int p = 0; p < playerSquad.get(i).capacity.size(); p++)
 					{
