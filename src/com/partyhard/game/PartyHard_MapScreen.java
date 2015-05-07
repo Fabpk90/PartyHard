@@ -128,10 +128,15 @@ public class PartyHard_MapScreen implements Screen{
             	//begin fight
             	if(fightTime >=2)
             	{
-            		playerMap.stopMovement();
-            		        		
-            		loadFight();
+            		Random r = new Random();
             		
+            		//if pseudo-randomly the fight is happening
+            		if(r.nextInt(101) < proba)
+            		{
+            			playerMap.stopMovement();
+            		        		
+            			loadFight();
+            		}
             		fightTime = 0;
             	}
         	}
@@ -537,10 +542,6 @@ public class PartyHard_MapScreen implements Screen{
 	private void loadFight()
 	{
 		Random r = new Random();
-		
-		//if pseudo-randomly the fight is happening
-		if(r.nextInt(101) < proba)
-		{
 			//loading the monsters
 			ArrayList<PartyHard_Monster> monster = new ArrayList<PartyHard_Monster>();
 			
@@ -569,7 +570,6 @@ public class PartyHard_MapScreen implements Screen{
 			
 			mapSound.dispose();
 			
-		}
 	}
 
 	public void moveRight()
