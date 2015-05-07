@@ -5,9 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,6 +26,10 @@ public class PartyHard_ScreenSplash implements Screen{
 	private Game game;
 	private Texture backgroundImg;
 	
+	private OrthographicCamera camera;
+	private TiledMap tiledmap;
+	private TiledMapRenderer maprenderer;
+	
 	private Stage stage;
 	private Table buttonTable;
 	
@@ -33,6 +41,15 @@ public class PartyHard_ScreenSplash implements Screen{
 
 	@Override
 	public void show() {
+	camera = new OrthographicCamera();
+	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
+	
+	camera.update();
+	
+	tiledmap = new TmxMapLoader().load("mainlevel.tmx");
+	//setting the camera on the middle of the screen
+	camera.position.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
+		
 	stage = new Stage();
 	buttonTable = new Table();
 	
@@ -109,6 +126,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(255, 255, 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        
+        maprenderer.setView(camera);
+        maprenderer.render();
 
 		stage.act(delta);
 		stage.draw();
