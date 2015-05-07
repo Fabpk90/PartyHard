@@ -269,11 +269,6 @@ public class PartyHard_MapScreen implements Screen{
 		
 	camera.update();
 	
-	/*
-	 * Calculating the map dimension for the camera
-	 */
-	 TiledMapTileLayer layer = (TiledMapTileLayer) tiledmap.getLayers().get(0);	
-
 	
 	Table mapNameTable = new Table();
 	stage = new Stage();
