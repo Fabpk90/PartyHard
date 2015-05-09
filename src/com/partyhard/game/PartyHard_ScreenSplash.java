@@ -1,17 +1,21 @@
 package com.partyhard.game;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -24,7 +28,6 @@ import com.partyhard.actor.PartyHard_Player_Map;
 public class PartyHard_ScreenSplash implements Screen{
 	
 	private Game game;
-	private Texture backgroundImg;
 	
 	private OrthographicCamera camera;
 	private TiledMap tiledmap;
@@ -32,6 +35,21 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	private Stage stage;
 	private Table buttonTable;
+	
+	private int movingX = 0;
+	private int movingY = 0;
+	/*
+	 * 0 not moving
+	 * 1 +
+	 * 2 -
+	 */
+	
+	private Vector2 direction = new Vector2();
+	
+	private int mapWidthPixel;
+	private int mapHeightPixel;
+	
+	private Random r = new Random();
 	
 	public PartyHard_ScreenSplash(Game gam)
 	{
@@ -44,11 +62,25 @@ public class PartyHard_ScreenSplash implements Screen{
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
 	
-	camera.update();
 	
 	tiledmap = new TmxMapLoader().load("mainlevel.tmx");
 	//setting the camera on the middle of the screen
-	camera.position.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
+	
+	maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
+	
+	MapProperties prop = tiledmap.getProperties();
+	
+	//calculating width and height of the map		
+	 int mapWidth = prop.get("width", Integer.class);
+	 int mapHeight = prop.get("height", Integer.class);
+	 int tilePixelWidth = prop.get("tilewidth", Integer.class);
+	 int tilePixelHeight = prop.get("tileheight", Integer.class);
+	 
+	 mapWidthPixel = mapWidth * tilePixelWidth;
+	 mapHeightPixel = mapHeight * tilePixelHeight; 
+	
+	 //setting the camera at the middle of the map
+	camera.position.set(mapWidthPixel / 2, mapHeightPixel / 2, 0);
 		
 	stage = new Stage();
 	buttonTable = new Table();
@@ -58,10 +90,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	 * TO DO  Options
 	 */
 	
-	TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
+	TextureAtlas tex = new TextureAtlas(Gdx.files.internal("ui_button/button.pack"));
 	
 	Skin skin = new Skin(tex);
-
 	
 	TextButtonStyle buttonStyle = new TextButtonStyle();
 	
@@ -81,9 +112,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	playButton.pad(10);
 	
-	playButton.setHeight(Gdx.graphics.getHeight() / 2);
+	playButton.setHeight(Gdx.graphics.getHeight() / 4);
 	playButton.setWidth(Gdx.graphics.getWidth() / 4);
-	playButton.setPosition((Gdx.graphics.getWidth() / 2) - playButton.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+	playButton.setPosition((Gdx.graphics.getWidth() / 2) - playButton.getWidth() / 2, Gdx.graphics.getHeight() / 4);
 	
 	playButton.addListener(new ClickListener(){
 		  @Override 
@@ -93,6 +124,7 @@ public class PartyHard_ScreenSplash implements Screen{
             game.setScreen(map);
           }
 	});
+	playButton.pad(10);
 	
 	 TextButton quitButton = new TextButton("Quit", buttonStyle);
 	
@@ -102,11 +134,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	quitButton.addListener(new ClickListener(){
 		  @Override 
-          public void clicked(InputEvent event, float x, float y){
-          	
+          public void clicked(InputEvent event, float x, float y){          	
 			  dispose();
-			  Gdx.app.exit();
-            
+			  Gdx.app.exit();    
           }
 	});
 	
@@ -118,7 +148,12 @@ public class PartyHard_ScreenSplash implements Screen{
 	stage.addActor(buttonTable);
 	
 	//telling that stage can manage input
-	 Gdx.input.setInputProcessor(stage);	
+	 Gdx.input.setInputProcessor(stage);
+	 
+	 //updating camera
+	 camera.update();
+	 
+	 generateDirection();
 	
 	}
 
@@ -127,17 +162,61 @@ public class PartyHard_ScreenSplash implements Screen{
 		Gdx.gl.glClearColor(255, 255, 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         
+        
         maprenderer.setView(camera);
         maprenderer.render();
 
 		stage.act(delta);
 		stage.draw();
 		
+			
+		switch(movingX)
+		{
+			case 1: // +				
+				if(camera.position.x + camera.viewportWidth / 2 < mapWidthPixel)
+				{
+					camera.position.x += (int) 2 + delta;
+				}
+				else
+					generateDirection();				
+				break;
+			case 2: // -
+				if(camera.position.x - camera.viewportWidth / 2 > 0)
+				{
+					camera.position.x -= (int) 2 + delta;
+				}
+				else
+					generateDirection();			
+				break;
+		}
+		
+		switch(movingY)
+		{
+		case 1: // +				
+			if(camera.position.y + camera.viewportHeight / 2 < mapHeightPixel)
+			{
+				camera.position.y += (int) 2 + delta;
+			}
+			else
+				generateDirection();				
+			break;
+		case 2: // -
+			if(camera.position.y - camera.viewportHeight / 2 > 0)
+			{
+				camera.position.y -= (int) 2 + delta;
+			}
+			else
+				generateDirection();			
+			break;
+		}
+		
+		camera.update();
+		
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+		 stage.getViewport().update(width, height, true);
 		
 	}
 
@@ -162,6 +241,21 @@ public class PartyHard_ScreenSplash implements Screen{
 	@Override
 	public void dispose() {
 		stage.dispose();
+		game.dispose();
+		tiledmap.dispose();
+	}
+	
+	private void generateDirection()
+	{
+			//random number to see where will move
+				movingX = r.nextInt(3);
+				movingY = r.nextInt(3);
+				
+				//if the camera is not moving then recall the function to make it move
+				if(movingY == 0 && movingX == 0)
+				{
+					generateDirection();
+				}
 	}
 
 }
