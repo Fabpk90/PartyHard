@@ -3,15 +3,12 @@ package com.partyhard.game;
 import java.util.ArrayList;
 import java.util.Random;
 
-import utils.FileManager;
-
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -20,7 +17,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -165,8 +161,7 @@ public class PartyHard_MapScreen implements Screen{
 	        		//if the camera is not going outside on the width
 	   		   		if(!blockedx)
 	   		   		{
-	   		   			camera.position.set(playerMap.getX(), camera.position.y, 0);
-	   		   			camera.update();
+	   		   			camera.position.set(playerMap.getX(), camera.position.y, 0);	   		   			
 	   		   		}		   				   		   	
         	}
         	
@@ -177,10 +172,11 @@ public class PartyHard_MapScreen implements Screen{
 	   		   	 if(playerMap.getY() - (camera.viewportHeight / 2 )  > 0 && playerMap.getY() + (camera.viewportHeight / 2) < mapPixelHeight)
 	   		   	 {
 	   		   		 //if the player cannot go on the x axe then move only on the y		   		
-	   		   		 camera.position.set(camera.position.x, playerMap.getY(), 0);	   		   		
-	   		   	     camera.update(); 		         
+	   		   		 camera.position.set(camera.position.x, playerMap.getY(), 0);	   		   		   		   	    	         
 	   		   	 }
         	}
+        	
+        	 camera.update(); 	
 		   	       
         /*
 	     * Movement
