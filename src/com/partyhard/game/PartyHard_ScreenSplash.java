@@ -2,6 +2,10 @@ package com.partyhard.game;
 
 import java.util.Random;
 
+import utils.LabelAccessor;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -18,6 +22,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -35,6 +40,8 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	private Stage stage;
 	private Table buttonTable;
+	
+	private TweenManager tweenManager = new TweenManager();
 	
 	private int movingX = 0;
 	private int movingY = 0;
@@ -59,6 +66,9 @@ public class PartyHard_ScreenSplash implements Screen{
 
 	@Override
 	public void show() {
+	//registering the accessors (used for modifying values with tween)
+	Tween.registerAccessor(Label.class, new LabelAccessor());
+		
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
 	
