@@ -3,6 +3,7 @@ package com.partyhard.game;
 import java.util.Random;
 
 import utils.LabelAccessor;
+import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 
@@ -23,6 +24,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -39,7 +41,6 @@ public class PartyHard_ScreenSplash implements Screen{
 	private TiledMapRenderer maprenderer;
 	
 	private Stage stage;
-	private Table buttonTable;
 	
 	private TweenManager tweenManager = new TweenManager();
 	
@@ -93,7 +94,7 @@ public class PartyHard_ScreenSplash implements Screen{
 	camera.position.set(mapWidthPixel / 2, mapHeightPixel / 2, 0);
 		
 	stage = new Stage();
-	buttonTable = new Table();
+	Table buttonTable = new Table();
 	
 	/*
 	 * creating 2 button one for play two for quit
@@ -134,7 +135,7 @@ public class PartyHard_ScreenSplash implements Screen{
             game.setScreen(map);
           }
 	});
-	playButton.pad(10);
+	playButton.pad(5);
 	
 	 TextButton quitButton = new TextButton("Quit", buttonStyle);
 	
@@ -150,12 +151,38 @@ public class PartyHard_ScreenSplash implements Screen{
           }
 	});
 	
-	quitButton.pad(10);
+	quitButton.pad(5);
 	
 	buttonTable.addActor(playButton);
 	buttonTable.addActor(quitButton);
 	
+	/*
+	 * creating the title animation
+	 */
+		
+	LabelStyle labelStyle = new LabelStyle();
+	labelStyle.font = new BitmapFont();
+	
+	Label labelTitle = new Label("Party Hard!",labelStyle);
+	labelTitle.setFontScale(6, 4);
+	
+	labelTitle.setPosition(Gdx.graphics.getWidth() / 2 - (labelTitle.getWidth() * labelTitle.getFontScaleX()) / 2, (float) ((Gdx.graphics.getHeight()* 2) / 3));
+	/*
+	 * first adding all in the stage to access to the label in Tween
+	 */
+	
+	stage.addActor(labelTitle);
 	stage.addActor(buttonTable);
+	stage.setDebugAll(true);
+	
+	//creating the sequence for the animation
+	
+	Timeline.createSequence()
+	.push(Tween.set(labelTitle, LabelAccessor.ScaleFont).target(labelTitle.getFontScaleX(), labelTitle.getFontScaleY()))
+	.push(Tween.to(labelTitle, LabelAccessor.ScaleFont, 2f).target(labelTitle.getFontScaleX() + 1, labelTitle.getFontScaleY() + 2))
+	.repeatYoyo(-1, 0f)
+	.start(tweenManager);
+	
 	
 	//telling that stage can manage input
 	 Gdx.input.setInputProcessor(stage);
@@ -172,6 +199,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		Gdx.gl.glClearColor(255, 255, 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         
+        tweenManager.update(delta);
         
         maprenderer.setView(camera);
         maprenderer.render();
@@ -267,5 +295,4 @@ public class PartyHard_ScreenSplash implements Screen{
 					generateDirection();
 				}
 	}
-
 }

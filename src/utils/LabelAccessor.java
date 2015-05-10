@@ -12,6 +12,8 @@ public class LabelAccessor implements TweenAccessor<Label> {
 	public static final int ALPHA = 0;
 	public static final int Y = 1;
 	public static final int X = 2;
+	public static final int ScaleFont = 3;
+	public static final int Scale = 4;
 	
 	
 	public LabelAccessor() {
@@ -31,24 +33,37 @@ public class LabelAccessor implements TweenAccessor<Label> {
 			case X:
 				returnValues[0] = label.getX();
 				return 1;
+			case ScaleFont:
+				returnValues[0] = label.getFontScaleX();
+				returnValues[1] = label.getFontScaleY();
+				return 2;
+			case Scale:
+				returnValues[0] = label.getScaleX();
+				returnValues[1] = label.getScaleY();
+				return 2;
 		}
 		//used an unknown tweentype
 		return -1;
 	}
 
 	@Override
-	public void setValues(Label label, int tweenType, float[] returnValues) {
+	public void setValues(Label label, int tweenType, float[] newValues) {
 		switch(tweenType)
 		{
 			case ALPHA:
-				label.setColor(label.getColor().r, label.getColor().g, label.getColor().b, returnValues[0]);
+				label.setColor(label.getColor().r, label.getColor().g, label.getColor().b, newValues[0]);
 				break;
 			case Y:
-				label.setY(returnValues[0]);
-				break;
-				
+				label.setY(newValues[0]);
+				break;				
 			case X:
-				label.setX(returnValues[0]);
+				label.setX(newValues[0]);
+				break;
+			case ScaleFont:				
+				label.setFontScale(newValues[0], newValues[1]);
+				break;
+			case Scale:
+				label.setScale(newValues[0], newValues[1]);
 				break;
 		}
 	}
