@@ -131,10 +131,7 @@ public class PartyHard_Player_Fight{
 		
 		//checking if the chara is dead
 		if(Hp <= 0)
-			isDead = true;
-		
-		
-		
+			isDead = true;			
 	}
 	
 	public void Damage(int amount)
@@ -145,8 +142,7 @@ public class PartyHard_Player_Fight{
 			isDead = true;
 		}
 		else
-			Hp -= amount;
-			
+			Hp -= amount;		
 	}
 	
 	public int getclass()
