@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Base64Coder;
 public class FileManager {
 
 	private FileHandle file;
-	private Base64Coder coder;
 	private FileHandle fileToReturn;
 	public FileManager(String filePath) {
 		
@@ -19,7 +18,7 @@ public class FileManager {
 	{
 		if(encoded)
 		{								
-			file.writeString(coder.encodeString(fileToSave.readString()), false);
+			file.writeString(Base64Coder.encodeString(fileToSave.readString()), false);
 		}
 		else
 			file.writeString(fileToSave.readString(), false);	
@@ -29,7 +28,7 @@ public class FileManager {
 	{
 		if(encoded)
 		{								
-			file.writeString(coder.encodeString(fileToSave), false);
+			file.writeString(Base64Coder.encodeString(fileToSave), false);
 		}
 		else
 			file.writeString(fileToSave, false);		
@@ -37,7 +36,7 @@ public class FileManager {
 	
 	public FileHandle readFile()
 	{	
-	  fileToReturn.writeString(coder.decodeString(file.readString()), false);
+	  fileToReturn.writeString(Base64Coder.decodeString(file.readString()), false);
 	  
 	  return fileToReturn;
 	}

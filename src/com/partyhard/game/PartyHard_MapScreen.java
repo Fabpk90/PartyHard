@@ -422,6 +422,7 @@ public class PartyHard_MapScreen implements Screen{
 		
 		Gdx.input.setInputProcessor(stage);
 		
+		
 		load();
 	}
 
@@ -506,12 +507,12 @@ public class PartyHard_MapScreen implements Screen{
 		 //loading player anim
 		 playerMap.createPlayerAnimation();
 		 
-		 //updating camera	 	 
+		//updating camera	 	 
 		 camera.position.x = camera.viewportWidth / 2;
 		 camera.position.y = camera.viewportHeight / 2;
 		 
-		 camera.update();	
-		 
+		 camera.update();
+	 
 		 //loading bg music
 		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
 		 mapSound.loop();

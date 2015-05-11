@@ -52,8 +52,6 @@ public class PartyHard_ScreenSplash implements Screen{
 	 * 2 -
 	 */
 	
-	private Vector2 direction = new Vector2();
-	
 	private int mapWidthPixel;
 	private int mapHeightPixel;
 	
@@ -130,8 +128,8 @@ public class PartyHard_ScreenSplash implements Screen{
 	playButton.addListener(new ClickListener(){
 		  @Override 
           public void clicked(InputEvent event, float x, float y){
-          	
-            PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(100,100, "player/test_player.png"));
+          	tiledmap.dispose();
+            PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(256,256, "player/test_player.png"));
             game.setScreen(map);
           }
 	});

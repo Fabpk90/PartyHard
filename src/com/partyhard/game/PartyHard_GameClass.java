@@ -39,23 +39,6 @@ public class PartyHard_GameClass extends Game {
 		Pixmap pm = new Pixmap(Gdx.files.internal("ui/cursorHand.png"));
 		Gdx.input.setCursorImage(pm, 0, 0);
 		pm.dispose();
-		/*
-		ArrayList<PartyHard_Monster> monsters = new ArrayList<PartyHard_Monster>();
-		 monsters.add(new PartyHard_Monster("blob"));
-		 monsters.add(new PartyHard_Monster("bear"));
-		 monsters.add(new PartyHard_Monster("champ"));
-		 
-		 ArrayList<PartyHard_Player_Fight> playerSquad = new ArrayList<PartyHard_Player_Fight>();
-		 
-		 playerSquad.add(new PartyHard_Player_Fight(0));
-		 playerSquad.add(new PartyHard_Player_Fight(1));
-		 
-		 
-		
-		PartyHard_Fight fight = new PartyHard_Fight(playerSquad, monsters, null, this);
-		setScreen(fight);
-	
-		*/
 		
 		PartyHard_ScreenSplash screensplash = new PartyHard_ScreenSplash(this);
 		this.setScreen(screensplash);

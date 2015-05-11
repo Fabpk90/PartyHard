@@ -3,7 +3,7 @@ package com.partyhard.actor;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import utils.FileManager;
+import utils.PartyHard_Level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
@@ -20,6 +20,9 @@ public class PartyHard_Player_Fight{
 	private int Exp = 0;
 	private int Level = 1;
 	private int Money = 0;
+	
+	public boolean isLevelMax = false;
+	public PartyHard_Level levelUp;
 	
 	public ArrayList<PartyHard_Object> bag;
 	public int bagSpace = 0;
@@ -67,7 +70,6 @@ public class PartyHard_Player_Fight{
 					Level = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("level").getAttribute("value"));
 					bagSpace = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("bag").getAttribute("space"));
 					Class = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("class").getAttribute("value"));
-					int Capacities = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("capacity").getAttribute("value"));
 					
 					 bag = new ArrayList<PartyHard_Object>();
 					 capacity = new ArrayList<PartyHard_Capacity>();
@@ -94,7 +96,7 @@ public class PartyHard_Player_Fight{
 					Element rootCap = xml.parse(Gdx.files.local("capacity.xml"));
 					
 					Array<Element> arrayOfCap =	rootCap.getChildrenByName("capacity");
-					Array<Element> arrayPlayerCap = root.getChildByName("player_Fight").getChildByName("capacity").getChildrenByName("cap");
+					Array<Element> arrayPlayerCap = arrayOfPlayer.get(i).getChildByName("capacity").getChildrenByName("cap");
 					
 					//looking first in capacity and then checking if it exist in playerxml					
 					for(int y = 0; y < arrayOfCap.size; y++)
@@ -120,7 +122,45 @@ public class PartyHard_Player_Fight{
 													
 						}
 						
-					}															
+					}
+					
+					rootCap = xml.parse(Gdx.files.local("level.xml"));
+					
+					Array<Element> arrayOfLevel = rootCap.getChildrenByName("level");
+					
+					/*
+					 * getting the info to level up
+					 */
+				
+					for(int p = 0; p < arrayOfLevel.size; p++)
+					{
+						if(arrayOfLevel.get(p).getInt("class") == Class)
+						{
+							
+							Array<Element> arrayOfPlayerLevel = arrayOfLevel.get(p).getChildrenByName("up");
+							
+							isLevelMax = false;
+							//checking if the player is not level max  (+1 because the first level up is lvl 2)
+							if(arrayOfPlayerLevel.size + 1 >= Level)
+							{								
+								System.out.println(arrayOfPlayerLevel.size);
+								int expToUp = arrayOfPlayerLevel.get(Level - 1).getInt("exp");
+								int hp = arrayOfPlayerLevel.get(Level - 1).getInt("hp");
+								int atk = arrayOfPlayerLevel.get(Level - 1).getInt("atk");
+								int def = arrayOfPlayerLevel.get(Level - 1).getInt("def");
+								
+								levelUp = new PartyHard_Level(this.Class, expToUp, hp, atk, def);										
+								break;
+							}
+							else
+							{
+								isLevelMax = true;					
+							}
+								
+							
+						}
+					}
+					
 				}
 			}
 			
@@ -136,7 +176,7 @@ public class PartyHard_Player_Fight{
 	
 	public void Damage(int amount)
 	{
-		if(amount > Hp)
+		if(amount >= Hp)
 		{
 			Hp = 0;
 			isDead = true;
@@ -180,6 +220,11 @@ public class PartyHard_Player_Fight{
 		return targetCapacity;
 	}
 	
+	public void setExp(int amount)
+	{
+		Exp = amount;
+	}
+	
 	public void addExp(int amount)
 	{
 		Exp += amount;
@@ -202,10 +247,10 @@ public class PartyHard_Player_Fight{
 	
 	public void addMoney(int amount)
 	{
-		Money = amount;
+		Money += amount;
 	}
 	
-	public boolean pay(int amount)
+	public boolean canPay(int amount)
 	{
 		if(Money - amount < 0)
 			return false;
@@ -247,6 +292,15 @@ public class PartyHard_Player_Fight{
 		this.Level = newLevel;
 	}
 	
+	public void LevelUp()
+	{
+		this.Level++;
+		
+		this.Atk += levelUp.atk;
+		this.Def += levelUp.def;
+		this.HpMax += levelUp.hp;
+	}
+	
 	public int getLevel()
 	{
 		return Level;
@@ -286,7 +340,7 @@ public class PartyHard_Player_Fight{
 	}
 
 	public void setHpMax(int hpMax) {
-		HpMax = hpMax;
+		HpMax += hpMax;
 	}
 
 	public int getDamageTaken() {
@@ -308,6 +362,5 @@ public class PartyHard_Player_Fight{
 
 	public void setHealAmount(int healAmount) {
 		this.healAmount += healAmount;
-	}
-	
+	}	
 }

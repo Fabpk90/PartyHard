@@ -858,11 +858,7 @@ public class PartyHard_Fight implements Screen {
 											//the monster is dead
 											if(enemySquad.get(monsterIndex).actualHp <= 0)
 											{																										
-												expgained += enemySquad.get(monsterIndex).actualExp; 
-														
-												/*
-												 * TO DO level up
-												 */
+												expgained += enemySquad.get(monsterIndex).actualExp; 																																
 												
 												Table monsterName = searchTable("monsterTableName");									
 												
@@ -982,8 +978,7 @@ public class PartyHard_Fight implements Screen {
 								stage.addActor(labelHealth);
 							}
 							
-						}
-							
+						}							
 									//setting the fight setting back to default
 									playerSquad.get(i).setCapacitySelected(-1);	
 									playerSquad.get(i).setTarget(-1);
@@ -1021,11 +1016,11 @@ public class PartyHard_Fight implements Screen {
 						
 						labelDamage.setPosition(labelName.getX(), labelName.getY() + 150);
 						
-						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(1).start(tweenManager);
-						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(1).start(tweenManager);
+						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(2).start(tweenManager);
+						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(3).start(tweenManager);
 						
-						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(2).start(tweenManager);
-						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(3).start(tweenManager);
+						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(3).start(tweenManager);
+						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(4).start(tweenManager);
 						
 						stage.addActor(labelDamage);
 						
@@ -1192,6 +1187,43 @@ public class PartyHard_Fight implements Screen {
 	
 	private void win()
 	{
+		//adding exp to player and checking for level up
+		for(int i = 0; i < playerSquad.size(); i++)
+		{
+			//if the player is not dead give him some exp
+			if(!playerSquad.get(i).isDead())
+			{
+				playerSquad.get(i).addExp(expgained);
+				
+				//level up?
+				if(playerSquad.get(i).getExp() >= playerSquad.get(i).levelUp.expToUp)
+				{
+					playerSquad.get(i).LevelUp();
+					playerSquad.get(i).setExp(0);
+					
+					/*
+					 * To DO animation level up
+					 */
+					
+					/*
+					 * Creating animated label that shows above the player name
+					 */					
+					Label labelLevelUp = new Label(playerSquad.get(i).Name+" has leveled up!", labelstyle);				
+					Table tableName = searchTable("tableLife");
+					
+					stage.addActor(labelLevelUp);
+															
+					labelLevelUp.setPosition(tableName.getChildren().get(i).getX(), tableName.getChildren().get(i).getY()+ 150);
+					
+					Tween.set(labelLevelUp, LabelAccessor.Y).target(labelLevelUp.getY()).start(tweenManager);
+					Tween.to(labelLevelUp,  LabelAccessor.Y, 1f).target(labelLevelUp.getY() + 100).start(tweenManager);
+					
+				}
+			}
+			
+		}
+		
+		
 		win = true;
 		
 		Sound soundWin = Gdx.audio.newSound(Gdx.files.internal("sound/win.mp3"));
@@ -1252,10 +1284,12 @@ public class PartyHard_Fight implements Screen {
 	        	{
 	        		switch(playerSquad.get(i).bag.get(p).type)
 	        		{
+	        		/*
 	        			case 0: //weapon
 	        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
 	        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - weapon.getAmount());
 	        			break;
+	        			*/
 	        		}
 	        	}
 	        }
