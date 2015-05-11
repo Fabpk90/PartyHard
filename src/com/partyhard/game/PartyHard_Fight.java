@@ -992,8 +992,9 @@ public class PartyHard_Fight implements Screen {
 				
 				for(int i = 0; i < playerSquad.size(); i++)
 				{
-					if(!playerSquad.get(i).isDead())
-					{
+					//if the player is not dead and have received damages
+					if(!playerSquad.get(i).isDead() && playerSquad.get(i).getDamageTaken() > 0)
+					{						
 						//getting the damage dealt to the player
 						int damageToPlayer = playerSquad.get(i).getDamageTaken();
 						
@@ -1016,11 +1017,11 @@ public class PartyHard_Fight implements Screen {
 						
 						labelDamage.setPosition(labelName.getX(), labelName.getY() + 150);
 						
-						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(2).start(tweenManager);
-						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(3).start(tweenManager);
+						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(1).start(tweenManager);
+						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(2).start(tweenManager);
 						
-						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(3).start(tweenManager);
-						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(4).start(tweenManager);
+						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(2).start(tweenManager);
+						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(3).start(tweenManager);
 						
 						stage.addActor(labelDamage);
 						
@@ -1199,11 +1200,7 @@ public class PartyHard_Fight implements Screen {
 				if(playerSquad.get(i).getExp() >= playerSquad.get(i).levelUp.expToUp)
 				{
 					playerSquad.get(i).LevelUp();
-					playerSquad.get(i).setExp(0);
-					
-					/*
-					 * To DO animation level up
-					 */
+					playerSquad.get(i).setExp(0);					
 					
 					/*
 					 * Creating animated label that shows above the player name
