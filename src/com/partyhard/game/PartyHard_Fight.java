@@ -96,9 +96,11 @@ public class PartyHard_Fight implements Screen {
 	private TweenManager tweenManager = new TweenManager();
 	
 	public PartyHard_GameClass game;
+	
+	private String musicPath;
 
 	
-	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, ArrayList<PartyHard_Monster> enemySquad, PartyHard_MapScreen mainScreen, PartyHard_GameClass game)
+	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, ArrayList<PartyHard_Monster> enemySquad, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath)
 	{
 	
 		this.playerSquad = playerSquad;
@@ -114,6 +116,8 @@ public class PartyHard_Fight implements Screen {
 			if(!playerSquad.get(i).isDead())
 					playerAlive++;
 		}
+		
+		musicPath = backgroundMusicPath;
 		
 	}
 
@@ -184,19 +188,12 @@ public class PartyHard_Fight implements Screen {
     	listStyle.fontColorSelected = Color.BLACK;
     	listStyle.fontColorUnselected = Color.WHITE;
     	listStyle.background = drawable;
+    	
+    	/*
+    	 * checking the music to play
+    	 */
+    	backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/"+musicPath+".mp3"));
 		
-		/*
-		 * list of actions
-		 */
-		
-		final TextButton atk = new TextButton("atk!", buttonStyle);
-		
-			atk.pad(20);		
-			atk.setSize(Gdx.graphics.getWidth()/2, 100);
-			atk.setHeight(100);	
-
-			 backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_sound.mp3"));
-			
 		//searching if it's a boss fight
 			for(int i = 0; i < enemySquad.size(); i++)
 			{
@@ -205,8 +202,12 @@ public class PartyHard_Fight implements Screen {
 					backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_boss.mp3"));
 					break;
 				}					 				
-			}				
+			}
 		
+		/*
+		 * list of actions
+		 */
+			
 		final TextButton buttonFlee = new TextButton("Flee!", buttonStyle);
 		
 		buttonFlee.pad(20);		
@@ -240,6 +241,10 @@ public class PartyHard_Fight implements Screen {
 		buttonFight.setWidth(Gdx.graphics.getWidth()/2);
 		buttonFight.setHeight(100);
 		
+		/*
+		 * clicking on it will activate the second phase of the fight
+		 */
+		
 		 buttonFight.addListener(new ClickListener(){
 	            @Override 
 	            public void clicked(InputEvent event, float x, float y){
@@ -262,9 +267,11 @@ public class PartyHard_Fight implements Screen {
        final Table tableFight = new Table();       
        
        final TextButton buttonAtk = new TextButton("Atk!", buttonStyle);
-       	buttonAtk.pad(20);		
-		buttonAtk.setWidth(Gdx.graphics.getWidth()/2);
-		buttonAtk.setHeight(100);
+       	buttonAtk.pad(10);		
+       	buttonAtk.setWidth(Gdx.graphics.getWidth()/3);
+		buttonAtk.setHeight(100);		
+       	
+		buttonAtk.setPosition(0, 0);		
 		
 		Table tableCap = new Table();
 	 	tableCap.setName("tableCap");
@@ -284,7 +291,8 @@ public class PartyHard_Fight implements Screen {
 					}
 					else
 						tableCap = new Table();
-									 				 						 		
+						tableCap.setName("tableCap");
+					
 				 		List<TextButton> list = new List<TextButton>(listStyle);
 			            list.setName("capacity");				           
 			            
@@ -320,6 +328,8 @@ public class PartyHard_Fight implements Screen {
 			            			 listChara.getItems().add(chara);
 			            		 }
 			            		 
+			            		 
+			            		 //setting the listener that set the Target of the player cap
 			            		 listChara.addListener(new ClickListener(){
 			            			 public void clicked(InputEvent event, float x, float y){
 			            				 
@@ -340,33 +350,32 @@ public class PartyHard_Fight implements Screen {
 					            	scroll.setPosition(cap.getChildren().get(0).getX() + cap.getChildren().get(0).getWidth() + 50, cap.getChildren().get(0).getY());
 									
 									tableListChara.addActor(scroll);
-									stage.addActor(tableListChara);		            		 
+									stage.addActor(tableListChara);									
 			            	 }
 			            	 
 			            	}
 			            });		            	
 			            
-		            	for(int u = 0; u < playerSquad.get(getAlivePlayer()).capacity.size(); u++)
+		            	for(int u = 0; u != playerSquad.get(getAlivePlayer()).capacity.size(); u++)
 			            	{
 		            			//the list use the name to display, so i used the text to know which cap has been selected
 			            		TextButton cap = new TextButton(""+u, buttonStyle);
 			            		cap.setName(playerSquad.get(getAlivePlayer()).capacity.get(u).Name);
 			            			            		
 			            		list.getItems().add(cap);
-			            	}
+			            	}		            			            	
 		            	
 		            		tableCap.center();	            		
 		            		            				            		
-							Table label = searchTable("tableTurn");
-							                    		
+							Table label = searchTable("tableTurn");							                    		
 		            		
 		            	 	list.setPosition(label.getChildren().get(0).getX(), label.getChildren().get(0).getY() + list.getHeight() + 40);
 		            	
-		            		ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            	
+		            		ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            		
 		            	    ScrollPane scroll = new ScrollPane(list, scrollStyle);
 		            	  
-		  	            	scroll.setPosition(list.getX() - list.getWidth(), list.getY()); 	            	            	
-		  	          
+		  	            	scroll.setPosition(list.getX() - list.getWidth(), list.getY()); 	
+		  	            			  	            	
 		  	            	tableCap.addActor(scroll);
 		  	            	
 		  	            	tableCap.setVisible(true);
@@ -398,38 +407,53 @@ public class PartyHard_Fight implements Screen {
 				 }
 					
 			 }
-		});		
+		});	
+		
+		final TextButton buttonItem = new TextButton("Item", buttonStyle);
+	      
+      	buttonItem.pad(10);		
+		buttonItem.setSize(buttonAtk.getWidth(), 100);
+		
+		buttonItem.setPosition(buttonAtk.getX() + buttonAtk.getWidth(), 0);	
+		
 		
 		final TextButton buttonBack = new TextButton("Back", buttonStyle);
 		
-		buttonBack.pad(20);		
-		buttonBack.setWidth(Gdx.graphics.getWidth()/2);
-		buttonBack.setHeight(100);
+		buttonBack.pad(10);		
+		buttonBack.setSize(buttonItem.getWidth(), 100);
+	
+		buttonBack.setPosition(buttonItem.getX() + buttonItem.getWidth(), 0);
 		
 		buttonBack.addListener(new ClickListener(){
 	            @Override 
-	            public void clicked(InputEvent event, float x, float y){
+	            public void clicked(InputEvent event, float x, float y){	            	
+	            	/*
+	            	 * removing the menus only if they exist
+	            	 */
 	            	
-	            	//disabling the menus
-	    			stage.getActors().removeIndex(getTableIndex("tableCap"));
+	            	//disabling the menus(if exist)
+	            	if(getTableIndex("tableCap") != -1)
+	            		stage.getActors().get(getTableIndex("tableCap")).setVisible(false);;
 	    			//if a cap healing selected we need to erase the list of chara from the screen
 	    			if(getTableIndex("tableListChara") != -1)
 	    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
-	    			stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
+	    			if(getTableIndex("tableLabelTarget") != -1)
+	    				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
 	            	
 	               stage.getActors().get(1).setVisible(false);
 	               stage.getActors().get(2).setVisible(true);
 	            }
 	        });
-	       
-		tableFight.add(buttonAtk).width(Gdx.graphics.getWidth() / 2);
-	    tableFight.add(buttonBack).width(Gdx.graphics.getWidth() / 2);
+
+		
+		tableFight.add(buttonAtk).width(Gdx.graphics.getWidth() / 3);
+		tableFight.add(buttonItem).width(Gdx.graphics.getWidth() / 3);
+	    tableFight.add(buttonBack).width(Gdx.graphics.getWidth() / 3);
 		
        tableFight.setVisible(false);
+       tableFight.setSize(Gdx.graphics.getWidth(), 100);
        tableFight.right().bottom();
-       
-       tableFight.setHeight(100);
-       tableFight.setWidth(Gdx.graphics.getWidth());
+       tableFight.setPosition(0, 0);
        
        /*
         * Creating the label that show the life of the characters
@@ -454,18 +478,14 @@ public class PartyHard_Fight implements Screen {
 			labelName.setName(playerSquad.get(i).Name+"name");
 			labelName.setFontScale(2f);
 				
-			if(i == 0)
-			{
-				labelLife.setPosition(buttonAtk.getWidth() / 2 - labelLife.getWidth(), 0);
-				labelName.setPosition(buttonAtk.getWidth() / 2 - labelLife.getWidth(), 30);
-			}
-				
-			else
-			{
-				labelLife.setPosition(buttonAtk.getWidth() + (buttonBack.getWidth()  / 2) - labelLife.getWidth(), 0);
-				labelName.setPosition(buttonAtk.getWidth() + (buttonBack.getWidth()  / 2) - labelLife.getWidth(), 30);
-			}
-				
+			/*
+			 * setting the position( dividing the screen width by the number of player then multiply by i)
+			 */
+			
+			labelLife.setPosition((Gdx.graphics.getWidth() / playerSquad.size()) * i + 100, 0);
+			labelName.setPosition(labelLife.getX() - labelLife.getWidth(), 30);
+			
+			
 			labelLife.setWidth(100f);
 			labelLife.setHeight(20f);
 			
@@ -1041,7 +1061,6 @@ public class PartyHard_Fight implements Screen {
 								
 				}
 				
-				
 				/*
 				 * Updating the label that show the life
 				 */
@@ -1396,7 +1415,6 @@ public class PartyHard_Fight implements Screen {
 		stage.dispose();
 		skin.dispose();
 		backgroundMusic.dispose();
-		game.dispose();
-		
+		game.dispose();		
 	}	
 }
