@@ -87,8 +87,7 @@ public class PartyHard_MapScreen implements Screen{
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
 		this.playerMap.setMap(mapName);
-		this.playerMap.setCollisionLayer(tiledmap);
-		
+		this.playerMap.setCollisionLayer(tiledmap);		
 	}			
 	
 	@Override
@@ -109,9 +108,10 @@ public class PartyHard_MapScreen implements Screen{
        
         playerMap.update(delta);
         
-     
+     //updating the player's animation
         if(animationTime + delta >= 1)
         	animationTime = 0;
+        
         if(playerMap.isMoving())
         {
         	spriteBatch.draw(playerMap.getFrame(direction, animationTime), playerMap.getX(), playerMap.getY());
@@ -468,8 +468,7 @@ public class PartyHard_MapScreen implements Screen{
 		 {
 			 //probability for a fight
 			 proba = Integer.parseInt(prop.get("Proba", String.class));
-			 
-			 
+			 			 
 			//getting the name of the monsters then splitting them(they are stored with a comma)
 			 String monsterNameRaw = prop.get("Monsters", String.class);
 			 String name[] = monsterNameRaw.split(",");
@@ -557,7 +556,7 @@ public class PartyHard_MapScreen implements Screen{
 			playerSquad.add(new PartyHard_Player_Fight(0));
 			playerSquad.add(new PartyHard_Player_Fight(1));
 			 
-		    fightScreen = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame);
+		    fightScreen = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame, prop.get("Battle_Music", String.class));
 			mainGame.setScreen(fightScreen);
 			
 			mapSound.dispose();
