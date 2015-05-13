@@ -27,7 +27,12 @@ public class PartyHard_Player_Fight{
 	public ArrayList<PartyHard_Object> bag;
 	public int bagSpace = 0;
 	
+	private int objectUsed = -1;
+	
 	public ArrayList<PartyHard_Capacity> capacity;
+	
+	private int targetCapacity = -1;
+	private int capacitySelected = -1;
 	
 	private int HpMax;
 	
@@ -37,8 +42,6 @@ public class PartyHard_Player_Fight{
 	
 	private boolean isDead = false;
 	
-	private int targetCapacity = -1;
-	private int capacitySelected = -1;
 	
 	public int damageTaken = 0;
 	public int healAmount = 0;
@@ -362,5 +365,13 @@ public class PartyHard_Player_Fight{
 
 	public void setHealAmount(int healAmount) {
 		this.healAmount += healAmount;
+	}
+
+	public int getObjectUsed() {
+		return objectUsed;
+	}
+
+	public void setObjectUsed(int objectUsed) {
+		this.objectUsed = objectUsed;
 	}	
 }
