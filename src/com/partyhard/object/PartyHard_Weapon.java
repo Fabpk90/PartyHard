@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 
-public class PartyHard_Weapon extends PartyHard_Object{
+public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Weareable{
 	
 	public int price;
 	private int weaponType;
@@ -98,5 +98,11 @@ public class PartyHard_Weapon extends PartyHard_Object{
 
 	public void setEquip(boolean equip) {
 		this.equip = equip;
+	}
+
+
+	@Override
+	public boolean isEquiped(){
+		return equip;
 	}
 }
