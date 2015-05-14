@@ -235,8 +235,7 @@ public class PartyHard_MapScreen implements Screen{
 	        	
 	    		playerMap.setMap(Name);
 	    		playerMap.setCollisionLayer(tiledmap);
-	    			    		
-	    		
+	    			    	
 	    		playerMap.isTp = false;
 	    		
 	    		mapSound.dispose();
@@ -506,12 +505,39 @@ public class PartyHard_MapScreen implements Screen{
 		 //loading player anim
 		 playerMap.createPlayerAnimation();
 		 
-		//updating camera	 	 
-		 camera.position.x = camera.viewportWidth / 2;
-		 camera.position.y = camera.viewportHeight / 2;
-		 
+		 camera.position.y = playerMap.getY();
+		 camera.position.x = playerMap.getX();
 		 camera.update();
-	 
+		 
+		 //checking if the camera is outside the map		 		 
+		
+		 	//checking y -
+			 if(playerMap.getY() < camera.viewportHeight / 2)
+			 {
+				 System.out.println("min");
+				 camera.position.y =  camera.viewportHeight / 2;
+			 }
+			 
+			 //checking y +
+			 if(playerMap.getY() + camera.viewportHeight / 2 > mapPixelHeight)
+			 {
+				camera.position.y = mapPixelHeight - camera.viewportHeight / 2; 
+			 }
+			 
+			 //checking x -
+			 if(playerMap.getX() < camera.viewportWidth / 2)
+			 {
+				 camera.position.x = camera.viewportWidth / 2;
+			 }
+			 
+			 //checking x +
+			 if(playerMap.getX() + camera.viewportWidth / 2 > mapPixelWidth)
+			 {
+				 camera.position.x = mapPixelWidth - camera.viewportWidth / 2; 
+			 }
+			
+			 camera.update();
+ 
 		 //loading bg music
 		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
 		 mapSound.loop();
