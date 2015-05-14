@@ -416,6 +416,43 @@ public class PartyHard_Fight implements Screen {
 		
 		buttonItem.setPosition(buttonAtk.getX() + buttonAtk.getWidth(), 0);	
 		
+		buttonItem.addListener(new ClickListener()
+		{
+			 public void clicked(InputEvent event, float x, float y)
+			 {	
+				 //if the table already exist load it or load a new table if not
+				 
+				 Table tableItem = null;
+				 if(getTableIndex("tableItem") != -1)
+					 tableItem = searchTable("tableItem");
+				 
+				 tableItem = new Table();				 
+				 tableItem.setName("tableItem");
+				 
+				 List<TextButton> listItem = new List<TextButton>(listStyle);
+				 
+				 for(int i = 0; i < playerSquad.get(getAlivePlayer()).bagSpace; i++)
+				 {
+					 if(playerSquad.get(getAlivePlayer()).bag.get(i).type == 2)
+					 {
+						 TextButton item = new TextButton(""+i, buttonStyle);
+						 item.setName(playerSquad.get(getAlivePlayer()).bag.get(i).Name);
+						 
+						 listItem.getItems().add(item);
+					 }
+				 }
+				 
+				 tableItem.add(listItem);
+				 
+				 //if the table already exist just update it with the new one
+				 if(getTableIndex("tableItem") != -1)
+					 stage.getActors().items[getTableIndex("tableItem")] = tableItem;
+				 else
+					 stage.addActor(tableItem);
+				 
+			 }
+			             
+		});
 		
 		final TextButton buttonBack = new TextButton("Back", buttonStyle);
 		
