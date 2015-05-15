@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.FileHandler;
 
 import utils.ImageAccessor;
 import utils.LabelAccessor;
@@ -291,6 +290,7 @@ public class PartyHard_Fight implements Screen {
 					}
 					else
 						tableCap = new Table();
+					
 						tableCap.setName("tableCap");
 					
 				 		List<TextButton> list = new List<TextButton>(listStyle);
@@ -355,15 +355,16 @@ public class PartyHard_Fight implements Screen {
 			            	 
 			            	}
 			            });		            	
+			           
 			            
 		            	for(int u = 0; u != playerSquad.get(getAlivePlayer()).capacity.size(); u++)
-			            	{
+			            {
 		            			//the list use the name to display, so i used the text to know which cap has been selected
 			            		TextButton cap = new TextButton(""+u, buttonStyle);
 			            		cap.setName(playerSquad.get(getAlivePlayer()).capacity.get(u).Name);
 			            			            		
 			            		list.getItems().add(cap);
-			            	}		            			            	
+			            }		            			            	
 		            	
 		            		tableCap.center();	            		
 		            		            				            		
@@ -394,7 +395,8 @@ public class PartyHard_Fight implements Screen {
 			  	            	tableTarget.addActor(label1);
 			  	            	
 			  	            	stage.getActors().add(tableTarget);
-		  	            	}		
+		  	            	}
+		  	            	//updating the cap
 		  	            		if(getTableIndex("tableCap") != -1)	  	            	
 		  	            			stage.getActors().removeIndex(getTableIndex("tableCap"));	
 		  	            		stage.getActors().add(tableCap);
@@ -418,38 +420,52 @@ public class PartyHard_Fight implements Screen {
 		
 		buttonItem.addListener(new ClickListener()
 		{
+			@Override
 			 public void clicked(InputEvent event, float x, float y)
-			 {	
-				 //if the table already exist load it or load a new table if not
-				 
-				 Table tableItem = null;
-				 if(getTableIndex("tableItem") != -1)
-					 tableItem = searchTable("tableItem");
-				 
-				 tableItem = new Table();				 
-				 tableItem.setName("tableItem");
-				 
-				 List<TextButton> listItem = new List<TextButton>(listStyle);
-				 
-				 for(int i = 0; i < playerSquad.get(getAlivePlayer()).bagSpace; i++)
-				 {
-					 if(playerSquad.get(getAlivePlayer()).bag.get(i).type == 2)
-					 {
-						 TextButton item = new TextButton(""+i, buttonStyle);
-						 item.setName(playerSquad.get(getAlivePlayer()).bag.get(i).Name);
-						 
-						 listItem.getItems().add(item);
-					 }
-				 }
-				 
-				 tableItem.add(listItem);
-				 
-				 //if the table already exist just update it with the new one
-				 if(getTableIndex("tableItem") != -1)
-					 stage.getActors().items[getTableIndex("tableItem")] = tableItem;
-				 else
-					 stage.addActor(tableItem);
-				 
+			 {		
+				Table tableItem = new Table();
+				tableItem.setName("tableItem");
+				
+				List<TextButton> listItem = new List<TextButton>(listStyle);
+				
+				for(int i = 0; i != playerSquad.get(getAlivePlayer()).bagSpace; i++)
+				{
+					if(playerSquad.get(getAlivePlayer()).bag.get(i).type == 2)
+					{
+						TextButton item = new TextButton(""+i,buttonStyle);
+						item.setName(playerSquad.get(getAlivePlayer()).bag.get(i).Name);
+						item.pad(5f);
+						
+						listItem.getItems().add(item);
+					}
+					
+				}
+				
+				//if there is no item found
+				if(listItem.getItems().size == 0)
+				{
+					TextButton item = new TextButton("",buttonStyle);
+					item.setName("No item to use found!");
+					item.pad(5f);
+					
+					listItem.getItems().add(item);
+				}
+				
+				ScrollPaneStyle style = new ScrollPaneStyle();
+				ScrollPane scroll = new ScrollPane(listItem, style);
+				        		
+				Table label = searchTable("tableTurn");							                    		
+
+				scroll.setPosition(label.getChildren().get(0).getX(), label.getChildren().get(0).getY() + listItem.getHeight() + 40);
+				
+				if(getTableIndex("tableItem") != -1)
+					stage.getActors().removeIndex(getTableIndex("tableItem"));								
+				
+				tableItem.addActor(scroll);
+				tableItem.center();
+								
+				stage.addActor(tableItem);
+				
 			 }
 			             
 		});
@@ -476,6 +492,8 @@ public class PartyHard_Fight implements Screen {
 	    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
 	    			if(getTableIndex("tableLabelTarget") != -1)
 	    				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
+	    			if(getTableIndex("tableItem") != -1)
+	    				stage.getActors().removeIndex(getTableIndex("tableItem"));
 	            	
 	               stage.getActors().get(1).setVisible(false);
 	               stage.getActors().get(2).setVisible(true);
