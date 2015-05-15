@@ -513,8 +513,7 @@ public class PartyHard_MapScreen implements Screen{
 		
 		 	//checking y -
 			 if(playerMap.getY() < camera.viewportHeight / 2)
-			 {
-				 System.out.println("min");
+			 {				 
 				 camera.position.y =  camera.viewportHeight / 2;
 			 }
 			 
