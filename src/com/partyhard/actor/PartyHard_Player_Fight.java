@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Object;
 import com.partyhard.object.PartyHard_Weapon;
 
@@ -86,6 +87,9 @@ public class PartyHard_Player_Fight{
 						{
 							case 0: //weapon
 								bag.add(new PartyHard_Weapon(items.get(p).getInt("id")));
+								break;
+							case 1: //Armor
+								bag.add(new PartyHard_Armor(items.get(p).getInt("id")));
 								break;
 						}
 					}

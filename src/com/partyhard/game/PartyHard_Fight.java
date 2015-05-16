@@ -50,6 +50,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
+import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Fight implements Screen {
@@ -428,6 +429,63 @@ public class PartyHard_Fight implements Screen {
 				
 				List<TextButton> listItem = new List<TextButton>(listStyle);
 				
+				//adding listener for knwoing which object the player is using on who
+				listItem.addListener(new ClickListener(){
+			             public void clicked(InputEvent event, float x, float y){
+			            	 
+			            	 List<TextButton> list = (List<TextButton>) event.getTarget();            	
+			            		 playerSquad.get(getAlivePlayer()).setObjectUsed(Integer.parseInt(list.getSelected().getText().toString()));
+		            	 
+			            	//if the user is switch cap from healing to normal
+            				 if(getTableIndex("tableListChara") != -1)
+            					 stage.getActors().removeIndex(getTableIndex("tableListChara"));
+			            	 
+			            	 if(playerSquad.get(getAlivePlayer()).capacity.get(playerSquad.get(getAlivePlayer()).getCapacitySelected()).isHeal)
+			            	 {
+			            		 Table tableListChara = new Table();
+			            		 tableListChara.setName("tableListChara");
+			            		 
+			            		 tableListChara.center();
+			            		 
+			            		 List<TextButton> listChara = new List<TextButton>(listStyle);
+			            		 	
+			            		 //the list display the name of the textbutton not the text
+			            		 for(int l = 0; l < playerSquad.size(); l++)
+			            		 {
+			            			 TextButton chara = new TextButton(""+l, buttonStyle);
+			            			 chara.setName(playerSquad.get(l).Name);
+			            			 
+			            			 listChara.getItems().add(chara);
+			            		 }
+			            		 
+			            		 
+			            		 //setting the listener that set the Target of the player cap
+			            		 listChara.addListener(new ClickListener(){
+			            			 public void clicked(InputEvent event, float x, float y){
+			            				 
+			            				 List<TextButton> list = (List<TextButton>) event.getTarget();
+			            				 playerSquad.get(getAlivePlayer()).setTarget(Integer.parseInt(list.getSelected().getText().toString()));			            				 			            				
+			            			 }
+			             
+			            		 });
+			            		             		 
+			            		 /*
+			            		  * Displaying the list of chara
+			            		  */
+									Table cap = searchTable("tableCap");								
+									
+									ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            	
+					            	ScrollPane scroll = new ScrollPane(listChara, scrollStyle);
+					            	
+					            	scroll.setPosition(cap.getChildren().get(0).getX() + cap.getChildren().get(0).getWidth() + 50, cap.getChildren().get(0).getY());
+									
+									tableListChara.addActor(scroll);
+									stage.addActor(tableListChara);									
+			            	 }
+			            	 
+			            	}
+			            });	
+				
 				for(int i = 0; i != playerSquad.get(getAlivePlayer()).bagSpace; i++)
 				{
 					if(playerSquad.get(getAlivePlayer()).bag.get(i).type == 2)
@@ -778,23 +836,28 @@ public class PartyHard_Fight implements Screen {
 	private void fight()
 	{
 		
-		if(playerSquad.get(getAlivePlayer()).getCapacitySelected() > -1)
-		{						
-			//disabling the menus
-			stage.getActors().get(getTableIndex("tableCap")).setVisible(false);
-			//if a cap healing selected we need to erase the list of chara from the screen
-			if(playerSquad.get(getAlivePlayer()).capacity.get(playerSquad.get(getAlivePlayer()).getCapacitySelected()).isHeal)
-				stage.getActors().removeIndex(getTableIndex("tableListChara"));
-			//if not heal then need to remove the arrowMonster
-			else
-				stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);
+		if(playerSquad.get(getAlivePlayer()).getCapacitySelected() > -1 || playerSquad.get(getAlivePlayer()).getObjectUsed() > -1)
+		{
+			//if the player is using a cap
+			if(playerSquad.get(getAlivePlayer()).getCapacitySelected() > -1)
+			{
+				//disabling the menus
+				stage.getActors().get(getTableIndex("tableCap")).setVisible(false);
+				//if a cap healing selected we need to erase the list of chara from the screen
+				if(playerSquad.get(getAlivePlayer()).capacity.get(playerSquad.get(getAlivePlayer()).getCapacitySelected()).isHeal)
+					stage.getActors().removeIndex(getTableIndex("tableListChara"));
+				//if not heal then need to remove the arrowMonster
+				else
+					stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);
+					
+				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
+									
+				//turning off the arrow
+				int index = getTableIndex("monsterArrow");
 				
-			stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
-								
-			//turning off the arrow
-			int index = getTableIndex("monsterArrow");
+				stage.getActors().get(index).setVisible(false);
+			}
 			
-			stage.getActors().get(index).setVisible(false);
 				
 			/*
 			 * FIGHT!!
@@ -851,8 +914,17 @@ public class PartyHard_Fight implements Screen {
 							playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount((playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).amount));														
 						}
 						
-						//setting to default damage taken 
-						//playerSquad.get(enemySquad.get(i).getIdTarget()).damageTaken = 0;
+				//the player is using an object, for now only heal
+					if(playerSquad.get(i).getObjectUsed() != -1)
+					{
+						//healing player
+						playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount( ((PartyHard_Potion) playerSquad.get(i).bag.get(playerSquad.get(i).getObjectUsed())).getAmount());
+						
+						//deleting the used object from bag and setting back the objectused var to -1(default)
+						playerSquad.get(i).bag.remove(playerSquad.get(i).getObjectUsed());
+						playerSquad.get(i).setObjectUsed(-1);
+					}
+									
 				}
 					/*
 					 * Monster turn
