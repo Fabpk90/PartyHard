@@ -7,6 +7,7 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -33,7 +34,7 @@ import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
 
-public class PartyHard_MapScreen implements Screen{
+public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	public Game mainGame;
 	private SpriteBatch spriteBatch;  
@@ -209,14 +210,7 @@ public class PartyHard_MapScreen implements Screen{
 		        {
 		        	playerMap.moving(true);
 		        	moveDown();
-		        }
-		      
-		        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-		        {
-		        	this.dispose();
-		        	mainGame.dispose();
-		        	Gdx.app.exit();	
-		        }      	  
+		        }		      	           	  
           }
         }     
 	        stage.draw();
@@ -633,13 +627,86 @@ public class PartyHard_MapScreen implements Screen{
 	 * 
 	 * @return The index of the Table
 	 */
-		private int getTableIndex(String name)
+	private int getTableIndex(String name)
+	{
+		for(int i = 0; i < stage.getActors().size; i++)
 		{
-			for(int i = 0; i < stage.getActors().size; i++)
-			{
-				if(stage.getActors().get(i).getName() == name)
-					return i;
-			}	
-			return -1;
+			if(stage.getActors().get(i).getName() == name)
+				return i;
+		}	
+		return -1;
+	}
+	
+	//used to toggle the menus
+	private void toggleMenu()
+	{
+		//menu exist
+		if(getTableIndex("tableMenu") != -1)
+		{
+			stage.getActors().removeIndex(getTableIndex("tableMenu"));
 		}
+		//if it doesn't
+		else
+		{
+			Table tableMenu = new Table();
+			tableMenu.setName("tableMenu");
+		}
+	
+		
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		
+		switch(keycode)
+		{
+			case Input.Keys.ESCAPE:
+				toggleMenu();
+			break;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
