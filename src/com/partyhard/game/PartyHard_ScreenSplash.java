@@ -171,7 +171,6 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	stage.addActor(labelTitle);
 	stage.addActor(buttonTable);
-	stage.setDebugAll(true);
 	
 	//creating the sequence for the animation
 	

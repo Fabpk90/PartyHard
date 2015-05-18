@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Object;
+import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Player_Fight{
@@ -26,7 +27,7 @@ public class PartyHard_Player_Fight{
 	public PartyHard_Level levelUp;
 	
 	public ArrayList<PartyHard_Object> bag;
-	public int bagSpace = 0;
+	private int bagSpace = 0;
 	
 	private int objectUsed = -1;
 	
@@ -76,10 +77,10 @@ public class PartyHard_Player_Fight{
 					Class = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("class").getAttribute("value"));
 					
 					 bag = new ArrayList<PartyHard_Object>();
-					 capacity = new ArrayList<PartyHard_Capacity>();
-					
+					 capacity = new ArrayList<PartyHard_Capacity>();				
 					 
 					 Array<Element> items =	arrayOfPlayer.get(i).getChildByName("bag").getChildrenByName("item");
+					 
 					//populating the inventory
 					for(int p = 0; p != bagSpace; p++)
 					{
@@ -91,13 +92,12 @@ public class PartyHard_Player_Fight{
 							case 1: //Armor
 								bag.add(new PartyHard_Armor(items.get(p).getInt("id")));
 								break;
+							case 2: //Potion
+								bag.add(new PartyHard_Potion(items.get(p).getInt("id")));
+								break;
 						}
 					}
-					
-					/*
-					 * TODO get all the id from the player and check them by capacity if equal add
-					 */
-					
+										
 					//getting the capacities
 					
 					Element rootCap = xml.parse(Gdx.files.local("capacity.xml"));
@@ -200,6 +200,21 @@ public class PartyHard_Player_Fight{
 	public void setclass(int Class)
 	{
 		this.Class = Class;
+	}
+	
+	public void refreshBag()
+	{
+		bagSpace = bag.size();
+	}
+	
+	public void bagUsed()
+	{
+		bagSpace--;
+	}
+	
+	public void setBagSpace(int amount)
+	{
+		bagSpace = amount;
 	}
 	
 	public int getBagSpace()

@@ -49,7 +49,7 @@ super("", "", "", 0);
 				super.Name = Name;
 				super.imagePath = imagePath;
 				super.description = description;
-				super.type = 0;
+				super.type = 2;
 				
 				/*
 				 * load info for the weapon

@@ -50,6 +50,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
+import com.partyhard.object.PartyHard_Armor;
+import com.partyhard.object.PartyHard_Consumable;
 import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weapon;
 
@@ -278,7 +280,21 @@ public class PartyHard_Fight implements Screen {
 		
 		buttonAtk.addListener(new ClickListener(){
 			 @Override 
-	            public void clicked(InputEvent event, float x, float y){			 
+	            public void clicked(InputEvent event, float x, float y){	
+				 
+				 //deleting the item list if shown before
+				 if(getTableIndex("tableItem") != -1)
+	    				stage.getActors().removeIndex(getTableIndex("tableItem"));
+				 if(getTableIndex("tableListChara") != -1)
+	    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
+				 
+				 //setting back default value if the player tried to use an object, making sure that the player was using an item
+				 if(playerSquad.get(getAlivePlayer()).getObjectUsed() != -1)
+				 {
+					 playerSquad.get(getAlivePlayer()).setObjectUsed(-1);
+					 playerSquad.get(getAlivePlayer()).setTarget(-1);
+				 }
+							 
 				    /*
 		             * Creating the list of abilities that can be used against the monster
 		             */		            				 		
@@ -423,7 +439,28 @@ public class PartyHard_Fight implements Screen {
 		{
 			@Override
 			 public void clicked(InputEvent event, float x, float y)
-			 {		
+			 {
+				
+				/*
+				 * checking if the user was using a cap before
+				 */
+				
+				//disabling the menus(if exist)
+            	if(getTableIndex("tableCap") != -1)
+            		stage.getActors().get(getTableIndex("tableCap")).setVisible(false);;
+    			//if a cap healing selected we need to erase the list of chara from the screen
+    			if(getTableIndex("tableListChara") != -1)
+    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
+    			if(getTableIndex("tableLabelTarget") != -1)
+    				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
+    			
+    			//setting back the default value if the player has first decided to attack with a cap, making sure that it uses on before act
+    			if(playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1)
+    			{
+    				playerSquad.get(getAlivePlayer()).setCapacitySelected(-1);
+        			playerSquad.get(getAlivePlayer()).setTarget(-1);
+    			}
+    			  			
 				Table tableItem = new Table();
 				tableItem.setName("tableItem");
 				
@@ -433,21 +470,25 @@ public class PartyHard_Fight implements Screen {
 				listItem.addListener(new ClickListener(){
 			             public void clicked(InputEvent event, float x, float y){
 			            	 
-			            	 List<TextButton> list = (List<TextButton>) event.getTarget();            	
+			            	 List<TextButton> list = (List<TextButton>) event.getTarget();
+			            	 //no item in the bag to use
+			            	 if(list.getItems().get(0).getName() != "No item to use found!")
+			            	 {
 			            		 playerSquad.get(getAlivePlayer()).setObjectUsed(Integer.parseInt(list.getSelected().getText().toString()));
 		            	 
 			            	//if the user is switch cap from healing to normal
             				 if(getTableIndex("tableListChara") != -1)
             					 stage.getActors().removeIndex(getTableIndex("tableListChara"));
 			            	 
-			            	 if(playerSquad.get(getAlivePlayer()).capacity.get(playerSquad.get(getAlivePlayer()).getCapacitySelected()).isHeal)
+            				 //if it is a potion what the player has selected
+			            	 if(((PartyHard_Consumable) playerSquad.get(getAlivePlayer()).bag.get(Integer.parseInt(list.getSelected().getText().toString()))).getType() == 2)
 			            	 {
 			            		 Table tableListChara = new Table();
 			            		 tableListChara.setName("tableListChara");
 			            		 
 			            		 tableListChara.center();
 			            		 
-			            		 List<TextButton> listChara = new List<TextButton>(listStyle);
+			            		 List<TextButton> listChara = new List<TextButton>(listStyle);			            		 
 			            		 	
 			            		 //the list display the name of the textbutton not the text
 			            		 for(int l = 0; l < playerSquad.size(); l++)
@@ -459,22 +500,26 @@ public class PartyHard_Fight implements Screen {
 			            		 }
 			            		 
 			            		 
-			            		 //setting the listener that set the Target of the player cap
+			            		 //listener that set the used object
 			            		 listChara.addListener(new ClickListener(){
 			            			 public void clicked(InputEvent event, float x, float y){
 			            				 
 			            				 List<TextButton> list = (List<TextButton>) event.getTarget();
-			            				 playerSquad.get(getAlivePlayer()).setTarget(Integer.parseInt(list.getSelected().getText().toString()));			            				 			            				
+			            				 //if there is item to use in the bag
+			            				 if(list.getItems().get(0).getName() != "No item to use found!")
+			            				 {
+			            					 playerSquad.get(getAlivePlayer()).setTarget(Integer.parseInt(list.getSelected().getText().toString()));
+			            				 }			        					 				            				 
 			            			 }
 			             
 			            		 });
 			            		             		 
 			            		 /*
-			            		  * Displaying the list of chara
+			            		  * setting the list on its position
 			            		  */
-									Table cap = searchTable("tableCap");								
+									Table cap = searchTable("tableItem");								
 									
-									ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            	
+									ScrollPaneStyle scrollStyle = new ScrollPaneStyle();																
 					            	ScrollPane scroll = new ScrollPane(listChara, scrollStyle);
 					            	
 					            	scroll.setPosition(cap.getChildren().get(0).getX() + cap.getChildren().get(0).getWidth() + 50, cap.getChildren().get(0).getY());
@@ -484,9 +529,11 @@ public class PartyHard_Fight implements Screen {
 			            	 }
 			            	 
 			            	}
+			                	 
+			             }//closing the if bag item found
 			            });	
 				
-				for(int i = 0; i != playerSquad.get(getAlivePlayer()).bagSpace; i++)
+				for(int i = 0; i < playerSquad.get(getAlivePlayer()).bag.size(); i++)
 				{
 					if(playerSquad.get(getAlivePlayer()).bag.get(i).type == 2)
 					{
@@ -511,6 +558,7 @@ public class PartyHard_Fight implements Screen {
 				
 				ScrollPaneStyle style = new ScrollPaneStyle();
 				ScrollPane scroll = new ScrollPane(listItem, style);
+				
 				        		
 				Table label = searchTable("tableTurn");							                    		
 
@@ -523,6 +571,12 @@ public class PartyHard_Fight implements Screen {
 				tableItem.center();
 								
 				stage.addActor(tableItem);
+				
+				 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
+				 if(!win && !loose && playerSquad.get(getAlivePlayer()).getObjectUsed() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
+				 {
+					 fight();
+				 }
 				
 			 }
 			             
@@ -550,6 +604,7 @@ public class PartyHard_Fight implements Screen {
 	    				stage.getActors().removeIndex(getTableIndex("tableListChara"));
 	    			if(getTableIndex("tableLabelTarget") != -1)
 	    				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
+	    			//item shown
 	    			if(getTableIndex("tableItem") != -1)
 	    				stage.getActors().removeIndex(getTableIndex("tableItem"));
 	            	
@@ -791,7 +846,7 @@ public class PartyHard_Fight implements Screen {
         
         for(int i = 0; i < playerSquad.size(); i++)
         {
-        	for(int p = 0; p != playerSquad.get(i).bagSpace; p++)
+        	for(int p = 0; p != playerSquad.get(i).getBagSpace(); p++)
         	{
         		switch(playerSquad.get(i).bag.get(p).type)
         		{
@@ -821,9 +876,7 @@ public class PartyHard_Fight implements Screen {
 		 Gdx.gl.glClearColor(0, 0, 0, 1);
 	        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	        
-	        batch.begin();	      
-	        
-	        
+	        batch.begin();	              
 	        
 	        tweenManager.update(delta);
 	        
@@ -836,26 +889,30 @@ public class PartyHard_Fight implements Screen {
 	private void fight()
 	{
 		
-		if(playerSquad.get(getAlivePlayer()).getCapacitySelected() > -1 || playerSquad.get(getAlivePlayer()).getObjectUsed() > -1)
+		if(playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1 || playerSquad.get(getAlivePlayer()).getObjectUsed() != -1)
 		{
 			//if the player is using a cap
-			if(playerSquad.get(getAlivePlayer()).getCapacitySelected() > -1)
+			if(playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1)
 			{
 				//disabling the menus
 				stage.getActors().get(getTableIndex("tableCap")).setVisible(false);
 				//if a cap healing selected we need to erase the list of chara from the screen
-				if(playerSquad.get(getAlivePlayer()).capacity.get(playerSquad.get(getAlivePlayer()).getCapacitySelected()).isHeal)
+				if(getTableIndex("tableListChara") != -1)
 					stage.getActors().removeIndex(getTableIndex("tableListChara"));
 				//if not heal then need to remove the arrowMonster
-				else
-					stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);
-					
-				stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));
-									
-				//turning off the arrow
-				int index = getTableIndex("monsterArrow");
-				
-				stage.getActors().get(index).setVisible(false);
+				if(getTableIndex("monsterArrow") != -1)
+					stage.getActors().get(getTableIndex("monsterArrow")).setVisible(false);;
+				if(getTableIndex("tableLabelTarget") != -1)	
+					stage.getActors().removeIndex(getTableIndex("tableLabelTarget"));																	
+			}
+			
+			if(playerSquad.get(getAlivePlayer()).getObjectUsed() != -1)
+			{											
+				//deleting the tables
+				if(getTableIndex("tableItem") != -1)
+					stage.getActors().removeIndex(getTableIndex("tableItem"));
+				if(getTableIndex("tableListChara") != -1)
+					stage.getActors().removeIndex(getTableIndex("tableListChara"));
 			}
 			
 				
@@ -887,7 +944,9 @@ public class PartyHard_Fight implements Screen {
 				{
 					if(!playerSquad.get(i).isDead())
 					{
-						//if the cap doesn't heals 
+						//checking if the player is using a cap
+						if(playerSquad.get(i).getCapacitySelected() != -1)
+						//if the cap doesn't heals 				
 						if(!playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).isHeal)
 						{																									
 							//getting the index in the table of the monster and the index in the array									
@@ -916,13 +975,16 @@ public class PartyHard_Fight implements Screen {
 						
 				//the player is using an object, for now only heal
 					if(playerSquad.get(i).getObjectUsed() != -1)
-					{
+					{						
 						//healing player
 						playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount( ((PartyHard_Potion) playerSquad.get(i).bag.get(playerSquad.get(i).getObjectUsed())).getAmount());
-						
+												
 						//deleting the used object from bag and setting back the objectused var to -1(default)
 						playerSquad.get(i).bag.remove(playerSquad.get(i).getObjectUsed());
 						playerSquad.get(i).setObjectUsed(-1);
+						
+						//refreshing the bag index
+						playerSquad.get(getAlivePlayer()).bagUsed();;
 					}
 									
 				}
@@ -945,6 +1007,9 @@ public class PartyHard_Fight implements Screen {
 				{
 					if(!playerSquad.get(i).isDead())
 					{
+						//checking if the player is using a cap
+						if(playerSquad.get(i).getCapacitySelected() != -1)
+						{
 						if(!playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).isHeal)
 						{
 							//searching the monster
@@ -1090,10 +1155,10 @@ public class PartyHard_Fight implements Screen {
 										}
 										
 										
-						}
-						//cap heal
-						else
-						{
+						}//cap atk
+					}//if using a cap			
+						//healing(potion or cap)
+					
 							//if the player is really getting healed
 							if(playerSquad.get(i).getHealAmount() > 0)
 							{
@@ -1125,12 +1190,12 @@ public class PartyHard_Fight implements Screen {
 								stage.addActor(labelHealth);
 							}
 							
-						}							
-									//setting the fight setting back to default
-									playerSquad.get(i).setCapacitySelected(-1);	
-									playerSquad.get(i).setTarget(-1);
-					}
-					
+							
+							//setting the fight setting back to default
+							playerSquad.get(i).setCapacitySelected(-1);	
+							playerSquad.get(i).setTarget(-1);
+						
+					}//and if player not dead				
 				}
 				
 				/*
@@ -1423,16 +1488,21 @@ public class PartyHard_Fight implements Screen {
 		 */
 		 for(int i = 0; i < playerSquad.size(); i++)
 	        {
-	        	for(int p = 0; p != playerSquad.get(i).bagSpace; p++)
+	        	for(int p = 0; p != playerSquad.get(i).bag.size(); p++)
 	        	{
 	        		switch(playerSquad.get(i).bag.get(p).type)
 	        		{
-	        		/*
+	        		
 	        			case 0: //weapon
 	        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
 	        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - weapon.getAmount());
 	        			break;
-	        			*/
+	        			
+	        			case 1://armor
+	        				PartyHard_Armor armor =  (PartyHard_Armor) playerSquad.get(i).bag.get(p);
+	        				playerSquad.get(i).setDef(playerSquad.get(i).getDef() - armor.getAmount());
+	        			break;
+	        			
 	        		}
 	        	}
 	        }
@@ -1460,7 +1530,7 @@ public class PartyHard_Fight implements Screen {
 	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
 					
 					//populating the bag
-					for(int p = 0; p < playerSquad.get(i).bagSpace; p++)
+					for(int p = 0; p < playerSquad.get(i).bag.size(); p++)
 					{
 						xml.element("item").attribute("type", playerSquad.get(i).bag.get(p).type);	
 						
@@ -1468,7 +1538,15 @@ public class PartyHard_Fight implements Screen {
 		        		{
 		        			case 0: //weapon
 		        				PartyHard_Weapon wep = (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", wep.id).pop();
+		        				xml.attribute("id", wep.getId()).pop();
+		        			break;
+		        			case 1: //armor
+		        				PartyHard_Armor armor = (PartyHard_Armor) playerSquad.get(i).bag.get(p);
+		        				xml.attribute("id", armor.getId()).pop();
+		        			break;
+		        			case 2: //potion
+		        				PartyHard_Potion pot = (PartyHard_Potion) playerSquad.get(i).bag.get(p);
+		        				xml.attribute("id", pot.getId()).pop();
 		        			break;
 		        		}
 					}

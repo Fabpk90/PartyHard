@@ -13,7 +13,7 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 	public int price;
 	private int weaponType;
 	public boolean equip = false;
-	public int id;
+	private int id;
 
 	/*
 	 * 0 sword
@@ -25,7 +25,7 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 		super("", "", "", 0);
 
 		
-		this.id = id;
+		this.setId(id);
 			
 		XmlReader xml = new XmlReader();
 		
@@ -104,5 +104,15 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 	@Override
 	public boolean isEquiped(){
 		return equip;
+	}
+
+
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }
