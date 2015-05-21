@@ -91,6 +91,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private ListStyle listStyle = new ListStyle();
 	private TextButtonStyle buttonStyle = new TextButtonStyle();
 	private LabelStyle labelStyle = new LabelStyle();
+	private ListStyle listInventoryStyle = new ListStyle();
 	
 	//for randomly begin a fight
 	private float fightTime = 0;	
@@ -107,7 +108,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
 		this.playerMap.setMap(mapName);
-		this.playerMap.setCollisionLayer(tiledmap);		
+		this.playerMap.setCollisionLayer(tiledmap);			 
 	}			
 	
 	@Override
@@ -520,6 +521,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 else
 			 labelName.setText(Name);	
 		 
+		 System.out.println(labelName.getText());
+		 
+		 //updating the table where the label is
 		 Table name = searchTable("name");
 		 name.getChildren().items[0] = labelName;
 		 
@@ -740,6 +744,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			listMenu.addListener(new ClickListener(){
 				 @Override 
 		            public void clicked(InputEvent event, float x, float y){
+					 //loading the drawable for the tables background
+					 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));						
+				 	 NinePatchDrawable drawable = new NinePatchDrawable(patch);
+					 
 					 switch(((List<TextButton>) event.getTarget()).getSelectedIndex())
 					 {
 					 	case 0: //status
@@ -750,9 +758,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		Table tableStatus = new Table();
 					 		tableStatus.setName("tableStatus");
 					 		
-					 		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
-								
-					 		NinePatchDrawable drawable = new NinePatchDrawable(patch);
+					 		
 					 		
 					 		tableStatus.setBackground(drawable);					 							 							 							 		
 					 		
@@ -837,6 +843,37 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		break;
 					 		
 					 	case 1: //inventory
+					 		
+					 		//deleting the old menu			 			
+					 			toggleSubMenu();
+					 		
+					 			//creating the table that will holds the inventory
+					 		Table inventory = new Table();
+					 		inventory.setName("tableInventory");
+					 		inventory.setBackground(drawable);
+					 		
+					 		inventory.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+					 		inventory.setPosition(Gdx.graphics.getWidth()/2 - inventory.getWidth(), Gdx.graphics.getHeight() / 2);
+					 		
+					 		//creating the title label (centered)
+					 		Label lblinventory = new Label("Inventory", labelStyle);
+					 		lblinventory.setPosition(inventory.getWidth() / 2 - (lblinventory.getText().length * 10) / 2 , inventory.getHeight() - 40);
+					 							 							 		
+					 		//showing each player -> click then show up the inventory of the player choose
+					 		float dimension = inventory.getWidth() / (playerSquad.size() + 1);
+					 		
+					 		for(int i = 0; i < playerSquad.size(); i++)
+					 		{
+					 			Label labelNamePlayer = new Label(playerSquad.get(i).Name, labelStyle);
+					 			
+					 			labelNamePlayer.setPosition(dimension + (dimension * i) , inventory.getHeight() / 2);
+					 			
+					 			inventory.addActor(labelNamePlayer);
+					 		}
+					 		
+					 		inventory.addActor(lblinventory);
+					 		
+					 		stage.getActors().add(inventory);
 					 		break;
 					 		
 					 	case 2://Quit
@@ -861,10 +898,12 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private void toggleSubMenu()
 	{
 		//deleting the other sub menu if called
-		if(getTableIndex("tableStatus") != -1)
-		{
-			stage.getActors().removeIndex(getTableIndex("tableStatus"));
-		}
+		
+		if(getTableIndex("tableStatus") != -1)		
+			stage.getActors().removeIndex(getTableIndex("tableStatus"));		
+		
+		if(getTableIndex("tableInventory") != -1)
+			stage.getActors().removeIndex(getTableIndex("tableInventory"));
 	}
 	
 	@Override

@@ -150,9 +150,9 @@ public class PartyHard_Fight implements Screen {
 		background.setPosition(0, 0);
 		background.setFillParent(true);
 		
-		//TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
+		TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
 		
-		skin = new Skin(Gdx.files.internal("ui_button/button.pack"));		
+		skin = new Skin(tex);		
 		
 		/*
 		 * button style 
@@ -802,9 +802,9 @@ public class PartyHard_Fight implements Screen {
 		tableMonsterSelected.center();
 		tableMonsterSelected.setName("monsterArrow");
 		
-		//TextureAtlas text = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
+		TextureAtlas text = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
 		
-		Skin skin = new Skin(Gdx.files.internal("ui_button/arrows.pack"));	
+		Skin skin = new Skin(text);	
 
 		ButtonStyle styleRight = new ButtonStyle();
 		styleRight.up = skin.getDrawable("arrowDown");
