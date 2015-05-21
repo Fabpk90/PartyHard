@@ -6,7 +6,6 @@ public abstract class PartyHard_Consumable extends PartyHard_Object{
 		super(Name, imagePath, description, type);
 	}
 	
-	
 	public abstract int getType();
 	public abstract void setType(int type);
 	public abstract int getAmount();

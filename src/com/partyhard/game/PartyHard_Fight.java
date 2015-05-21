@@ -27,6 +27,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -149,9 +150,9 @@ public class PartyHard_Fight implements Screen {
 		background.setPosition(0, 0);
 		background.setFillParent(true);
 		
-		TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
+		//TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
 		
-		skin = new Skin(tex);		
+		skin = new Skin(Gdx.files.internal("ui_button/button.pack"));		
 		
 		/*
 		 * button style 
@@ -165,12 +166,8 @@ public class PartyHard_Fight implements Screen {
 		buttonStyle.pressedOffsetX = 1;
 		buttonStyle.pressedOffsetY = -1;
 		
-		BitmapFont font = new BitmapFont();
+		BitmapFont font = new BitmapFont();		
 		font.setColor(Color.BLUE);
-		if(Gdx.app.getType() == Gdx.app.getType().Android)
-			font.setScale(scale);	
-		else
-			font.setScale(2f);
 		buttonStyle.font = font;
 		//smoothing the font
 		buttonStyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -387,7 +384,7 @@ public class PartyHard_Fight implements Screen {
 		            		            				            		
 							Table label = searchTable("tableTurn");							                    		
 		            		
-		            	 	list.setPosition(label.getChildren().get(0).getX(), label.getChildren().get(0).getY() + list.getHeight() + 40);
+		            	 	list.setPosition(label.getChildren().get(0).getX(), label.getChildren().get(0).getY() + 40);
 		            	
 		            		ScrollPaneStyle scrollStyle = new ScrollPaneStyle();		            		
 		            	    ScrollPane scroll = new ScrollPane(list, scrollStyle);
@@ -805,9 +802,9 @@ public class PartyHard_Fight implements Screen {
 		tableMonsterSelected.center();
 		tableMonsterSelected.setName("monsterArrow");
 		
-		TextureAtlas text = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
+		//TextureAtlas text = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
 		
-		Skin skin = new Skin(text);	
+		Skin skin = new Skin(Gdx.files.internal("ui_button/arrows.pack"));	
 
 		ButtonStyle styleRight = new ButtonStyle();
 		styleRight.up = skin.getDrawable("arrowDown");
@@ -1189,8 +1186,7 @@ public class PartyHard_Fight implements Screen {
 								
 								stage.addActor(labelHealth);
 							}
-							
-							
+														
 							//setting the fight setting back to default
 							playerSquad.get(i).setCapacitySelected(-1);	
 							playerSquad.get(i).setTarget(-1);

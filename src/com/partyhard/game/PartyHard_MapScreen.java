@@ -7,14 +7,20 @@ import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -27,9 +33,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
@@ -74,12 +86,17 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private float scale = 2f;
 	
+	private ListStyle listStyle = new ListStyle();
+	private TextButtonStyle buttonStyle = new TextButtonStyle();
+	private LabelStyle labelStyle = new LabelStyle();
+	
 	//for randomly begin a fight
 	private float fightTime = 0;	
 	//probability of fight
 	private int proba = 0;
 	//array of monster name 
 	private ArrayList<String> nameMonster = new ArrayList<String>();
+	private Skin skin;
 	
 	
 	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
@@ -210,7 +227,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		        {
 		        	playerMap.moving(true);
 		        	moveDown();
-		        }		      	           	  
+		        }	
           }
         }     
 	        stage.draw();
@@ -273,9 +290,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			/*
 			 * Loading the skin which contains the arrows info
 			 */						
-			TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
+			//TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
 			
-			Skin skin = new Skin(tex);		
+			Skin skin = new Skin(Gdx.files.internal("ui_button/arrows.pack"));		
 			
 			/*
 			 * Button style that change at each button need a new one each time too apparently
@@ -396,11 +413,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 prop = tiledmap.getProperties();		 
 		 Name = prop.get("Name", String.class);
 		 
-		 LabelStyle style1 = new LabelStyle();		 
-		 style1.font = new BitmapFont(Gdx.files.internal("font/font.fnt"),Gdx.files.internal("font/font_0.png"), false);
+		 		 
+		 labelStyle.font = new BitmapFont(Gdx.files.internal("font/font.fnt"),Gdx.files.internal("font/font_0.png"), false);
 		 
 		 //used for printing the map name
-		 Label labelname = new Label(Name, style1);	
+		 Label labelname = new Label(Name, labelStyle);	
 		
 		 // setting position of the label
 		 mapNameTable.center().top();
@@ -412,8 +429,13 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 mapNameTable.add(labelname);
 		 stage.addActor(mapNameTable);
 	
+		 //setting processor for input
+		 
+		 InputMultiplexer inputMultiplexer = new InputMultiplexer();
+		 inputMultiplexer.addProcessor(stage);
+		 inputMultiplexer.addProcessor(this);
 		
-		Gdx.input.setInputProcessor(stage);
+		Gdx.input.setInputProcessor(inputMultiplexer);
 		
 		
 		load();
@@ -537,6 +559,37 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 
 		//FileManager fileManager = new FileManager("monster.xml");
 		// fileManager.saveFile(false, Gdx.files.internal("monster.xml"));
+		 
+		 /*
+		  * loading the styles
+		  */
+		 
+		 TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
+			
+			skin = new Skin(tex);
+			
+						
+		 
+		 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
+			
+		NinePatchDrawable drawable = new NinePatchDrawable(patch);
+		 
+		listStyle.selection = drawable;
+		listStyle.font = new BitmapFont();
+	    listStyle.fontColorSelected = Color.BLACK;
+	    listStyle.fontColorUnselected = Color.WHITE;
+	    listStyle.background = drawable;
+	    
+	    
+	    buttonStyle.up = skin.getDrawable("button.up");
+		buttonStyle.down = skin.getDrawable("button.down");
+		
+		buttonStyle.pressedOffsetX = 1;
+		buttonStyle.pressedOffsetY = -1;
+		BitmapFont font = new BitmapFont();
+		
+		buttonStyle.font = font;
+		buttonStyle.font.getRegion().getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.MipMapLinearLinear);
 		
 	}
 
@@ -647,9 +700,73 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		}
 		//if it doesn't
 		else
-		{
+		{			
 			Table tableMenu = new Table();
 			tableMenu.setName("tableMenu");
+			tableMenu.center();
+			
+			List<TextButton> listMenu = new List<TextButton>(listStyle);
+			listMenu.setHeight(100);
+			listMenu.setWidth(80);
+			
+			
+			TextButton btn;
+			//adding the buttons to the menu
+			for(int i= 0; i != 3;i++)
+			{
+				 btn = new TextButton(""+i, buttonStyle);
+				switch(i)
+				{
+					case 0://Status of the player
+						btn.setName("Status");						
+					break;
+					
+					case 1://Inventory of the player
+						btn.setName("Inventory");						
+					break;
+					
+					case 2://Exit game
+						btn.setName("Quit");																	
+					break;
+				}
+				
+				listMenu.getItems().add(btn);
+			}	
+			
+			listMenu.addListener(new ClickListener(){
+				 @Override 
+		            public void clicked(InputEvent event, float x, float y){
+					 switch(((List<TextButton>) event.getTarget()).getSelectedIndex())
+					 {
+					 	case 0: //status
+					 		//if the status has already been called
+					 		if(getTableIndex("tableStatus") != -1)
+					 			stage.getActors().removeIndex(getTableIndex("tableStatus"));
+					 		
+					 		Table tableStatus = new Table();
+					 		tableStatus.setName("tableStatus");
+					 		
+					 		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
+								
+					 		NinePatchDrawable drawable = new NinePatchDrawable(patch);
+					 		
+					 		tableStatus.setBackground(drawable);					 							 		
+					 		
+					 		tableStatus.add();
+					 		
+					 		stage.getActors().add(tableStatus);
+					 		
+					 		break;
+					 }
+				
+			}});
+						
+			//setting the pos of the list
+			listMenu.setPosition(Gdx.graphics.getWidth() - listMenu.getWidth(), Gdx.graphics.getHeight() - listMenu.getHeight());
+							
+			tableMenu.addActor(listMenu);
+			
+			stage.getActors().add(tableMenu);
 		}
 	
 		
@@ -657,14 +774,12 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	@Override
 	public boolean keyDown(int keycode) {
-		
 		switch(keycode)
 		{
 			case Input.Keys.ESCAPE:
 				toggleMenu();
-			break;
+			return true;
 		}
-		
 		return false;
 	}
 
@@ -709,4 +824,5 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 }

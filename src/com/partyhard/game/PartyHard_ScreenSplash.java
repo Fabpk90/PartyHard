@@ -102,6 +102,7 @@ public class PartyHard_ScreenSplash implements Screen{
 	TextureAtlas tex = new TextureAtlas(Gdx.files.internal("ui_button/button.pack"));
 	
 	Skin skin = new Skin(tex);
+
 	
 	TextButtonStyle buttonStyle = new TextButtonStyle();
 	
@@ -113,13 +114,10 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	BitmapFont font = new BitmapFont();
 	font.setColor(Color.BLUE);
-	font.setScale(1.5f);	
 	
 	buttonStyle.font = font; 
-	
+
 	 TextButton playButton = new TextButton("Play", buttonStyle);
-	
-	playButton.pad(10);
 	
 	playButton.setHeight(Gdx.graphics.getHeight() / 4);
 	playButton.setWidth(Gdx.graphics.getWidth() / 4);

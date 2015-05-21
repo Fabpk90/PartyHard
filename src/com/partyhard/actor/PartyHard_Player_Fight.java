@@ -204,7 +204,7 @@ public class PartyHard_Player_Fight{
 	
 	public void refreshBag()
 	{
-		bagSpace = bag.size();
+		bagSpace = bag.size() + 1;
 	}
 	
 	public void bagUsed()
