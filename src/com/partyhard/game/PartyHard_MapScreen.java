@@ -57,6 +57,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private PartyHard_Fight fightScreen;
 	
+	private ArrayList<PartyHard_Player_Fight> playerSquad = new ArrayList<PartyHard_Player_Fight>();
+	
 	//could be transfered into the player will see
 	private int direction = 0;
 	/*
@@ -264,6 +266,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	@Override
 	public void show() {
+	
+	//loading the playerSquad
+	playerSquad.add(new PartyHard_Player_Fight(0));
+	playerSquad.add(new PartyHard_Player_Fight(1));
+		
 		
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
@@ -290,9 +297,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			/*
 			 * Loading the skin which contains the arrows info
 			 */						
-			//TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
+			TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/arrows.pack")));
 			
-			Skin skin = new Skin(Gdx.files.internal("ui_button/arrows.pack"));		
+			Skin skin = new Skin(tex);		
 			
 			/*
 			 * Button style that change at each button need a new one each time too apparently
@@ -426,7 +433,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			 
 		 labelname.setPosition(mapNameTable.getWidth(), mapNameTable.getHeight()); 
 		
-		 mapNameTable.add(labelname);
+		 mapNameTable.addActor(labelname);
 		 stage.addActor(mapNameTable);
 	
 		 //setting processor for input
@@ -568,7 +575,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 			skin = new Skin(tex);
 			
-						
+			tex.dispose();
 		 
 		 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
 			
@@ -620,13 +627,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 			/*
 			 * TO DO: maybe make the loading dynamic
-			 */
+			 */			
 			
-			//preparing fighters
-			ArrayList<PartyHard_Player_Fight> playerSquad = new ArrayList<PartyHard_Player_Fight>();
 			
-			playerSquad.add(new PartyHard_Player_Fight(0));
-			playerSquad.add(new PartyHard_Player_Fight(1));
 			 
 		    fightScreen = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame, prop.get("Battle_Music", String.class));
 			mainGame.setScreen(fightScreen);
@@ -696,7 +699,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		//menu exist
 		if(getTableIndex("tableMenu") != -1)
 		{
-			stage.getActors().removeIndex(getTableIndex("tableMenu"));
+			stage.getActors().removeIndex(getTableIndex("tableMenu"));	
+			
+			toggleSubMenu();
 		}
 		//if it doesn't
 		else
@@ -705,16 +710,15 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			tableMenu.setName("tableMenu");
 			tableMenu.center();
 			
-			List<TextButton> listMenu = new List<TextButton>(listStyle);
+			List<Label> listMenu = new List<Label>(listStyle);
 			listMenu.setHeight(100);
-			listMenu.setWidth(80);
+			listMenu.setWidth(80);	
 			
-			
-			TextButton btn;
+			Label btn;
 			//adding the buttons to the menu
 			for(int i= 0; i != 3;i++)
 			{
-				 btn = new TextButton(""+i, buttonStyle);
+				 btn = new Label("", labelStyle);
 				switch(i)
 				{
 					case 0://Status of the player
@@ -740,9 +744,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 {
 					 	case 0: //status
 					 		//if the status has already been called
-					 		if(getTableIndex("tableStatus") != -1)
-					 			stage.getActors().removeIndex(getTableIndex("tableStatus"));
+					 		toggleSubMenu();
 					 		
+					 		//creating table and setting the pos
 					 		Table tableStatus = new Table();
 					 		tableStatus.setName("tableStatus");
 					 		
@@ -750,12 +754,94 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 								
 					 		NinePatchDrawable drawable = new NinePatchDrawable(patch);
 					 		
-					 		tableStatus.setBackground(drawable);					 							 		
+					 		tableStatus.setBackground(drawable);					 							 							 							 		
 					 		
-					 		tableStatus.add();
+					 		tableStatus.setHeight(Gdx.graphics.getHeight() / 2);
+					 		tableStatus.setWidth(Gdx.graphics.getWidth() / 2);					 							 		
+					 		
+					 		tableStatus.setPosition(Gdx.graphics.getWidth()/2 - tableStatus.getWidth(), Gdx.graphics.getHeight() / 2);
+					 		
+					 		//creating the cat labels
+					 		
+					 		Label Name = new Label("Name", labelStyle);
+					 		Name.setPosition(10, tableStatus.getHeight() - 40);					 		
+					 		
+					 		Label Hp = new Label("Hp", labelStyle);
+					 		Hp.setPosition(110, Name.getY());
+					 		
+					 		Label Atk = new Label("Atk", labelStyle);
+					 		Atk.setPosition(210, Name.getY());
+					 		
+					 		Label Def = new Label("Def", labelStyle);
+					 		Def.setPosition(310, Name.getY());
+					 		
+					 		Label Lvl = new Label("Level", labelStyle);
+					 		Lvl.setPosition(410, Name.getY());
+					 		
+					 		Label Exp = new Label("Exp", labelStyle);
+					 		Exp.setPosition(510, Name.getY());
+					 							 	
+					 		//populating the table with the player info
+					 		Label labelPlayer = new Label("", labelStyle);
+					 		for(int i = 0; i < playerSquad.size(); i++)
+					 		{
+					 			for(int p = 0; p < 6; p++)
+					 			{
+					 				switch(p)
+						 			{
+						 				case 0: //Name
+						 					labelPlayer = new Label(playerSquad.get(i).Name, labelStyle);						 					
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );						 											 					
+						 				break;
+						 				
+						 				case 1: //Hp
+						 					labelPlayer = new Label(""+playerSquad.get(i).getLife(), labelStyle);
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );
+						 				break;
+						 				
+						 				case 2: //Atk
+						 					labelPlayer = new Label(""+playerSquad.get(i).getAtk(), labelStyle);
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );
+						 				break;
+						 				
+						 				case 3: //Def
+						 					labelPlayer = new Label(""+playerSquad.get(i).getDef(), labelStyle);
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );
+						 				break;
+						 				
+						 				case 4: //Lvl
+						 					labelPlayer = new Label(""+playerSquad.get(i).getLevel(), labelStyle);
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );						 					
+						 				break;
+						 				
+						 				case 5: // Exp
+						 					labelPlayer = new Label(""+playerSquad.get(i).getExp(), labelStyle);
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );
+					 					break;
+						 			}
+					 				tableStatus.addActor(labelPlayer);
+					 			}
+					 			
+					 		}
+					 		
+					 		tableStatus.addActor(Name);
+					 		tableStatus.addActor(Hp);
+					 		tableStatus.addActor(Atk);
+					 		tableStatus.addActor(Def);
+					 		tableStatus.addActor(Lvl);
+					 		tableStatus.addActor(Exp);	
+					 		
 					 		
 					 		stage.getActors().add(tableStatus);
 					 		
+					 		break;
+					 		
+					 	case 1: //inventory
+					 		break;
+					 		
+					 	case 2://Quit
+					 		dispose();
+					 		Gdx.app.exit();
 					 		break;
 					 }
 				
@@ -772,6 +858,15 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 	}
 
+	private void toggleSubMenu()
+	{
+		//deleting the other sub menu if called
+		if(getTableIndex("tableStatus") != -1)
+		{
+			stage.getActors().removeIndex(getTableIndex("tableStatus"));
+		}
+	}
+	
 	@Override
 	public boolean keyDown(int keycode) {
 		switch(keycode)
