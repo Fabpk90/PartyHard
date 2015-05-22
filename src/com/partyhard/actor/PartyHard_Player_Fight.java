@@ -23,6 +23,11 @@ public class PartyHard_Player_Fight{
 	private int Level = 1;
 	private int Money = 0;
 	
+	private int head = -1;
+	private int chest = -1;
+	
+	private int weapon= -1;
+	
 	public boolean isLevelMax = false;
 	public PartyHard_Level levelUp;
 	
@@ -392,5 +397,34 @@ public class PartyHard_Player_Fight{
 
 	public void setObjectUsed(int objectUsed) {
 		this.objectUsed = objectUsed;
-	}	
+	}
+	/*
+	 * @param type 0 - Wep, 1 - Armor(Chest), 2 - Head
+	 */
+	public boolean getEquipSlot(int type)
+	{
+		switch(type)
+		{
+			case 0: // weapon
+				if(weapon != -1)
+					return true;
+				else
+					return false;
+				
+				
+			case 1: // armor
+				if(chest != -1)
+					return true;
+				else
+					return false;
+				
+			case 2: //head
+		 	if(head != -1)
+				return true;
+			else
+				return false;		 	
+		}
+		//nothing has been found
+		return false;
+	}
 }
