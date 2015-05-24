@@ -398,7 +398,7 @@ public class PartyHard_Player_Fight{
 	public void setObjectUsed(int objectUsed) {
 		this.objectUsed = objectUsed;
 	}
-	/*
+	/**
 	 * @param type 0 - Wep, 1 - Armor(Chest), 2 - Head
 	 */
 	public boolean getEquipSlot(int type)
@@ -409,20 +409,17 @@ public class PartyHard_Player_Fight{
 				if(weapon != -1)
 					return true;
 				else
-					return false;
-				
-				
+					return false;							
 			case 1: // armor
 				if(chest != -1)
 					return true;
 				else
-					return false;
-				
+					return false;				
 			case 2: //head
-		 	if(head != -1)
-				return true;
-			else
-				return false;		 	
+				if(head != -1)
+					return true;
+				else
+					return false;		 	
 		}
 		//nothing has been found
 		return false;

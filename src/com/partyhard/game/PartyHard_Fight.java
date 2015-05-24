@@ -137,6 +137,7 @@ public class PartyHard_Fight implements Screen {
 		tableFirst = new Table();
 		stage = new Stage();
 		
+		
 		//registering the accessors (used for modifying values with tween)
 		Tween.registerAccessor(Label.class, new LabelAccessor());
 		Tween.registerAccessor(Image.class, new ImageAccessor());
@@ -463,7 +464,7 @@ public class PartyHard_Fight implements Screen {
 				
 				List<TextButton> listItem = new List<TextButton>(listStyle);
 				
-				//adding listener for knwoing which object the player is using on who
+				//adding listener for knowing which object the player is using on who
 				listItem.addListener(new ClickListener(){
 			             public void clicked(InputEvent event, float x, float y){
 			            	 
@@ -518,6 +519,7 @@ public class PartyHard_Fight implements Screen {
 									
 									ScrollPaneStyle scrollStyle = new ScrollPaneStyle();																
 					            	ScrollPane scroll = new ScrollPane(listChara, scrollStyle);
+					            	scroll.setForceScroll(false, true);
 					            	
 					            	scroll.setPosition(cap.getChildren().get(0).getX() + cap.getChildren().get(0).getWidth() + 50, cap.getChildren().get(0).getY());
 									
@@ -555,7 +557,7 @@ public class PartyHard_Fight implements Screen {
 				
 				ScrollPaneStyle style = new ScrollPaneStyle();
 				ScrollPane scroll = new ScrollPane(listItem, style);
-				
+				scroll.setForceScroll(false, true);
 				        		
 				Table label = searchTable("tableTurn");							                    		
 
@@ -1362,10 +1364,10 @@ public class PartyHard_Fight implements Screen {
 		
 	}
 
-/*
+/**
  * @param name the name of the table (setName)
  * 
- * @return The table or an exception if null
+ * @return The table or null
  */
 	private Table searchTable(String name)
 	{
@@ -1378,7 +1380,7 @@ public class PartyHard_Fight implements Screen {
 		//hopefully will never be 
 		return null;
 	}
-/*
+/**
  * @param name The name of the table
  * 
  * @return The index of the Table
