@@ -23,10 +23,9 @@ public class PartyHard_Player_Fight{
 	private int Level = 1;
 	private int Money = 0;
 	
-	private int head = -1;
-	private int chest = -1;
+	public int armorEquipped = -1;
 	
-	private int weapon= -1;
+	public int weaponEquipped = -1;
 	
 	public boolean isLevelMax = false;
 	public PartyHard_Level levelUp;
@@ -209,13 +208,8 @@ public class PartyHard_Player_Fight{
 	
 	public void refreshBag()
 	{
-		bagSpace = bag.size() + 1;
-	}
-	
-	public void bagUsed()
-	{
-		bagSpace--;
-	}
+		bagSpace = bag.size();
+	}	
 	
 	public void setBagSpace(int amount)
 	{
@@ -398,30 +392,87 @@ public class PartyHard_Player_Fight{
 	public void setObjectUsed(int objectUsed) {
 		this.objectUsed = objectUsed;
 	}
+	
+	public void useObject(int index)
+	{
+		bag.remove(index);	
+	}
+	
+	public void useObject()
+	{
+		bag.remove(objectUsed);
+	}
 	/**
 	 * @param type 0 - Wep, 1 - Armor(Chest), 2 - Head
 	 */
-	public boolean getEquipSlot(int type)
+	public boolean isEquipSlot(int type)
 	{
 		switch(type)
 		{
 			case 0: // weapon
-				if(weapon != -1)
+				if(weaponEquipped != -1)
 					return true;
 				else
 					return false;							
 			case 1: // armor
-				if(chest != -1)
+				if(armorEquipped != -1)
 					return true;
 				else
 					return false;				
-			case 2: //head
-				if(head != -1)
-					return true;
-				else
-					return false;		 	
+				 	
 		}
 		//nothing has been found
 		return false;
+	}
+	/**
+	 * @param type The type of the item
+	 * @param itemIndex Inde of the item in the bag
+	 */
+	public void setEquipSlot(int type, int itemIndex)
+	{
+		switch(type)
+		{
+			case 0: // weapon
+				weaponEquipped = itemIndex;				
+				break;					
+			case 1: // armor
+				armorEquipped = itemIndex;
+				break;				 	
+		}
+	}
+	
+	/**
+	 * @param itemIndex Inde of the item in the bag
+	 */
+	public void setEquipSlot(int itemIndex)
+	{
+		switch(getItemType(itemIndex))
+		{
+			case 0: // weapon
+				weaponEquipped = itemIndex;				
+				break;					
+			case 1: // armor
+				armorEquipped = itemIndex;
+				break;					
+		}
+	}
+	/**
+	 * @param id The id of the item
+	 * @return -1 if not found 
+	 */
+	public int getItemIndex(int id)
+	{
+		for(int i = 0; i < bag.size(); i++)
+		{
+			if(bag.get(i).getItemId() == id)
+				return i;
+		}
+		
+		return -1;
+	}
+	
+	public int getItemType(int itemIndex)
+	{
+		return bag.get(itemIndex).type;
 	}
 }

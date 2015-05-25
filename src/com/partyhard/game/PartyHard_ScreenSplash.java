@@ -10,6 +10,7 @@ import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -57,6 +58,8 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	private Random r = new Random();
 	
+	private Music backgroundMusic;
+	
 	public PartyHard_ScreenSplash(Game gam)
 	{
 		game = gam;
@@ -68,6 +71,8 @@ public class PartyHard_ScreenSplash implements Screen{
 	//registering the accessors (used for modifying values with tween)
 	Tween.registerAccessor(Label.class, new LabelAccessor());
 		
+	backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/map_sound_relax.mp3"));
+	backgroundMusic.play();
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
 	
@@ -127,6 +132,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		  @Override 
           public void clicked(InputEvent event, float x, float y){
           	tiledmap.dispose();
+          	backgroundMusic.stop();   		
             PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(256,256, "player/test_player.png"));
             game.setScreen(map);
           }

@@ -844,17 +844,13 @@ public class PartyHard_Fight implements Screen {
          */
         
         for(int i = 0; i < playerSquad.size(); i++)
-        {
-        	for(int p = 0; p != playerSquad.get(i).getBagSpace(); p++)
-        	{
-        		switch(playerSquad.get(i).bag.get(p).type)
-        		{
-        			case 0: //weapon
-        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
-        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() + weapon.getAmount());
-        			break;
-        		}
-        	}
+        {       	
+        	//first checking if something is equipped then apply
+        	if(playerSquad.get(i).isEquipSlot(0))//wep       	
+        		playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() + ((PartyHard_Weapon) playerSquad.get(i).bag.get(playerSquad.get(i).weaponEquipped)).getAmount());      	
+        		
+        	if(playerSquad.get(i).isEquipSlot(1))//arm
+        		playerSquad.get(i).setDef(playerSquad.get(i).getDef() + ((PartyHard_Armor) playerSquad.get(i).bag.get(playerSquad.get(i).armorEquipped)).getAmount());        	
         }
 	}
 
@@ -979,11 +975,8 @@ public class PartyHard_Fight implements Screen {
 						playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount( ((PartyHard_Potion) playerSquad.get(i).bag.get(playerSquad.get(i).getObjectUsed())).getAmount());
 												
 						//deleting the used object from bag and setting back the objectused var to -1(default)
-						playerSquad.get(i).bag.remove(playerSquad.get(i).getObjectUsed());
-						playerSquad.get(i).setObjectUsed(-1);
-						
-						//refreshing the bag index
-						playerSquad.get(getAlivePlayer()).bagUsed();;
+						playerSquad.get(i).useObject();;
+						playerSquad.get(i).setObjectUsed(-1);												
 					}
 									
 				}
@@ -1486,23 +1479,11 @@ public class PartyHard_Fight implements Screen {
 		 */
 		 for(int i = 0; i < playerSquad.size(); i++)
 	        {
-	        	for(int p = 0; p != playerSquad.get(i).bag.size(); p++)
-	        	{
-	        		switch(playerSquad.get(i).bag.get(p).type)
-	        		{
+			 if(playerSquad.get(i).isEquipSlot(0))//wep       	
+	        	playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - ((PartyHard_Weapon) playerSquad.get(i).bag.get(playerSquad.get(i).weaponEquipped)).getAmount());      	
 	        		
-	        			case 0: //weapon
-	        				PartyHard_Weapon weapon =  (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
-	        				playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - weapon.getAmount());
-	        			break;
-	        			
-	        			case 1://armor
-	        				PartyHard_Armor armor =  (PartyHard_Armor) playerSquad.get(i).bag.get(p);
-	        				playerSquad.get(i).setDef(playerSquad.get(i).getDef() - armor.getAmount());
-	        			break;
-	        			
-	        		}
-	        	}
+	        if(playerSquad.get(i).isEquipSlot(1))//arm
+	        	playerSquad.get(i).setDef(playerSquad.get(i).getDef() - ((PartyHard_Armor) playerSquad.get(i).bag.get(playerSquad.get(i).armorEquipped)).getAmount());        	     
 	        }
 		
 		try {
