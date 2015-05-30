@@ -13,6 +13,7 @@ import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Object;
 import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weapon;
+import com.partyhard.object.PartyHard_Weareable;
 
 public class PartyHard_Player_Fight{
 	
@@ -80,14 +81,20 @@ public class PartyHard_Player_Fight{
 					bagSpace = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("bag").getAttribute("space"));
 					Class = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("class").getAttribute("value"));
 					
+					weaponEquipped = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("weaponEquip").getAttribute("value"));
+					armorEquipped = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("armorEquip").getAttribute("value"));
+					
 					 bag = new ArrayList<PartyHard_Object>();
 					 capacity = new ArrayList<PartyHard_Capacity>();				
 					 
 					 Array<Element> items =	arrayOfPlayer.get(i).getChildByName("bag").getChildrenByName("item");
 					 
+					 //if ther is items
+					 if(items.size > 0)					 
 					//populating the inventory
 					for(int p = 0; p != bagSpace; p++)
 					{
+						
 						switch(items.get(p).getInt("type"))
 						{
 							case 0: //weapon
@@ -393,17 +400,30 @@ public class PartyHard_Player_Fight{
 		this.objectUsed = objectUsed;
 	}
 	
-	public void useObject(int index)
+	public void removeObjectFromInventory(int index)
 	{
 		bag.remove(index);	
+		
+		//checkig if the object was equipped, if equipped setting back to default the slot, - 1 because of size()
+		if(index == weaponEquipped )
+		{
+			weaponEquipped = -1;
+			System.out.println("asdasdasdasd");
+		}
+			
+		else if(index == armorEquipped)
+			armorEquipped = -1;
+			
 	}
 	
 	public void useObject()
 	{
 		bag.remove(objectUsed);
+		
 	}
 	/**
-	 * @param type 0 - Wep, 1 - Armor(Chest), 2 - Head
+	 * @param type  0 - Wep, 1 - Armor
+	 * @return True if item equipped on this slot
 	 */
 	public boolean isEquipSlot(int type)
 	{
@@ -413,7 +433,7 @@ public class PartyHard_Player_Fight{
 				if(weaponEquipped != -1)
 					return true;
 				else
-					return false;							
+					return false;				
 			case 1: // armor
 				if(armorEquipped != -1)
 					return true;
@@ -424,19 +444,38 @@ public class PartyHard_Player_Fight{
 		//nothing has been found
 		return false;
 	}
+	
+	public void unequipItem(int itemindex)
+	{
+		switch(getItemType(itemindex))
+		{
+			case 0://wep				
+				Atk -=	((PartyHard_Weareable) bag.get(weaponEquipped)).getAmount();				
+				weaponEquipped = -1;
+				break;
+			case 1: //armor
+				Def -= ((PartyHard_Weareable) bag.get(armorEquipped)).getAmount();
+				armorEquipped = -1;
+				break;				
+		}
+	}
+	
 	/**
 	 * @param type The type of the item
-	 * @param itemIndex Inde of the item in the bag
+	 * @param itemIndex Index of the item in the bag
 	 */
 	public void setEquipSlot(int type, int itemIndex)
 	{
 		switch(type)
 		{
 			case 0: // weapon
-				weaponEquipped = itemIndex;				
+				weaponEquipped = itemIndex;					
+				//applying the bonus
+				Atk += ((PartyHard_Weareable) bag.get(weaponEquipped)).getAmount();
 				break;					
 			case 1: // armor
 				armorEquipped = itemIndex;
+				Def += ((PartyHard_Weareable) bag.get(armorEquipped)).getAmount();
 				break;				 	
 		}
 	}
@@ -449,10 +488,12 @@ public class PartyHard_Player_Fight{
 		switch(getItemType(itemIndex))
 		{
 			case 0: // weapon
-				weaponEquipped = itemIndex;				
+				weaponEquipped = itemIndex;	
+				Atk += ((PartyHard_Weareable) bag.get(weaponEquipped)).getAmount();
 				break;					
 			case 1: // armor
 				armorEquipped = itemIndex;
+				Def += ((PartyHard_Weareable) bag.get(armorEquipped)).getAmount();
 				break;					
 		}
 	}
@@ -475,4 +516,5 @@ public class PartyHard_Player_Fight{
 	{
 		return bag.get(itemIndex).type;
 	}
+	
 }

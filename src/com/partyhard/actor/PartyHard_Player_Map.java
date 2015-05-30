@@ -58,7 +58,7 @@ public class PartyHard_Player_Map {
 	//the player is tping?
 	public boolean isTp = false;
 	
-	private TiledMap collisionLayer;
+	private TiledMap masterLayer;
 	
 	//the key word that makes a cell blocked
 	private String blockedKey = "block";
@@ -72,7 +72,7 @@ public class PartyHard_Player_Map {
 	{
 		this.setX(x);
 		this.setY(y);
-		this.collisionLayer = Map;
+		this.masterLayer = Map;
 		this.imagePath = imagePath;
 		destination = new Vector2(x,y);
 	}
@@ -148,7 +148,7 @@ public class PartyHard_Player_Map {
 	
 	public void setCollisionLayer(TiledMap Map)
 	{
-		this.collisionLayer = Map;
+		this.masterLayer = Map;
 	}
 	
 	public void moving(boolean ismoving)
@@ -394,9 +394,9 @@ public class PartyHard_Player_Map {
 	
 	private boolean isCellBlocked(float x, float y) {
 		
-		for(int i = 0; i < collisionLayer.getLayers().getCount(); i++ )
+		for(int i = 0; i < masterLayer.getLayers().getCount(); i++ )
 		{
-			TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(i);			
+			TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(i);			
 			Cell cell = layer.getCell((int) (x / layer.getTileWidth()), (int) (y / layer.getTileHeight()));		
 			//check the cell for collisions
 			if( cell != null && cell.getTile() != null && (cell.getTile().getProperties().containsKey(blockedKey) || cell.getTile().getProperties().containsKey(blockedKey2)))
@@ -409,7 +409,7 @@ public class PartyHard_Player_Map {
 	private boolean isCellTp(float x, float y)
 	{
 		//taking a random layer just for knowing how much the width is(maybe store that in a var could be better)
-		TiledMapTileLayer layer = (TiledMapTileLayer) collisionLayer.getLayers().get(0);
+		TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(0);
 		//scaling the x and y
 		x = Math.round(x / layer.getTileWidth());
 		y = Math.round(y / layer.getTileHeight());		
@@ -426,8 +426,86 @@ public class PartyHard_Player_Map {
 		return false; 
 	}
 	
+	/*
+	 * @return -1 if no shop has been found
+	 */
+	
+	public int getCellShop()
+	{
+		//checking all layer if there is a shop near the player(switching on orientation)
+		
+		for(int i = 0; i != masterLayer.getLayers().getCount();i++)
+		{
+			TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(i);
+			
+			if(movingRight)
+				if(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
+				}
+				
+			if(movingLeft)
+				if(layer.getCell((int) (x - getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) (x - getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
+				}
+				
+			if(movingTop)
+				if(layer.getCell((int) x, (int) (y + getHeight())).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) x, (int) (y + getHeight())).getTile().getProperties().get("shop", String.class));
+				}
+			if(movingDown)
+				if(layer.getCell((int) x, (int) (y - getHeight())).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) x, (int) (y - getHeight())).getTile().getProperties().get("shop", String.class));
+				}
+		}
+		
+		return -1;
+	}
+	
+	/*
+	 * @return -1 if no shop has been found
+	 */
+	
+	public int getCellShop(int x, int y)
+	{
+		//checking all layer if there is a shop near the player(switching on orientation)
+		
+		for(int i = 0; i != masterLayer.getLayers().getCount();i++)
+		{
+			TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(i);
+			
+			if(movingRight)
+				if(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
+				}
+				
+			if(movingLeft)
+				if(layer.getCell((int) (x - getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) (x - getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
+				}
+				
+			if(movingTop)
+				if(layer.getCell((int) x, (int) (y + getHeight())).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) x, (int) (y + getHeight())).getTile().getProperties().get("shop", String.class));
+				}
+			if(movingDown)
+				if(layer.getCell((int) x, (int) (y - getHeight())).getTile().getProperties().containsKey("shop"))
+				{
+					return Integer.parseInt(layer.getCell( (int) x, (int) (y - getHeight())).getTile().getProperties().get("shop", String.class));
+				}
+		}
+		
+		return -1;
+	}
+	
 	private boolean collidesX() {
-		for(float step = 0; step <= getWidth(); step +=  ((TiledMapTileLayer) collisionLayer.getLayers().get(0)).getTileWidth())
+		for(float step = 0; step <= getWidth(); step +=  ((TiledMapTileLayer) masterLayer.getLayers().get(0)).getTileWidth())
 			if(isCellBlocked(destination.x, getY()))
 				return true;
 		return false;
@@ -442,7 +520,7 @@ public class PartyHard_Player_Map {
 
 	public void dispose() {
 		
-		collisionLayer.dispose();
+		masterLayer.dispose();
 	}
 
 	public String getMap() {

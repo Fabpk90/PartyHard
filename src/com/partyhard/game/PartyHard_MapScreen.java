@@ -29,6 +29,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -45,7 +46,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.actor.PartyHard_Monster;
@@ -54,6 +54,7 @@ import com.partyhard.actor.PartyHard_Player_Map;
 import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weapon;
+import com.partyhard.object.PartyHard_Weareable;
 
 public class PartyHard_MapScreen implements Screen, InputProcessor{
 
@@ -119,6 +120,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int playerSelected;
 	private int itemIndex;
 	
+	private boolean enterEquip = false;
+	private boolean isShopping;
 	
 	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
 	{	
@@ -254,7 +257,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		        {
 		        	playerMap.moving(true);
 		        	moveDown();
-		        }	
+		        }
+		        
+		        if(Gdx.input.isKeyPressed(Input.Keys.ENTER))
+		        {
+		        	if(!isShopping)
+		        	if(playerMap.getCellShop() != -1)
+		        	{
+		        		loadShop(playerMap.getCellShop());
+		        	}
+		        }
           }
         }     
 	        stage.draw();
@@ -664,6 +676,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 	}
 
+	private void loadShop(int id)
+	{
+		
+	}
+
 	public void moveRight()
 	{	
         		playerMap.stopMovement();
@@ -773,7 +790,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		            public void clicked(InputEvent event, float x, float y){
 					 //loading the drawable for the tables background
 					 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));						
-				 	 NinePatchDrawable drawable = new NinePatchDrawable(patch);
+				 	 final NinePatchDrawable drawable = new NinePatchDrawable(patch);
 					 
 					 switch(((List<TextButton>) event.getTarget()).getSelectedIndex())
 					 {
@@ -795,7 +812,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		//creating the cat labels
 					 		
 					 		Label Name = new Label("Name", labelStyle);
-					 		Name.setPosition(10, tableStatus.getHeight() - 40);					 		
+					 		Name.setPosition(10, tableStatus.getHeight() - 40);	
 					 		
 					 		Label Hp = new Label("Hp", labelStyle);
 					 		Hp.setPosition(110, Name.getY());
@@ -822,7 +839,99 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 						 			{
 						 				case 0: //Name
 						 					labelPlayer = new Label(playerSquad.get(i).Name, labelStyle);						 					
-						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );						 											 					
+						 					labelPlayer.setPosition(10 + p * 100, Name.getY() - 100 - (i * 100) );
+						 					labelPlayer.setName(""+i);
+						 					//adding the equipment show
+						 					labelPlayer.addListener(new InputListener()
+						 					{
+						 						//the is over the name?
+						 						@Override
+						 						public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+						 						{
+						 							 playerSelected = Integer.parseInt(event.getTarget().getName()); 
+						 							
+						 							//checking if the table exist
+						 							if(getTableIndex("tableEquip") != -1)
+						 								stage.getActors().removeIndex(getTableIndex("tableEquip"));
+						 							
+						 							enterEquip = true;						 												 							
+						 							
+						 							//creating the table
+						 							Table tableEquip = new Table();
+						 							tableEquip.setName("tableEquip");
+						 							tableEquip.setBackground(drawable);
+						 							
+						 							/*
+						 							 * size of the list
+						 							 */
+						 							
+						 							tableEquip.setHeight(stage.getHeight() / 4);
+											 		tableEquip.setWidth(stage.getWidth() / 2);	
+											 		
+											 		
+											 		//creating the label of equipment, need to check 2 var, 1 for wep 2 for arm
+											 		Label labelWep = new Label("Weapon", labelStyle);
+											 		labelWep.setPosition(tableEquip.getWidth() / 4 - labelWep.getWidth(), tableEquip.getHeight() - labelWep.getHeight());
+											 		
+											 		Label labelArmor = new Label("Armor", labelStyle);
+											 		labelArmor.setPosition(tableEquip.getWidth() / 2 - labelArmor.getWidth(), tableEquip.getHeight() - labelArmor.getHeight());
+											 		
+											 			// if wep is equip
+											 			if(playerSquad.get(playerSelected).weaponEquipped != -1)
+											 			{
+											 				Label Wep = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).weaponEquipped).Name, labelStyle);
+											 				Wep.setPosition(labelWep.getX(), labelWep.getY()  - Wep.getHeight());
+											 				
+											 				Label amountWep = new Label(""+((PartyHard_Weareable) playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).weaponEquipped)).getAmount()+" Atk", labelStyle);
+											 				amountWep.setPosition(Wep.getX(), Wep.getY() - amountWep.getHeight());
+											 				
+											 				tableEquip.addActor(amountWep);
+											 				tableEquip.addActor(Wep);
+											 			}
+											 			
+											 			if(playerSquad.get(playerSelected).armorEquipped != -1)
+											 			{
+											 				Label Arm = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped)).Name, labelStyle);
+											 				Arm.setPosition(labelArmor.getX(), labelArmor.getY()  - Arm.getHeight());
+											 				
+											 				Label amountArm = new Label(""+((PartyHard_Weareable) playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped))).getAmount()+" Def", labelStyle);
+											 				amountArm.setPosition(Arm.getX(), Arm.getY() - amountArm.getHeight());
+											 				
+											 				tableEquip.addActor(Arm);
+											 				tableEquip.addActor(amountArm);
+											 			}
+											 			
+											 		tableEquip.addActor(labelArmor);
+											 		tableEquip.addActor(labelWep);	
+											 		
+											 													 		
+											 		tableEquip.setPosition(x, y + stage.getHeight() / 2);
+											 	//	stage.setDebugAll(true);
+											 		stage.addActor(tableEquip);
+						 							
+						 						}
+						 						
+						 						//exiting the name
+						 						@Override
+						 						public void exit(InputEvent event, float x, float y, int pointer, Actor toActor)
+						 						{
+						 							enterEquip = false;
+						 							//deleting the table
+						 							if(getTableIndex("tableEquip") != -1)
+						 								stage.getActors().removeIndex(getTableIndex("tableEquip"));
+						 						}
+						 						
+						 						//following the mouse
+						 						public boolean mouseMoved(InputEvent event, float x, float y)
+						 						{
+						 							//update only if the player has the mouse on the name
+						 							if(enterEquip)
+						 								stage.getActors().items[getTableIndex("tableEquip")].setPosition(x, y + stage.getHeight() / 2);
+						 							return false;
+						 						}
+						 					});
+					 		
+						 					
 						 				break;
 						 				
 						 				case 1: //Hp
@@ -950,27 +1059,52 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 							 					tableChoice.setSize(stage.getWidth() / 2, stage.getHeight() / 2);
 										 		tableChoice.setPosition(stage.getWidth()/2 - tableChoice.getWidth(), stage.getHeight() / 2);
 							 					
-						 						List<Label> listChoice = new List<Label>(listStyle);				 						
-					 										 						
-						 						/*
+										 		/*
 						 						 * 0 - drop
 						 						 * 1 = equip
 						 						 * 2 - use 						 
 						 						 */
+										 		
+						 						List<Label> listChoice = new List<Label>(listStyle);				 											 										 								 						
 						 						
 						 						switch(playerSquad.get(playerSelected).bag.get(itemIndex).type)
 								 				{
 								 					case 0: //weapon
-							 						Label equipWep = new Label("1",labelStyle);
-							 						equipWep.setName("Equip");						 						
+								 						//itemEquipped
+								 						//unequip
+								 						if(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped) == itemIndex )
+								 						{
+								 							Label unequip = new Label("3", labelStyle);
+								 							unequip.setName("Unequip");
+								 							
+								 							listChoice.getItems().add(unequip);
+								 						}
+								 						else//equip
+								 						{
+								 							Label equipWep = new Label("1",labelStyle);
+									 						equipWep.setName("Equip");						 						
+									 						
+									 						listChoice.getItems().add(equipWep);
+								 						}
 							 						
-							 						listChoice.getItems().add(equipWep);
 								 						break;
 								 					case 1: //armor
-								 					Label equipArm = new Label("1",labelStyle);
-								 					equipArm.setName("Equip");
-								 						
-								 					listChoice.getItems().add(equipArm);
+								 						if( playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped) == itemIndex )
+								 						{
+								 							Label unequip = new Label("3", labelStyle);
+								 							unequip.setName("Unequip");
+								 							
+								 							listChoice.getItems().add(unequip);
+								 						}
+								 						else
+								 						{
+								 							Label equipArm = new Label("1",labelStyle);
+									 						equipArm.setName("Equip");						 						
+									 						
+									 						listChoice.getItems().add(equipArm);
+								 						}
+								 							
+								 					
 								 						break;
 								 					case 2: //potion
 								 					Label use = new Label("2", labelStyle);
@@ -987,8 +1121,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 						 						listChoice.getItems().add(labelDrop);					 						
 						 						
 						 						listChoice.addListener(new ClickListener(){					 						
-						 						public void clicked(InputEvent event, float x, float y){
-						 							
+						 						public void clicked(InputEvent event, float x, float y){					 							
 						 							
 						 								int choice = Integer.parseInt(((List<Label>) event.getTarget()).getSelected().getText().toString());					 								
 							 							
@@ -996,7 +1129,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 							 							{
 							 								case 0://drop
 							 									//Removing from inventory
-							 									playerSquad.get(playerSelected).useObject(itemIndex);													
+							 									playerSquad.get(playerSelected).removeObjectFromInventory(itemIndex);													
 							 									
 							 									//updating the inventory table
 							 									Table Inv = searchTable("tableInventory");
@@ -1028,16 +1161,25 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 							 						 			stage.getActors().removeIndex(getTableIndex("tableInventory"));
 							 									stage.addActor(Inv);
 																 							
-							 									//erasing the choice table
-							 									stage.getActors().removeIndex(getTableIndex("tableChoice"));
+							 									
+							 									
 							 									break;
-							 								case 1: //equip
+							 								case 1: //equip, then erase the choices
 							 									playerSquad.get(playerSelected).setEquipSlot(itemIndex);
+							 									
+							 							
 							 									break;
 							 								case 2: //use
 							 									
 							 									break;
-							 							}						 											 													 							
+							 									
+							 								case 3: //unequip
+							 									playerSquad.get(playerSelected).unequipItem(itemIndex);
+							 															 									
+							 									break;
+							 							}
+							 							//erasing the choices table
+							 							stage.getActors().removeIndex(getTableIndex("tableChoice"));
 						 						}});
 						 									 						 												
 						 						//getting the pos of the itemList
@@ -1161,19 +1303,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	}
 	
 	private void save() {
-		
-		/*
-		 * resetting the stats back before the items buff was applies
-		 */
-		 for(int i = 0; i < playerSquad.size(); i++)
-	        {
-			 if(playerSquad.get(i).isEquipSlot(0))//wep       	
-	        	playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - ((PartyHard_Weapon) playerSquad.get(i).bag.get(playerSquad.get(i).weaponEquipped)).getAmount());      	
-	        		
-	        if(playerSquad.get(i).isEquipSlot(1))//arm
-	        	playerSquad.get(i).setDef(playerSquad.get(i).getDef() - ((PartyHard_Armor) playerSquad.get(i).bag.get(playerSquad.get(i).armorEquipped)).getAmount());        	     
-	        }
-		
+
 		try {
 		//FileManager file = new FileManager("player_Fight.xml");
 			FileHandle file = Gdx.files.local("player_Fight.xml");
@@ -1194,6 +1324,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	                .element("exp").attribute("value", playerSquad.get(i).getExp()).pop()
 	                .element("money").attribute("value", playerSquad.get(i).getMoney()).pop()
 	                .element("level").attribute("value", playerSquad.get(i).getLevel()).pop()
+	                .element("weaponEquip").attribute("value", playerSquad.get(i).weaponEquipped).pop()
+	                .element("armorEquip").attribute("value", playerSquad.get(i).armorEquipped).pop()
 	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
 					
 					//populating the bag

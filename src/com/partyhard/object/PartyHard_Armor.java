@@ -22,7 +22,8 @@ public class PartyHard_Armor extends PartyHard_Object implements PartyHard_Weare
 	private int armorType;
 	private int id;
 	public PartyHard_Armor(int id) {
-super("", "", "", 0);
+		//ginving 1 to super constructor because it's an armor
+super("", "", "", 1);
 
 		
 		this.setId(id);
@@ -53,8 +54,7 @@ super("", "", "", 0);
 				 */			
 				super.Name = Name;
 				super.imagePath = imagePath;
-				super.description = description;
-				super.type = 0;
+				super.description = description;				
 				
 				/*
 				 * load info for the weapon

@@ -225,6 +225,11 @@ public class PartyHard_Fight implements Screen {
             	  game.setScreen(mapscreen);
             	  backToMap();
               }
+              else//flee failed, player gonna be attacked by monsters
+              {
+            	  turn = playerAlive -1;
+            	  fight();
+              }
              
               
             }
