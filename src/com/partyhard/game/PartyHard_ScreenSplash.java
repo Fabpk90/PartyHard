@@ -133,7 +133,7 @@ public class PartyHard_ScreenSplash implements Screen{
           public void clicked(InputEvent event, float x, float y){
           	tiledmap.dispose();
           	backgroundMusic.stop();   		
-            PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(256,256, "player/test_player.png"));
+            PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(160,192, "player/test_player.png"));
             game.setScreen(map);
           }
 	});

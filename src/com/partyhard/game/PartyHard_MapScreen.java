@@ -92,7 +92,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private float mapPixelWidth;
 	private float mapPixelHeight;
 	
-	private boolean isSafe;
+	private boolean isSafe = true;
 	private float timeToFight = 0;
 	
 	private boolean blockedx = false;
@@ -113,7 +113,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private Skin skin;
 	
 	/*
-	 * Invotry var
+	 * Inventory var
 	 */
 	
 	//of which inventory we are?
@@ -121,14 +121,14 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int itemIndex;
 	
 	private boolean enterEquip = false;
-	private boolean isShopping;
+	
 	
 	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
 	{	
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
-		this.playerMap.setMap(mapName);
+		this.playerMap.setMap(mapName, isSafe);
 		this.playerMap.setCollisionLayer(tiledmap);	
 		
 		//loading the playerSquad
@@ -233,7 +233,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
         	scale = 4f;
-        	  if(!playerMap.isMoving())
+        	  if(!playerMap.isMoving() && !playerMap.isShopping)
           {	    
 		    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 		    	{
@@ -259,15 +259,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		        	moveDown();
 		        }
 		        
-		        if(Gdx.input.isKeyPressed(Input.Keys.ENTER))
-		        {
-		        	if(!isShopping)
-		        	if(playerMap.getCellShop() != -1)
-		        	{
-		        		loadShop(playerMap.getCellShop());
+		        
+          }
+        	  if(Gdx.input.isKeyPressed(Input.Keys.ENTER))
+		        {			        			        			        			        	
+		        	//if(!playerMap.isShopping)
+		        	if(playerMap.getCellShop(direction) != -1)
+		        	{		        		
+		        		loadShop(playerMap.getCellShop(direction));
 		        	}
 		        }
-          }
         }     
 	        stage.draw();
 	        
@@ -283,7 +284,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	        	//reloading
 	        	tiledmap = new TmxMapLoader().load(Name+".tmx");	   
 	        	
-	    		playerMap.setMap(Name);
+	    		playerMap.setMap(Name, isSafe);
 	    		playerMap.setCollisionLayer(tiledmap);
 	    			    	
 	    		playerMap.isTp = false;
@@ -318,7 +319,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	Table mapNameTable = new Table();
 	stage = new Stage();
-	
+	stage.setDebugAll(true);
 
 		spriteBatch = new SpriteBatch();
 		
@@ -677,7 +678,67 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	}
 
 	private void loadShop(int id)
-	{
+	{	
+		//loading the background for the table
+		 
+		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/Shop.9.png"))));
+			
+		NinePatchDrawable drawable = new NinePatchDrawable(patch);	
+		
+		
+		//for disabling movements
+		playerMap.isShopping = true;
+		playerMap.stopMovement();
+		
+		Table tableShop = new Table();
+		tableShop.setName("tableShop");
+		
+		
+		//setting bg
+		tableShop.setBackground(drawable);
+		
+		
+		//fill up the entire screen
+		tableShop.setWidth(stage.getWidth());
+		tableShop.setHeight(stage.getHeight());
+		
+		Label description = new Label(playerMap.getShopDescription(id), labelStyle);
+		description.setHeight(100);
+		description.setPosition(tableShop.getWidth() / 2 - description.getHeight(), tableShop.getHeight() - description.getHeight());
+		
+		
+		
+		Label Buy = new Label("Buy", labelStyle);
+		Buy.setPosition(tableShop.getWidth() / 3 - Buy.getWidth(), tableShop.getHeight() - 100);
+		
+		
+		
+		Label Sell = new Label("Sell", labelStyle);
+		Sell.setPosition(tableShop.getWidth() / 1.5f - Sell.getWidth(), tableShop.getHeight() - 100);
+		
+		
+		
+		Label Quit = new Label("Quit", labelStyle);	
+		Quit.setPosition(tableShop.getWidth() - (Quit.getWidth() + 20) , tableShop.getHeight() - 100);
+		
+		System.out.println(Quit.getWidth());
+		
+		Quit.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				
+				stage.getActors().removeIndex(getTableIndex("tableShop"));
+				playerMap.isShopping = false;
+			}
+		});
+		
+		
+		tableShop.addActor(description);
+		tableShop.addActor(Buy);
+		tableShop.addActor(Sell);
+		tableShop.addActor(Quit);
+		
+		stage.addActor(tableShop);
 		
 	}
 
@@ -1195,9 +1256,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 						 					}
 						 										 					
 						 				}
-						 			}});	
-			 							
-					 							 				
+						 			}});			 												 							 				
 					 			
 					 			//creating the scroll
 					 			ScrollPaneStyle style = new ScrollPaneStyle();					 			

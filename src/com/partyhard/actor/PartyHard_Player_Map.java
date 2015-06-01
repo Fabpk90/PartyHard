@@ -3,6 +3,7 @@ package com.partyhard.actor;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import utils.PartyHard_Shop;
 import utils.PartyHard_Tp;
 
 import com.badlogic.gdx.Gdx;
@@ -52,6 +53,9 @@ public class PartyHard_Player_Map {
 	//store tp
 	private ArrayList<PartyHard_Tp> Tp = new ArrayList<PartyHard_Tp>();
 	
+	//store shop, based on the map
+	private ArrayList<PartyHard_Shop> Shops = new ArrayList<PartyHard_Shop>();
+	
 	//for knowing which tp the player is doing
 	private int tp = -1;
 	
@@ -66,6 +70,8 @@ public class PartyHard_Player_Map {
 	
 	//used for movement smoothness
 	private boolean moving = false;
+	
+	public boolean isShopping = false;
 	
 	//normal constructor
 	public PartyHard_Player_Map(int x, int y, String imagePath, TiledMap Map)
@@ -125,7 +131,7 @@ public class PartyHard_Player_Map {
 		moving = true;
 		movingLeft = true;
 		//setting the position of the destination
-		destination.x += - 32;
+		destination.x -= 32;
 	}
 	
 	public void moveDown()
@@ -134,7 +140,7 @@ public class PartyHard_Player_Map {
 		moving = true;
 		movingDown = true;
 		//setting the position of the destination
-		destination.y +=  - 32;
+		destination.y -=  32;
 	}
 	
 	public void moveTop()
@@ -143,7 +149,7 @@ public class PartyHard_Player_Map {
 		moving = true;
 		movingTop = true;
 		//setting the position of the destination
-		destination.y +=  + 32;
+		destination.y +=  32;
 	}
 	
 	public void setCollisionLayer(TiledMap Map)
@@ -181,13 +187,13 @@ public class PartyHard_Player_Map {
 			stopMovement();
 			destination.x = getX();
 			destination.y = getY();
-			resetCollision();
+			
 		}
 		else
 		{
 			if(movingRight)
 			{
-				setX(getX() + (2+delta));
+				setX((int)(getX() + (2+delta)));
 				if(getX() > destination.x)
 				{
 					stopMovement();
@@ -197,7 +203,7 @@ public class PartyHard_Player_Map {
 			
 			if(movingLeft)
 			{
-				setX(getX() + (-2 + -delta));
+				setX((int)(getX() + (-2 + -delta)));
 				if(getX() < destination.x)
 				{					
 					stopMovement();
@@ -215,14 +221,13 @@ public class PartyHard_Player_Map {
 		{
 			stopMovement();
 			destination.x = getX();
-			destination.y = getY();
-			resetCollision();
+			destination.y = getY();			
 		}
 		else
 		{
 			if(movingTop)
 			{
-				setY(getY() + (2+delta));
+				setY((int)(getY() + (2+delta)));
 				if(getY() > destination.y)
 				{
 					stopMovement();
@@ -233,7 +238,7 @@ public class PartyHard_Player_Map {
 				
 			if(movingDown)
 			{
-				setY(getY() + (-2 + -delta));
+				setY((int)(getY() + (-2 + -delta)));
 				if(getY() < destination.y)
 				{					
 					stopMovement();
@@ -285,7 +290,7 @@ public class PartyHard_Player_Map {
 		movingLeft = false;
 		movingTop = false;
 		movingDown = false;
-		moving = false;
+		moving = false;	
 	}
 
 	public  void createPlayerAnimation()
@@ -426,93 +431,69 @@ public class PartyHard_Player_Map {
 		return false; 
 	}
 	
-	/*
-	 * @return -1 if no shop has been found
+	/**
+	 * 
+	 * @param direction The direction of the player on the map
+	 * @return -1 if not found, or the id of the shop
 	 */
 	
-	public int getCellShop()
+	public int getCellShop(int direction)
 	{
-		//checking all layer if there is a shop near the player(switching on orientation)
-		
-		for(int i = 0; i != masterLayer.getLayers().getCount();i++)
-		{
-			TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(i);
+		//checking the shop Array, need to check all the direction		
+		TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(0);
 			
-			if(movingRight)
-				if(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
-				}
-				
-			if(movingLeft)
-				if(layer.getCell((int) (x - getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) (x - getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
-				}
-				
-			if(movingTop)
-				if(layer.getCell((int) x, (int) (y + getHeight())).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) x, (int) (y + getHeight())).getTile().getProperties().get("shop", String.class));
-				}
-			if(movingDown)
-				if(layer.getCell((int) x, (int) (y - getHeight())).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) x, (int) (y - getHeight())).getTile().getProperties().get("shop", String.class));
-				}
+		
+		for(int i = 0; i < Shops.size() ;i++)
+		{
+			
+			
+			/*
+			 * 0 back
+			 * 1 left
+			 * 2 right
+			 * 3 toward
+			 */	
+			switch(direction)
+			{
+				case 0:
+					if(Shops.get(i).y == (this.y - getWidth()) / layer.getTileWidth())
+						return i;
+					break;
+					
+				case 1:
+					if(Shops.get(i).x == (this.x - getWidth()) / layer.getTileWidth())
+						return i;
+					break;
+					
+				case 2:
+					if(Shops.get(i).x == (this.x + getWidth()) / layer.getTileWidth())
+						return i;
+					break;
+					
+				case 3:
+					if(Shops.get(i).y == (this.y + getWidth()) / layer.getTileWidth())
+						return i;
+					break;
+			}
 		}
 		
 		return -1;
 	}
 	
-	/*
-	 * @return -1 if no shop has been found
-	 */
-	
-	public int getCellShop(int x, int y)
+	public String getShopDescription(int id)
 	{
-		//checking all layer if there is a shop near the player(switching on orientation)
-		
-		for(int i = 0; i != masterLayer.getLayers().getCount();i++)
-		{
-			TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(i);
-			
-			if(movingRight)
-				if(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) (x + getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
-				}
-				
-			if(movingLeft)
-				if(layer.getCell((int) (x - getWidth()), (int)y).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) (x - getWidth()), (int)y).getTile().getProperties().get("shop", String.class));
-				}
-				
-			if(movingTop)
-				if(layer.getCell((int) x, (int) (y + getHeight())).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) x, (int) (y + getHeight())).getTile().getProperties().get("shop", String.class));
-				}
-			if(movingDown)
-				if(layer.getCell((int) x, (int) (y - getHeight())).getTile().getProperties().containsKey("shop"))
-				{
-					return Integer.parseInt(layer.getCell( (int) x, (int) (y - getHeight())).getTile().getProperties().get("shop", String.class));
-				}
-		}
-		
-		return -1;
+		return Shops.get(id).description;
 	}
 	
 	private boolean collidesX() {
-		for(float step = 0; step <= getWidth(); step +=  ((TiledMapTileLayer) masterLayer.getLayers().get(0)).getTileWidth())
+		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) masterLayer.getLayers().get(0)).getTileWidth())
 			if(isCellBlocked(destination.x, getY()))
 				return true;
 		return false;
 	}
 
 	private boolean collidesY() {
-		//using destination for knowing where 
+		for(float step = 0; step <= getWidth(); step += ((TiledMapTileLayer) masterLayer.getLayers().get(0)).getTileWidth())
 			if(isCellBlocked(getX(), destination.y))
 				return true;
 		return false;
@@ -527,9 +508,11 @@ public class PartyHard_Player_Map {
 		return Map;
 	}
 
-	public void setMap(String map) {
+	public void setMap(String map, boolean isSafe) {
 		Map = map;
 		loadTp();
+		if(isSafe)
+		loadShop();
 	}	
 	
 	//load all the tp point into an array
@@ -577,7 +560,39 @@ public class PartyHard_Player_Map {
 			e.printStackTrace();
 		}
 	}
+
+	//load all the shops based on the map
+	private void loadShop()
+	{
+		
+		XmlReader xml = new XmlReader();
 	
+			/*
+			 * getting the map child, then all the shop in the map and add their id for populating the shops			  
+			 */
+	
+		try
+		{
+			Element	root = xml.parse(Gdx.files.local("Shop.xml"));
+			
+			//this check is needed because if the map doesn't has shop this crash
+			Element array = root.getChildByName(Map);
+			if(array != null)
+			{
+				Array<Element> arrayOfShop = array.getChildrenByName("shop");
+				
+				for(int i = 0; i != arrayOfShop.size; i++)
+				{					
+					Shops.add(new PartyHard_Shop(i, Map));
+				}
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public PartyHard_Tp Tp()
 	{
 		return Tp.get(tp);
