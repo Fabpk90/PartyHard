@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Weareable{
 	
-	public int price;
 	private int weaponType;
 	public boolean equip = false;
 	private int id;
@@ -22,7 +21,7 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 	
 	public PartyHard_Weapon(int id)
 	{
-		super("", "", "", 0);
+		super("", "", "", 0, 0);
 
 		
 		this.setId(id);
@@ -32,7 +31,7 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 		Element root = null;
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Weapon.xml"));
+			root = xml.parse(Gdx.files.internal("data/Weapon.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,12 +54,12 @@ public class PartyHard_Weapon extends PartyHard_Object implements PartyHard_Wear
 				super.imagePath = imagePath;
 				super.description = description;
 				super.type = 0;
+				super.price = Integer.parseInt(arrayOfItem.get(i).getAttribute("price"));
 				
 				/*
 				 * load info for the weapon
 				 */
-				
-				price = Integer.parseInt(arrayOfItem.get(i).getAttribute("price"));
+							
 				weaponType = Integer.parseInt(arrayOfItem.get(i).getAttribute("type"));
 				amount = Integer.parseInt(arrayOfItem.get(i).getAttribute("amount"));
 				

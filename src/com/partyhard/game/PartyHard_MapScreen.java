@@ -1,9 +1,10 @@
 package com.partyhard.game;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
+
+import utils.PartyHard_Shop;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Game;
@@ -47,13 +48,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.XmlWriter;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
-import com.partyhard.object.PartyHard_Armor;
-import com.partyhard.object.PartyHard_Potion;
-import com.partyhard.object.PartyHard_Weapon;
 import com.partyhard.object.PartyHard_Weareable;
 
 public class PartyHard_MapScreen implements Screen, InputProcessor{
@@ -121,19 +121,18 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int itemIndex;
 	
 	private boolean enterEquip = false;
+	private int idSave;
 	
 	
-	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap)
+	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
 	{	
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
 		this.playerMap.setMap(mapName, isSafe);
 		this.playerMap.setCollisionLayer(tiledmap);	
+		this.idSave = idSave;
 		
-		//loading the playerSquad
-		playerSquad.add(new PartyHard_Player_Fight(0));
-		playerSquad.add(new PartyHard_Player_Fight(1));
 	}			
 	
 	@Override
@@ -157,6 +156,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
     	   playerMap.update(delta);
         
      //updating the player's animation
+       
         if(animationTime + delta >= 1)
         	animationTime = 0;
         
@@ -263,7 +263,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
           }
         	  if(Gdx.input.isKeyPressed(Input.Keys.ENTER))
 		        {			        			        			        			        	
-		        	//if(!playerMap.isShopping)
+		        	if(!playerMap.isShopping)
 		        	if(playerMap.getCellShop(direction) != -1)
 		        	{		        		
 		        		loadShop(playerMap.getCellShop(direction));
@@ -305,6 +305,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		
+	loadSquad();
 		
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
@@ -319,7 +320,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	Table mapNameTable = new Table();
 	stage = new Stage();
-	stage.setDebugAll(true);
+	//stage.setDebugAll(true);
 
 		spriteBatch = new SpriteBatch();
 		
@@ -650,6 +651,27 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		playerMap.dispose();
 	}
 	
+	private void loadSquad() {
+		XmlReader xml = new XmlReader();
+		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		
+		try {
+			Element root = xml.parse(file);
+			
+			Array<Element> players = root.getChildrenByName("player_Fight");
+			
+			for(int i = 0; i < players.size; i++)
+			{
+				playerSquad.add(new PartyHard_Player_Fight(i, idSave));
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private void loadFight()
 	{
 		Random r = new Random();
@@ -677,7 +699,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 	}
 
-	private void loadShop(int id)
+	private void loadShop(final int id)
 	{	
 		//loading the background for the table
 		 
@@ -709,25 +731,73 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		
 		Label Buy = new Label("Buy", labelStyle);
-		Buy.setPosition(tableShop.getWidth() / 3 - Buy.getWidth(), tableShop.getHeight() - 100);
+		Buy.setPosition(tableShop.getWidth() / 3 - Buy.getWidth() - 100, tableShop.getHeight() - 100);
 		
+		Buy.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				//cleaning the shop from old menus
+				toggleSubMenu();
+				
+					Table tableBuy = new Table();
+					tableBuy.setName("tableBuy");					
+					tableBuy.setBounds(20, 20, stage.getWidth() - 40, stage.getHeight() - 120);
+					
+					List<Label> listBuy = new List<Label>(listStyle);
+					
+					PartyHard_Shop shop = playerMap.getShop(id);
+					
+					for(int i = 0;i < shop.getShopSize(); i++)
+					{
+						Label item = new Label(""+i, labelStyle);
+						item.setName(shop.getObjectName(i));
+						
+						listBuy.getItems().add(item);
+						
+					}
+					
+					ScrollPaneStyle style = new ScrollPaneStyle();
+					ScrollPane scroll = new ScrollPane(listBuy, style);
+					
+					tableBuy.addActor(scroll);
+					
+					stage.addActor(tableBuy);
+												
+			}
+		});
 		
 		
 		Label Sell = new Label("Sell", labelStyle);
-		Sell.setPosition(tableShop.getWidth() / 1.5f - Sell.getWidth(), tableShop.getHeight() - 100);
+		Sell.setPosition(tableShop.getWidth() / 1.5f - Sell.getWidth() - 100, tableShop.getHeight() - 100);
 		
+		Sell.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				
+				toggleSubMenu();
+				
+				Table tableSell = new Table();
+				tableSell.setName("tableSell");
+				
+				tableSell.setBounds(20, 20, stage.getWidth() - 40, stage.getHeight() - 120);
+				
+				stage.addActor(tableSell);
+				
+			}
+		});
 		
 		
 		Label Quit = new Label("Quit", labelStyle);	
-		Quit.setPosition(tableShop.getWidth() - (Quit.getWidth() + 20) , tableShop.getHeight() - 100);
-		
-		System.out.println(Quit.getWidth());
+		Quit.setPosition(tableShop.getWidth() - (Quit.getWidth() + 20)  - 100, tableShop.getHeight() - 100);		
 		
 		Quit.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				
 				stage.getActors().removeIndex(getTableIndex("tableShop"));
+				
+				toggleSubMenu();
+				
 				playerMap.isShopping = false;
 			}
 		});
@@ -742,6 +812,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 	}
 
+	
 	public void moveRight()
 	{	
         		playerMap.stopMovement();
@@ -1305,7 +1376,13 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			stage.getActors().removeIndex(getTableIndex("tableInventory"));
 		
 		if(getTableIndex("tableChoice") != -1)
-			stage.getActors().removeIndex(getTableIndex("tableChoice"));		
+			stage.getActors().removeIndex(getTableIndex("tableChoice"));
+		
+		if(getTableIndex("tableBuy") != -1)
+			stage.getActors().removeIndex(getTableIndex("tableBuy"));
+		
+		if(getTableIndex("tableSell") != -1)
+			stage.getActors().removeIndex(getTableIndex("tableSell"));
 	}
 	
 	@Override
@@ -1363,76 +1440,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private void save() {
 
-		try {
-		//FileManager file = new FileManager("player_Fight.xml");
-			FileHandle file = Gdx.files.local("player_Fight.xml");
+		//first save the fighters
+		playerSquad.get(0).prepareForSave();
+		for(int i = 0; i < playerSquad.size(); i++)
+		{
+			playerSquad.get(i).save(i);
+		}
 				
-			 StringWriter stringwriter = new StringWriter();
-			 XmlWriter xml = new XmlWriter(stringwriter);
-		 
-				xml.element("root");	
-				for(int i = 0;i < playerSquad.size(); i++)
-				{
-					xml.element("player_Fight").attribute("num", i)	       
-	                .element("name").attribute("value", playerSquad.get(i).Name).pop()
-	                .element("class").attribute("value", playerSquad.get(i).getclass()).pop()
-	                .element("hpmax").attribute("value", playerSquad.get(i).getHpMax()).pop()
-	                .element("hp").attribute("value", playerSquad.get(i).getLife()).pop()
-	                .element("def").attribute("value", playerSquad.get(i).getDef()).pop()
-	                .element("atk").attribute("value", playerSquad.get(i).getAtk()).pop()
-	                .element("exp").attribute("value", playerSquad.get(i).getExp()).pop()
-	                .element("money").attribute("value", playerSquad.get(i).getMoney()).pop()
-	                .element("level").attribute("value", playerSquad.get(i).getLevel()).pop()
-	                .element("weaponEquip").attribute("value", playerSquad.get(i).weaponEquipped).pop()
-	                .element("armorEquip").attribute("value", playerSquad.get(i).armorEquipped).pop()
-	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
-					
-					//populating the bag
-					for(int p = 0; p < playerSquad.get(i).bag.size(); p++)
-					{
-						xml.element("item").attribute("type", playerSquad.get(i).bag.get(p).type);	
-						
-						switch(playerSquad.get(i).bag.get(p).type)
-		        		{
-		        			case 0: //weapon
-		        				PartyHard_Weapon wep = (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", wep.getId()).pop();
-		        			break;
-		        			case 1: //armor
-		        				PartyHard_Armor armor = (PartyHard_Armor) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", armor.getId()).pop();
-		        			break;
-		        			case 2: //potion
-		        				PartyHard_Potion pot = (PartyHard_Potion) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", pot.getId()).pop();
-		        			break;
-		        		}
-					}
-					xml.pop();//closing the bag
-					xml.element("capacity").attribute("value", playerSquad.get(i).capacity.size());
-					
-					for(int p = 0; p < playerSquad.get(i).capacity.size(); p++)
-					{
-						xml.element("cap").attribute("id", playerSquad.get(i).capacity.get(p).id).pop();				
-					}
-					//closing cap and then the player
-					xml.pop();
-					xml.pop();
-			
-					/*
-					 * updating the inventory with (class, object)
-					 */
-					             
-				}
-				      //to be sure that all the element has been close  
-				   xml.close();                   
-			
-				   file.writeString(stringwriter.toString(), false);
-				   			 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}					
+		playerSquad.get(0).finishFile();
+		//the the player map		   			 
+		playerMap.save();				
 	}
 
 

@@ -19,7 +19,7 @@ public class PartyHard_Shop {
 	public int x;
 	public int y;
 	
-	ArrayList<PartyHard_Object> merch = new ArrayList<PartyHard_Object>();
+	private ArrayList<PartyHard_Object> merch = new ArrayList<PartyHard_Object>();
 	/**
 	 * 
 	 * @param id The id of the Shop
@@ -36,7 +36,7 @@ public class PartyHard_Shop {
 		Element root = null;
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Shop.xml"));
+			root = xml.parse(Gdx.files.internal("data/Shop.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -79,18 +79,96 @@ public class PartyHard_Shop {
 	 */
 	public void addItem(int type, int id)
 	{
-		
+		switch(type)
+		{
+			case 0:
+				merch.add(new PartyHard_Weapon(id));
+				break;
+			case 1:
+				merch.add(new PartyHard_Armor(id));
+				break;
+			case 2:
+				merch.add(new PartyHard_Potion(id));
+				break;
+		}
 	}
-	
 	/**
 	 * 
-	 * @param index Index of the item
+	 * @param index The index of the object in the shop
+	 * @return The name of the object
+	 */
+	public String getObjectName(int index)
+	{
+		return merch.get(index).Name;
+	}
+	/**
+	 * 
+	 * @param index The index of the object in the shop
+	 * @return The price of the given object
+	 */
+	public int getObjectPrice(int index)
+	{
+		return merch.get(index).price;
+	}
+	/**
+	 * 
+	 * @param type The type of the searched object
+	 * @param index The index of the object in the shop
 	 * @return -1 if not found
 	 */
-	
-	public int getItemIndex(int index)
+	public int getObjectAmount(int type, int index)
 	{
+		switch(type)
+		{
+			case 0:
+				return ((PartyHard_Weapon) merch.get(index)).getAmount();
+				
+			case 1:
+				return ((PartyHard_Armor) merch.get(index)).getAmount();
+				
+			case 2:
+				return ((PartyHard_Potion) merch.get(index)).getAmount();
+		}
+		
 		return -1;
+	}
+	/**
+	 * 
+	 * @param index The index of the object in the shop
+	 * @return -1 if not found
+	 */
+	public int getObjectAmount(int index)
+	{
+		switch(getObjectType(index))
+		{
+			case 0:
+				return ((PartyHard_Weapon) merch.get(index)).getAmount();
+				
+			case 1:
+				return ((PartyHard_Armor) merch.get(index)).getAmount();
+				
+			case 2:
+				return ((PartyHard_Potion) merch.get(index)).getAmount();
+		}
+		
+		return -1;
+	}
+	/**
+	 * 
+	 * @param index The index of the object in the shop
+	 * @return ATTENTION, not catching any not found error!
+	 */
+	public int getObjectType(int index)
+	{
+		return merch.get(index).type;
+	}
+	/**
+	 * 
+	 * @return The size()
+	 */
+	public int getShopSize()
+	{
+		return merch.size();
 	}
 	
 }

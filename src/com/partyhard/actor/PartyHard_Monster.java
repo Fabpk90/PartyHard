@@ -55,7 +55,7 @@ public class PartyHard_Monster extends Sprite {
 			//FileManager fileManager = new FileManager("monster.xml");
 			
 			try {
-				root = xml.parse(Gdx.files.internal("monster.xml"));
+				root = xml.parse(Gdx.files.internal("data/monster.xml"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

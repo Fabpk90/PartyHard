@@ -1,12 +1,14 @@
 package com.partyhard.actor;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import utils.PartyHard_Shop;
 import utils.PartyHard_Tp;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,7 +18,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.partyhard.object.PartyHard_Armor;
+import com.partyhard.object.PartyHard_Potion;
+import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Player_Map {
 	
@@ -73,28 +79,109 @@ public class PartyHard_Player_Map {
 	
 	public boolean isShopping = false;
 	
-	//normal constructor
-	public PartyHard_Player_Map(int x, int y, String imagePath, TiledMap Map)
+	private int Money = 0;
+	
+	private int idSave;
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param imagePath The path of the Sprite
+	 * @param Map The TiledMa where the player is
+	 * @param idSave The id of the current Save
+	 * @see TextureAtlas 
+	 */
+	public PartyHard_Player_Map(int x, int y, String imagePath, TiledMap Map, int idSave)
 	{
 		this.setX(x);
 		this.setY(y);
 		this.masterLayer = Map;
 		this.imagePath = imagePath;
 		destination = new Vector2(x,y);
+		this.idSave = idSave;
 	}
 	
 	//special constructor without the tiledlayer
-	/*
+	/**
 	 * @param imagePath The path of the image(Texture Atlas)
 	 * @see TextureAtlas
 	 */
-	public PartyHard_Player_Map(int x, int y, String imagePath)
+	public PartyHard_Player_Map(int x, int y, String imagePath, int idSave)
 	{
 		this.setX(x);
 		this.setY(y);
 		destination = new Vector2(x,y);
 	
 		this.imagePath = imagePath;
+		this.idSave = idSave;
+	}
+	/**
+	 * 
+	 * @param idSave The id of the current Save
+	 */
+	public PartyHard_Player_Map(int idSave)
+	{
+		this.idSave = idSave;
+		
+		XmlReader xml = new XmlReader();
+		
+		Element root;
+		
+		try
+		{
+			//FileManager fileManager = new FileManager("player_Fight.xml");
+			
+			root = xml.parse(Gdx.files.internal("save/"+idSave+"Map.xml"));
+			Element Player = root.getChildByName("player_Map");	
+			
+			float x = Player.getFloatAttribute("x");
+			float y = Player.getFloatAttribute("y");
+			
+			this.destination = new Vector2(x, y);
+		
+			this.setX(x);
+			this.setY(y);
+			
+			this.Map = Player.getAttribute("Map");
+			this.imagePath = Player.getAttribute("imagePath");
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public PartyHard_Player_Map(int idSave, float x, float y)
+	{
+XmlReader xml = new XmlReader();
+		
+		Element root;
+		
+		try
+		{
+			//FileManager fileManager = new FileManager("player_Fight.xml");
+			
+			root = xml.parse(Gdx.files.internal("save/"+idSave+"Map.xml"));
+			Element Player = root.getChildByName("player_Map");							
+			
+			this.destination = new Vector2(x, y);
+		
+			this.setX(x);
+			this.setY(y);
+			
+			this.Map = Player.getAttribute("Map");
+			this.imagePath = Player.getAttribute("imagePath");
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/**
+	 *  Uses the xml file to load the player
+	 */
+	public PartyHard_Player_Map(TiledMap Map)
+	{
+		this.masterLayer = Map;
 	}
 	
 	
@@ -336,6 +423,7 @@ public class PartyHard_Player_Map {
            
             walkFrames = new TextureRegion[4 * 4];
         }
+              
             
 	}
 	/**
@@ -456,22 +544,22 @@ public class PartyHard_Player_Map {
 			switch(direction)
 			{
 				case 0:
-					if(Shops.get(i).y == (this.y - getWidth()) / layer.getTileWidth())
+					if(Shops.get(i).y == (this.y - getWidth()) / layer.getTileWidth() && Shops.get(i).x == this.x / layer.getTileWidth())
 						return i;
 					break;
 					
 				case 1:
-					if(Shops.get(i).x == (this.x - getWidth()) / layer.getTileWidth())
+					if(Shops.get(i).x == (this.x - getWidth()) / layer.getTileWidth() && Shops.get(i).y == this.y / layer.getTileWidth())
 						return i;
 					break;
 					
 				case 2:
-					if(Shops.get(i).x == (this.x + getWidth()) / layer.getTileWidth())
+					if(Shops.get(i).x == (this.x + getWidth()) / layer.getTileWidth() && Shops.get(i).y == this.y / layer.getTileWidth())
 						return i;
 					break;
 					
 				case 3:
-					if(Shops.get(i).y == (this.y + getWidth()) / layer.getTileWidth())
+					if(Shops.get(i).y == (this.y + getWidth()) / layer.getTileWidth() && Shops.get(i).x == this.x / layer.getTileWidth())
 						return i;
 					break;
 			}
@@ -483,6 +571,11 @@ public class PartyHard_Player_Map {
 	public String getShopDescription(int id)
 	{
 		return Shops.get(id).description;
+	}
+	
+	public PartyHard_Shop getShop(int id)
+	{
+		return Shops.get(id);
 	}
 	
 	private boolean collidesX() {
@@ -526,7 +619,7 @@ public class PartyHard_Player_Map {
 		 */
 		try
 		{
-			Element	root = xml.parse(Gdx.files.local("Tp.xml"));
+			Element	root = xml.parse(Gdx.files.local("data/Tp.xml"));
 			Array<Element> arrayOfMapTp = root.getChildrenByName("map");
 			
 			for(int i = 0; i != arrayOfMapTp.size; i++)
@@ -573,7 +666,7 @@ public class PartyHard_Player_Map {
 	
 		try
 		{
-			Element	root = xml.parse(Gdx.files.local("Shop.xml"));
+			Element	root = xml.parse(Gdx.files.local("data/Shop.xml"));
 			
 			//this check is needed because if the map doesn't has shop this crash
 			Element array = root.getChildByName(Map);
@@ -596,5 +689,61 @@ public class PartyHard_Player_Map {
 	public PartyHard_Tp Tp()
 	{
 		return Tp.get(tp);
+	}
+	
+	public int getMoney()
+	{
+		return Money;
+	}
+	
+	public void setMoney(int amount)
+	{
+		Money = amount;
+	}
+	
+	public void addMoney(int amount)
+	{
+		Money += amount;
+	}
+	
+	public boolean canPay(int amount)
+	{
+		if(Money - amount < 0)
+			return false;
+		else
+		{
+			Money -= amount;
+			return true;
+		}
+		
+	}
+	
+	public void save()
+	{
+		try {
+		//FileManager file = new FileManager("player_Fight.xml");
+		FileHandle file = Gdx.files.local("save/"+idSave+"Map.xml");
+				
+		 StringWriter stringwriter = new StringWriter();
+		 XmlWriter xml = new XmlWriter(stringwriter);
+	 
+			xml.element("root");	
+							
+			xml.element("player_Map")
+			.attribute("x", getX())
+			.attribute("y", getY())
+			.attribute("Map", Map)
+			.attribute("imagePath", imagePath).pop();
+			
+			//make sure that all has been closed
+			xml.close();   
+			
+					
+			file.writeString(stringwriter.toString(), false);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}              
+			   
 	}
 }

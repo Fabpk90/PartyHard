@@ -17,7 +17,7 @@ public class PartyHard_Potion extends PartyHard_Consumable{
 	private int price;
 
 	public PartyHard_Potion(int id) {
-super("", "", "", 0);
+super("", "", "", 0, 0);
 
 		
 		this.setId(id);
@@ -43,6 +43,8 @@ super("", "", "", 0);
 				String imagePath = arrayOfItem.get(i).getAttribute("imagePath");
 				String description = arrayOfItem.get(i).getAttribute("description");
 				
+				int price = Integer.parseInt(arrayOfItem.get(i).getAttribute("description"));
+				
 				/*
 				 * Act like the super constructor
 				 */			
@@ -50,6 +52,7 @@ super("", "", "", 0);
 				super.imagePath = imagePath;
 				super.description = description;
 				super.type = 2;
+				super.price = price;
 				
 				/*
 				 * load info for the weapon

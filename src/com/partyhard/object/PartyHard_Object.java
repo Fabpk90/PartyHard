@@ -6,6 +6,7 @@ public class PartyHard_Object {
 	public String description;
 	public int type;
 	private int id;
+	public int price;
 	
 	private static int Id= 0;
 	
@@ -16,13 +17,14 @@ public class PartyHard_Object {
 	 * 2 potion
 	 */
 	
-	public PartyHard_Object(String Name, String imagePath, String description, int type)
+	public PartyHard_Object(String Name, String imagePath, String description, int type, int price)
 	{
 		id = Id;
 		this.Name = Name;
 		this.imagePath = imagePath;
 		this.description = description;
-		this.type = type;		
+		this.type = type;	
+		this.price = price;
 		
 		Id++;
 		

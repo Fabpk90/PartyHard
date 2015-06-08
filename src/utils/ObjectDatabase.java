@@ -155,6 +155,7 @@ public class ObjectDatabase {
 	 * @param id
 	 * @return The object or null if not found
 	 */
+	/*
 	public <? extends PartyHard_Object>  getItem(int type, int id)
 	{
 		for(int i = 0; i < Objects.size; i++)
@@ -165,11 +166,17 @@ public class ObjectDatabase {
 				{
 					case 0:
 						return (PartyHard_Weapon)Objects.get(i);
+						
+					case 1:
+						return (PartyHard_Armor)Objects.get(i);
+						
+					case 2:
+						return (PartyHard_Potion)Objects.get(i);
 				}
 			}
 		}
 		
 		return null;
-	}
+	}*/
 		
 }

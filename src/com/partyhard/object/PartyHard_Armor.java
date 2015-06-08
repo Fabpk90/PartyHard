@@ -18,12 +18,11 @@ public class PartyHard_Armor extends PartyHard_Object implements PartyHard_Weare
 	
 	private int amount;
 	private boolean equip = false;
-	private int price;
 	private int armorType;
 	private int id;
 	public PartyHard_Armor(int id) {
 		//ginving 1 to super constructor because it's an armor
-super("", "", "", 1);
+super("", "", "", 1, 0);
 
 		
 		this.setId(id);
@@ -33,7 +32,7 @@ super("", "", "", 1);
 		Element root = null;
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Armor.xml"));
+			root = xml.parse(Gdx.files.internal("data/Armor.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,14 +53,14 @@ super("", "", "", 1);
 				 */			
 				super.Name = Name;
 				super.imagePath = imagePath;
-				super.description = description;				
+				super.description = description;
+				super.price = Integer.parseInt(arrayOfItem.get(i).getAttribute("price"));
 				
 				/*
 				 * load info for the weapon
 				 */
-				
-				setPrice(Integer.parseInt(arrayOfItem.get(i).getAttribute("price")));
-				armorType = Integer.parseInt(arrayOfItem.get(i).getAttribute("type"));
+								
+				setArmorType(Integer.parseInt(arrayOfItem.get(i).getAttribute("type")));
 				amount = Integer.parseInt(arrayOfItem.get(i).getAttribute("amount"));
 				
 				//stop here the right weapon has been found, no need to go further
@@ -88,7 +87,7 @@ super("", "", "", 1);
 	}
 
 	public int getPrice() {
-		return price;
+		return super.price;
 	}
 
 	public void setPrice(int price) {
@@ -101,6 +100,14 @@ super("", "", "", 1);
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getArmorType() {
+		return armorType;
+	}
+
+	public void setArmorType(int armorType) {
+		this.armorType = armorType;
 	}
 
 }

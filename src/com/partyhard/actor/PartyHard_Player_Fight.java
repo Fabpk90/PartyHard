@@ -1,13 +1,16 @@
 package com.partyhard.actor;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import utils.PartyHard_Level;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Object;
@@ -18,11 +21,12 @@ import com.partyhard.object.PartyHard_Weareable;
 public class PartyHard_Player_Fight{
 	
 	public String Name;
+	public String imagePath;
 	
 	private int Class;
 	private int Exp = 0;
 	private int Level = 1;
-	private int Money = 0;
+
 	
 	public int armorEquipped = -1;
 	
@@ -31,12 +35,12 @@ public class PartyHard_Player_Fight{
 	public boolean isLevelMax = false;
 	public PartyHard_Level levelUp;
 	
-	public ArrayList<PartyHard_Object> bag;
+	public ArrayList<PartyHard_Object> bag = new ArrayList<PartyHard_Object>();
 	private int bagSpace = 0;
 	
 	private int objectUsed = -1;
 	
-	public ArrayList<PartyHard_Capacity> capacity;
+	public ArrayList<PartyHard_Capacity> capacity = new ArrayList<PartyHard_Capacity>();
 	
 	private int targetCapacity = -1;
 	private int capacitySelected = -1;
@@ -49,12 +53,14 @@ public class PartyHard_Player_Fight{
 	
 	private boolean isDead = false;
 	
-	
 	public int damageTaken = 0;
 	public int healAmount = 0;
 	
-	public PartyHard_Player_Fight(int idplayer) 
+	private int idSave;
+	
+	public PartyHard_Player_Fight(int idplayer, int idSave) 
 	{
+		this.idSave = idSave;
 		XmlReader xml = new XmlReader();
 		
 		Element root;
@@ -63,7 +69,7 @@ public class PartyHard_Player_Fight{
 		{
 			//FileManager fileManager = new FileManager("player_Fight.xml");
 			
-			root = xml.parse(Gdx.files.internal("player_Fight.xml"));
+			root = xml.parse(Gdx.files.local("save/"+idSave+"Fight.xml"));
 			Array<Element> arrayOfPlayer =	root.getChildrenByName("player_Fight");	
 			for(int i = 0; i < arrayOfPlayer.size; i++)
 			{
@@ -75,8 +81,7 @@ public class PartyHard_Player_Fight{
 					Hp = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("hp").getAttribute("value"));
 					Def = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("def").getAttribute("value"));
 					Atk = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("atk").getAttribute("value"));
-					Exp = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("exp").getAttribute("value"));
-					Money = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("money").getAttribute("value"));
+					Exp = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("exp").getAttribute("value"));					
 					Level = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("level").getAttribute("value"));
 					bagSpace = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("bag").getAttribute("space"));
 					Class = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("class").getAttribute("value"));
@@ -111,7 +116,7 @@ public class PartyHard_Player_Fight{
 										
 					//getting the capacities
 					
-					Element rootCap = xml.parse(Gdx.files.local("capacity.xml"));
+					Element rootCap = xml.parse(Gdx.files.local("data/capacity.xml"));
 					
 					Array<Element> arrayOfCap =	rootCap.getChildrenByName("capacity");
 					Array<Element> arrayPlayerCap = arrayOfPlayer.get(i).getChildByName("capacity").getChildrenByName("cap");
@@ -142,7 +147,7 @@ public class PartyHard_Player_Fight{
 						
 					}
 					
-					rootCap = xml.parse(Gdx.files.local("level.xml"));
+					rootCap = xml.parse(Gdx.files.local("data/level.xml"));
 					
 					Array<Element> arrayOfLevel = rootCap.getChildrenByName("level");
 					
@@ -190,6 +195,33 @@ public class PartyHard_Player_Fight{
 		//checking if the chara is dead
 		if(Hp <= 0)
 			isDead = true;			
+	}
+
+	public PartyHard_Player_Fight(String Name, int Class, String imagePath)
+	{
+		this.Name = Name;
+		this.Class = Class;
+		this.imagePath = imagePath;
+		
+		switch(Class)
+		{
+			case 0://warrior
+				HpMax = 50;
+				Hp = 50;
+				Atk = 10;
+				Def = 10;
+				break;
+				
+			case 1://clerck
+				HpMax = 40;
+				Hp = 40;
+				Atk = 5;
+				Def = 10;
+				
+				//adding heal cap
+				loadCapacity(1);				
+				break;
+		}
 	}
 	
 	public void Damage(int amount)
@@ -261,33 +293,6 @@ public class PartyHard_Player_Fight{
 	public int getExp()
 	{
 		return Exp;
-	}
-	
-	public int getMoney()
-	{
-		return Money;
-	}
-	
-	public void setMoney(int amount)
-	{
-		Money = amount;
-	}
-	
-	public void addMoney(int amount)
-	{
-		Money += amount;
-	}
-	
-	public boolean canPay(int amount)
-	{
-		if(Money - amount < 0)
-			return false;
-		else
-		{
-			Money -= amount;
-			return true;
-		}
-		
 	}
 	
 	/*
@@ -515,6 +520,135 @@ public class PartyHard_Player_Fight{
 	public int getItemType(int itemIndex)
 	{
 		return bag.get(itemIndex).type;
+	}
+	
+	private void loadCapacity(int id)
+	{
+		XmlReader xml = new XmlReader();
+		Element rootCap = null;
+		try {
+			rootCap = xml.parse(Gdx.files.local("data/capacity.xml"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Array<Element> arrayOfCap =	rootCap.getChildrenByName("capacity");
+		
+		//looking first in capacity and then checking if it exist in playerxml					
+		for(int y = 0; y < arrayOfCap.size; y++)
+		{												
+				if(y == id)
+				{
+					String capName = arrayOfCap.get(y).getChildByName("name").getAttribute("value");
+					String capDescription = arrayOfCap.get(y).getChildByName("description").getAttribute("value");
+					
+					int job = Integer.parseInt(arrayOfCap.get(y).getChildByName("job").getAttribute("value"));
+					int mana = Integer.parseInt(arrayOfCap.get(y).getChildByName("mana").getAttribute("value"));
+					boolean isHeal = arrayOfCap.get(y).getChildByName("isheal").getBoolean("value");
+					int atk = Integer.parseInt(arrayOfCap.get(y).getChildByName("power").getAttribute("value"));
+					int percent = Integer.parseInt(arrayOfCap.get(y).getChildByName("percent").getAttribute("value"));
+					
+					capacity.add(new PartyHard_Capacity(capName, capDescription, percent, isHeal, atk, mana, this.Class,y)); 			
+				}
+										
+			}
+			
+	}
+	
+	public int getIdSave() {
+		return idSave;
+	}
+
+	public void setIdSave(int idSave) {
+		this.idSave = idSave;
+	}
+
+	public void save(int id)
+	{
+		try {
+			/*
+			 * Saving the player 
+			 */		
+			
+		//FileManager file = new FileManager("player_Fight.xml");
+			FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+				
+			 StringWriter stringwriter = new StringWriter();
+			 XmlWriter xml = new XmlWriter(stringwriter);	
+				
+					xml.element("player_Fight").attribute("num", id)	       
+	                .element("name").attribute("value",  Name).pop()
+	                .element("class").attribute("value",  getclass()).pop()
+	                .element("hpmax").attribute("value",  getHpMax()).pop()
+	                .element("hp").attribute("value",  getLife()).pop()
+	                .element("def").attribute("value",  getDef()).pop()
+	                .element("atk").attribute("value",  getAtk()).pop()
+	                .element("exp").attribute("value",  getExp()).pop()
+	                .element("level").attribute("value",  getLevel()).pop()
+	                .element("weaponEquip").attribute("value",  weaponEquipped).pop()
+	                .element("armorEquip").attribute("value",  armorEquipped).pop()
+	                .element("bag").attribute("space",  getBagSpace());
+					
+					//populating the bag
+					for(int p = 0; p <  bag.size(); p++)
+					{
+						xml.element("item").attribute("type",  bag.get(p).type);	
+						
+						switch(bag.get(p).type)
+		        		{
+		        			case 0: //weapon
+		        				PartyHard_Weapon wep = (PartyHard_Weapon) bag.get(p);
+		        				xml.attribute("id", wep.getId()).pop();
+		        			break;
+		        			case 1: //armor
+		        				PartyHard_Armor armor = (PartyHard_Armor) bag.get(p);
+		        				xml.attribute("id", armor.getId()).pop();
+		        			break;
+		        			case 2: //potion
+		        				PartyHard_Potion pot = (PartyHard_Potion) bag.get(p);
+		        				xml.attribute("id", pot.getId()).pop();
+		        			break;
+		        		}
+					}
+					xml.pop();//closing the bag
+					xml.element("capacity").attribute("value", capacity.size());
+					
+					for(int p = 0; p < capacity.size(); p++)
+					{
+						xml.element("cap").attribute("id", capacity.get(p).id).pop();				
+					}
+					//closing cap and then the player
+					xml.pop();
+					xml.pop();
+					             								                   
+			
+				   file.writeString(stringwriter.toString(), true);
+	}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			System.out.println("erroror");
+		}
+	
+	}
+	
+	public void prepareForSave()
+	{					 
+		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		file.delete();
+			
+		file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		file.writeString("<root>", false);
+	 
+		
+	}
+	
+	public void finishFile()
+	{
+		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		 
+		 file.writeString("</root>", true);
 	}
 	
 }

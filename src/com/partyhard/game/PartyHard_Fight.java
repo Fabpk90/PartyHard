@@ -1427,7 +1427,6 @@ public class PartyHard_Fight implements Screen {
 			
 		}
 		
-		
 		win = true;
 		
 		Sound soundWin = Gdx.audio.newSound(Gdx.files.internal("sound/win.mp3"));
@@ -1509,7 +1508,6 @@ public class PartyHard_Fight implements Screen {
 	                .element("def").attribute("value", playerSquad.get(i).getDef()).pop()
 	                .element("atk").attribute("value", playerSquad.get(i).getAtk()).pop()
 	                .element("exp").attribute("value", playerSquad.get(i).getExp()).pop()
-	                .element("money").attribute("value", playerSquad.get(i).getMoney()).pop()
 	                .element("level").attribute("value", playerSquad.get(i).getLevel()).pop()
 	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
 					
@@ -1550,7 +1548,7 @@ public class PartyHard_Fight implements Screen {
 					 */
 					             
 				}
-				      //to be sure that all the element has been close  
+				      //to be sure that all the element has been closed 
 				   xml.close();                   
 			
 				   file.writeString(stringwriter.toString(), false);
