@@ -145,6 +145,7 @@ public class PartyHard_Player_Map {
 			
 			this.Map = Player.getAttribute("Map");
 			this.imagePath = Player.getAttribute("imagePath");
+			this.Money = Player.getIntAttribute("Money");
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -733,7 +734,8 @@ XmlReader xml = new XmlReader();
 			.attribute("x", getX())
 			.attribute("y", getY())
 			.attribute("Map", Map)
-			.attribute("imagePath", imagePath).pop();
+			.attribute("imagePath", imagePath)
+			.attribute("Money", getMoney()).pop();
 			
 			//make sure that all has been closed
 			xml.close();   

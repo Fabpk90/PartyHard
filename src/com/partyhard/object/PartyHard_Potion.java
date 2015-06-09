@@ -27,7 +27,7 @@ super("", "", "", 0, 0);
 		Element root = null;
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Potion.xml"));
+			root = xml.parse(Gdx.files.internal("data/Potion.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -43,7 +43,7 @@ super("", "", "", 0, 0);
 				String imagePath = arrayOfItem.get(i).getAttribute("imagePath");
 				String description = arrayOfItem.get(i).getAttribute("description");
 				
-				int price = Integer.parseInt(arrayOfItem.get(i).getAttribute("description"));
+				int price = Integer.parseInt(arrayOfItem.get(i).getAttribute("price"));
 				
 				/*
 				 * Act like the super constructor

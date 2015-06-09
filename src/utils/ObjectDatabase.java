@@ -28,7 +28,7 @@ public class ObjectDatabase {
 		
 		//first fetching armors		
 		try {
-			root = xml.parse(Gdx.files.internal("Armor.xml"));
+			root = xml.parse(Gdx.files.internal("data/Armor.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -41,7 +41,7 @@ public class ObjectDatabase {
 		}
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Weapon.xml"));
+			root = xml.parse(Gdx.files.internal("data/Weapon.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class ObjectDatabase {
 		}
 		
 		try {
-			root = xml.parse(Gdx.files.internal("Potion.xml"));
+			root = xml.parse(Gdx.files.internal("data/Potion.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

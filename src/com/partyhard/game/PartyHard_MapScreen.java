@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import utils.ObjectDatabase;
 import utils.PartyHard_Shop;
 
 import com.badlogic.gdx.Application.ApplicationType;
@@ -58,8 +59,9 @@ import com.partyhard.object.PartyHard_Weareable;
 
 public class PartyHard_MapScreen implements Screen, InputProcessor{
 
-	public Game mainGame;
+	public PartyHard_GameClass mainGame;
 	private SpriteBatch spriteBatch;  
+	private ObjectDatabase Database = new ObjectDatabase();
 	
 	private Stage stage;	
 	
@@ -112,6 +114,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private ArrayList<String> nameMonster = new ArrayList<String>();
 	private Skin skin;
 	
+	
 	/*
 	 * Inventory var
 	 */
@@ -124,7 +127,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int idSave;
 	
 	
-	public PartyHard_MapScreen(Game gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
+	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
 	{	
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
@@ -715,10 +718,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		Table tableShop = new Table();
 		tableShop.setName("tableShop");
 		
-		
 		//setting bg
 		tableShop.setBackground(drawable);
 		
+		Table tableMoney = new Table();
+		tableMoney.setName("tableMoney");			
 		
 		//fill up the entire screen
 		tableShop.setWidth(stage.getWidth());
@@ -726,9 +730,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		Label description = new Label(playerMap.getShopDescription(id), labelStyle);
 		description.setHeight(100);
-		description.setPosition(tableShop.getWidth() / 2 - description.getHeight(), tableShop.getHeight() - description.getHeight());
+		description.setPosition(tableShop.getWidth() / 2 - description.getHeight(), tableShop.getHeight() - description.getHeight());		
 		
-		
+		Label moneyAmount = new Label("Money: "+playerMap.getMoney(),labelStyle);
+		moneyAmount.setPosition(description.getX() + description.getWidth() / 2, description.getY() - moneyAmount.getHeight());
 		
 		Label Buy = new Label("Buy", labelStyle);
 		Buy.setPosition(tableShop.getWidth() / 3 - Buy.getWidth() - 100, tableShop.getHeight() - 100);
@@ -759,7 +764,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					ScrollPaneStyle style = new ScrollPaneStyle();
 					ScrollPane scroll = new ScrollPane(listBuy, style);
 					
-					tableBuy.addActor(scroll);
+					tableBuy.addActor(scroll);				
 					
 					stage.addActor(tableBuy);
 												
@@ -793,8 +798,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		Quit.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				
+				//quitting the shop: deleting the shop table and the money table
 				stage.getActors().removeIndex(getTableIndex("tableShop"));
+				stage.getActors().removeIndex(getTableIndex("tableMoney"));
 				
 				toggleSubMenu();
 				
@@ -808,10 +814,27 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		tableShop.addActor(Sell);
 		tableShop.addActor(Quit);
 		
+		tableMoney.addActor(moneyAmount);
+		
 		stage.addActor(tableShop);
+		stage.addActor(tableMoney);
 		
 	}
 
+	
+	private void refreshMoneyShop()
+	{
+		if(getTableIndex("tableMoney") != -1)
+		{
+			Table tableMoney = (Table) stage.getActors().get(getTableIndex("tableMoney"));
+			
+			Label moneyAmount = (Label) tableMoney.getChildren().get(0);
+			moneyAmount.setText("Money: "+playerMap.getMoney());
+			
+			tableMoney.getChildren().items[0] = moneyAmount;
+			stage.getActors().items[getTableIndex("tableMoney")] = tableMoney;
+		}
+	}
 	
 	public void moveRight()
 	{	
@@ -1297,17 +1320,13 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 							 									
 							 									break;
 							 								case 1: //equip, then erase the choices
-							 									playerSquad.get(playerSelected).setEquipSlot(itemIndex);
-							 									
-							 							
+							 									playerSquad.get(playerSelected).setEquipSlot(itemIndex);				 																 							
 							 									break;
-							 								case 2: //use
-							 									
+							 								case 2: //use							 									
 							 									break;
 							 									
 							 								case 3: //unequip
-							 									playerSquad.get(playerSelected).unequipItem(itemIndex);
-							 															 									
+							 									playerSquad.get(playerSelected).unequipItem(itemIndex);						 															 									
 							 									break;
 							 							}
 							 							//erasing the choices table
@@ -1367,7 +1386,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	private void toggleSubMenu()
 	{
-		//deleting the other sub menu if called
+		//deleting the other sub menu if created
 		
 		if(getTableIndex("tableStatus") != -1)		
 			stage.getActors().removeIndex(getTableIndex("tableStatus"));		

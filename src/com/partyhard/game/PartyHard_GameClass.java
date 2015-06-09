@@ -1,28 +1,18 @@
 package com.partyhard.game;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
+import utils.ObjectDatabase;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.XmlWriter;
-import com.partyhard.actor.PartyHard_Monster;
-import com.partyhard.actor.PartyHard_Player_Fight;
 @SuppressWarnings("unused")
 public class PartyHard_GameClass extends Game {
 	private OrthographicCamera camera;
-	
 	private SpriteBatch batch;
 	private Texture texture;
 	private Sprite sprite;

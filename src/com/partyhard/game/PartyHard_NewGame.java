@@ -37,7 +37,7 @@ import com.partyhard.actor.PartyHard_Player_Map;
 public class PartyHard_NewGame implements Screen {	
 	private Stage stage = new Stage();
 	
-	private Game game;
+	private PartyHard_GameClass game;
 	private PartyHard_ScreenSplash screenSplash;
 	
 	private ArrayList<PartyHard_Player_Fight> playerFight = new ArrayList<PartyHard_Player_Fight>();
@@ -63,7 +63,7 @@ public class PartyHard_NewGame implements Screen {
 
 	private Skin skin;
 	
-	public PartyHard_NewGame(Game game, PartyHard_ScreenSplash screenSplash)
+	public PartyHard_NewGame(PartyHard_GameClass game, PartyHard_ScreenSplash screenSplash)
 	{
 		this.game = game;
 		this.screenSplash = screenSplash;
@@ -308,6 +308,8 @@ public class PartyHard_NewGame implements Screen {
 								//creating the playermap and saving it
 								PartyHard_Player_Map playerMap = new PartyHard_Player_Map(192, 192, playerFight.get(0).imagePath, id);
 								playerMap.setMap("mainlevel", true);
+								playerMap.setMoney(500);
+								
 								playerMap.save();
 								
 								PartyHard_MapScreen map = new PartyHard_MapScreen(game, "mainlevel", playerMap, id);							

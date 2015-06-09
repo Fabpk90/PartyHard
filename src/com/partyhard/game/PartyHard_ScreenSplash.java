@@ -44,7 +44,7 @@ import com.partyhard.actor.PartyHard_Player_Map;
 
 public class PartyHard_ScreenSplash implements Screen{
 	
-	private Game game;
+	private PartyHard_GameClass game;
 	
 	private OrthographicCamera camera;
 	private TiledMap tiledmap;
@@ -75,7 +75,7 @@ public class PartyHard_ScreenSplash implements Screen{
 
 	private Skin skin;
 	
-	public PartyHard_ScreenSplash(Game gam)
+	public PartyHard_ScreenSplash(PartyHard_GameClass gam)
 	{
 		game = gam;
 	}
@@ -92,7 +92,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		 
 		 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
 			
-		NinePatchDrawable drawable = new NinePatchDrawable(patch);
+		final NinePatchDrawable drawable = new NinePatchDrawable(patch);
 		 
 		listStyle.selection = drawable;
 		listStyle.font = new BitmapFont();
@@ -213,10 +213,12 @@ public class PartyHard_ScreenSplash implements Screen{
 						Table tableSave = new Table();
 						  tableSave.setName("tableSave");
 						  tableSave.setSize(stage.getWidth(), stage.getHeight());
-						  
+						  tableSave.setPosition(loadButton.getX() + loadButton.getWidth() + 10, loadButton.getY());
+						  						
 						 
 						 List<Label> listSave = new List<Label>(listStyle);
-						 listSave.setPosition(loadButton.getX() + 10, loadButton.getY());
+						 listSave.setPosition(0, 0);
+						 listSave.setWidth(50);
 						 
 						 //populating the list with save game
 						 for(int i = 0; i < file.list().length;i+=2)
@@ -248,8 +250,9 @@ public class PartyHard_ScreenSplash implements Screen{
 						 
 						 ScrollPaneStyle style = new ScrollPaneStyle();
 						 ScrollPane scroll = new ScrollPane(listSave, style);
-						 
-						 scroll.setPosition(loadButton.getX() + loadButton.getWidth() + 10, loadButton.getY());
+						 scroll.setForceScroll(false, true);
+						 											 
+						 scroll.setPosition(listSave.getX(), listSave.getY());
 						 
 						 Label chooseSave = new Label("Choose a save!", labelStyle);
 						 chooseSave.setPosition(scroll.getX(), scroll.getY() + scroll.getHeight());
