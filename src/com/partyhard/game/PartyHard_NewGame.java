@@ -1,9 +1,9 @@
 package com.partyhard.game;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Game;
+import utils.ObjectDatabase;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
@@ -31,11 +31,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.partyhard.actor.PartyHard_Capacity;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
 
 public class PartyHard_NewGame implements Screen {	
 	private Stage stage = new Stage();
+	
+	private ObjectDatabase database = new ObjectDatabase();
 	
 	private PartyHard_GameClass game;
 	private PartyHard_ScreenSplash screenSplash;
@@ -71,7 +74,8 @@ public class PartyHard_NewGame implements Screen {
 		labelStyle.font = new BitmapFont();
 		
 		textStyle.font = new BitmapFont();
-		textStyle.fontColor = Color.BLACK;		
+		textStyle.fontColor = Color.BLACK;	
+		textStyle.cursor = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/cursor.9.png")))));	
 			
 		scrollPaneStyle.background = drawable;
 		
@@ -79,6 +83,8 @@ public class PartyHard_NewGame implements Screen {
 		listStyle.fontColorSelected = Color.BLACK;
 		listStyle.fontColorUnselected = Color.WHITE;
 		listStyle.selection = drawable;
+		listStyle.background = drawable;
+		
 		
 		selectStyle.font = new BitmapFont();
 		selectStyle.fontColor = Color.BLUE;
@@ -126,7 +132,7 @@ public class PartyHard_NewGame implements Screen {
 	Table numberPlayer = new Table();
 	numberPlayer.setName("numberPlayer");
 	
-	Label numPlayer = new Label("Number of Player created: "+numberOfPlayer, labelStyle);
+	Label numPlayer = new Label("Number of Player created: "+numberOfPlayer+" of "+numberMaxOfPlayer, labelStyle);
 	numPlayer.setPosition(welcome.getX() , welcome.getY() - 100);
 	
 	/*
@@ -142,6 +148,7 @@ public class PartyHard_NewGame implements Screen {
 	
 	
 	newName.setMessageText("Enter a Name");
+	newName.setBlinkTime(0.15f);
 	
 	newName.setMaxLength(10);
 	newName.setBlinkTime(1f);
@@ -150,18 +157,12 @@ public class PartyHard_NewGame implements Screen {
 	lblName.setPosition(newName.getX() - lblName.getWidth(), newName.getY());
 	
 	
-	SelectBox<Label> newClass = new SelectBox<Label>(selectStyle);
+	SelectBox<String> newClass = new SelectBox<String>(selectStyle);
 	
 	//adding the classes manually, maybe make the loading dynamic 	
-	Label warrior = new Label("0", labelStyle);
-	warrior.setName("Warrior");
+	String string[] = {"Warrior", "Clerck"};
 	
-	Label clerck = new Label("1", labelStyle);
-	clerck.setName("Clerck");
-	
-	newClass.getItems().add(warrior);
-	newClass.getItems().add(clerck);
-		
+	newClass.setItems(string);
 	
 	newClass.setPosition(newName.getX(), newName.getY() - newClass.getHeight());
 	newClass.setWidth(100);
@@ -254,7 +255,7 @@ public class PartyHard_NewGame implements Screen {
 				TextField Name = (TextField) ((Table) stage.getActors().items[getTableIndex("newPlayer")]).getChildren().get(6);
 				if(Name.getText() != "" && !Name.getText().isEmpty())
 				{
-					SelectBox<Label> Class = (SelectBox<Label>) ((Table) stage.getActors().items[getTableIndex("newPlayer")]).getChildren().get(7);							
+					SelectBox<String> Class = (SelectBox<String>) ((Table) stage.getActors().items[getTableIndex("newPlayer")]).getChildren().get(7);							
 					
 					if(isMale)
 						playerFight.add(new PartyHard_Player_Fight(Name.getText(), Class.getSelectedIndex(),"player/"+indexOfCharacter+"m.png"));
@@ -296,9 +297,29 @@ public class PartyHard_NewGame implements Screen {
 								playerFight.get(0).setIdSave(id);
 								playerFight.get(0).prepareForSave();
 								
+								//giving two potions at each character, then saving
 								for(int i = 0; i < playerFight.size(); i++)
 								{						
 									playerFight.get(i).setIdSave(id);
+									playerFight.get(i).setBagSpace(5);
+									
+									playerFight.get(i).bag.add(database.getItem(database.POTION, 0));
+									playerFight.get(i).bag.add(database.getItem(database.POTION, 0));
+									
+									playerFight.get(i).capacity.add(new PartyHard_Capacity(0));
+									
+									//the fighter is a clerck
+									if(playerFight.get(i).getclass() == 1)
+									{
+										playerFight.get(i).capacity.add(new PartyHard_Capacity(PartyHard_Capacity.HEAL));
+										playerFight.get(i).bag.add(database.getItem(database.ARMOR, 0));
+									}
+									else//warrior
+									{
+										playerFight.get(i).capacity.add(new PartyHard_Capacity(PartyHard_Capacity.DOUBLEKICK));
+										playerFight.get(i).bag.add(database.getItem(database.ARMOR, 0));
+										playerFight.get(i).bag.add(database.getItem(database.WEAPON, 0));
+									}
 									playerFight.get(i).save(i);
 								}
 								
@@ -368,9 +389,6 @@ public class PartyHard_NewGame implements Screen {
 	stage.addActor(welcome);	
 	stage.addActor(imgCharacter);
 	stage.addActor(numberPlayer);
-	
-	stage.setDebugAll(true);
-
 	}
 	/**
 	 * 
@@ -423,7 +441,7 @@ public class PartyHard_NewGame implements Screen {
 		if(getTableIndex("numberPlayer") != -1)
 		{
 			Table newTable = (Table) stage.getActors().items[getTableIndex("numberPlayer")];			
-			((Label) newTable.getChildren().get(0)).setText("Number of Player created: "+numberOfPlayer);
+			((Label) newTable.getChildren().get(0)).setText("Number of Player created: "+numberOfPlayer+" of "+numberMaxOfPlayer);
 			
 			stage.getActors().items[getTableIndex("numberPlayer")] = newTable;
 			

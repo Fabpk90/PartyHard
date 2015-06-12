@@ -154,7 +154,6 @@ public class PartyHard_Shop {
 		return -1;
 	}
 	/**
-	 * 
 	 * @param index The index of the object in the shop
 	 * @return ATTENTION, not catching any not found error!
 	 */
@@ -163,7 +162,20 @@ public class PartyHard_Shop {
 		return merch.get(index).type;
 	}
 	/**
-	 * 
+	 * @param index The index of the object in the shop
+	 * @return ATTENTION, not catching any not found error!
+	 */
+	public String getObjectDescription(int index)
+	{
+		return merch.get(index).description;
+	}
+	
+	public PartyHard_Object getObject(int index)
+	{
+		return merch.get(index);
+	}
+	
+	/**
 	 * @return The size()
 	 */
 	public int getShopSize()

@@ -17,6 +17,9 @@ public class ObjectDatabase {
 	 * TO DO: load all the items (wep, arm , potion)
 	 */
 	
+	public static final int WEAPON = 0;
+	public static final int ARMOR = 1;
+	public static final int POTION = 2;
 	
 	Array<PartyHard_Object> Objects = new Array<PartyHard_Object>();
 	
@@ -79,13 +82,13 @@ public class ObjectDatabase {
 			{
 				switch(type)
 				{
-					case 0:
+					case WEAPON:
 						return ((PartyHard_Weapon) Objects.get(i)).getAmount();
 						
-					case 1:
+					case ARMOR:
 						return ((PartyHard_Armor) Objects.get(i)).getAmount();
 						
-					case 2:
+					case POTION:
 						return ((PartyHard_Potion) Objects.get(i)).getAmount();
 				}
 			}
@@ -107,13 +110,13 @@ public class ObjectDatabase {
 			{
 				switch(type)
 				{
-					case 0:
+					case WEAPON:
 						return ((PartyHard_Weapon) Objects.get(i)).Name;
 						
-					case 1:
+					case ARMOR:
 						return ((PartyHard_Armor) Objects.get(i)).Name;
 						
-					case 2:
+					case POTION:
 						return ((PartyHard_Potion) Objects.get(i)).Name;
 				}
 			}
@@ -135,13 +138,13 @@ public class ObjectDatabase {
 			{
 				switch(type)
 				{
-					case 0:
+					case WEAPON:
 						return ((PartyHard_Weapon) Objects.get(i)).price;
 						
-					case 1:
+					case ARMOR:
 						return ((PartyHard_Armor) Objects.get(i)).getPrice();
 						
-					case 2:
+					case POTION:
 						return ((PartyHard_Potion) Objects.get(i)).getPrice();
 				}
 			}
@@ -151,12 +154,12 @@ public class ObjectDatabase {
 	}
 	/**
 	 * 
-	 * @param type
-	 * @param id
+	 * @param type The type of the object
+	 * @param id The id of the object
 	 * @return The object or null if not found
 	 */
-	/*
-	public <? extends PartyHard_Object>  getItem(int type, int id)
+	
+	public PartyHard_Object  getItem(int type, int id)
 	{
 		for(int i = 0; i < Objects.size; i++)
 		{
@@ -164,19 +167,19 @@ public class ObjectDatabase {
 			{
 				switch(type)
 				{
-					case 0:
+					case WEAPON:
 						return (PartyHard_Weapon)Objects.get(i);
 						
-					case 1:
+					case ARMOR:
 						return (PartyHard_Armor)Objects.get(i);
 						
-					case 2:
+					case POTION:
 						return (PartyHard_Potion)Objects.get(i);
 				}
 			}
 		}
 		
 		return null;
-	}*/
+	}
 		
 }

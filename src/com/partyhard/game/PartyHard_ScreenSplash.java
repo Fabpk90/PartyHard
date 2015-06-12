@@ -153,11 +153,7 @@ public class PartyHard_ScreenSplash implements Screen{
 	/*
 	 * creating 3 buttons one for play two for load three for quit
 	 * TO DO  Options
-	 */
-	
-
-	
-	
+	 */	
 
 	 TextButton playButton = new TextButton("New Game", buttonStyle);
 	
@@ -170,7 +166,7 @@ public class PartyHard_ScreenSplash implements Screen{
           public void clicked(InputEvent event, float x, float y){
           	tiledmap.dispose();
           	backgroundMusic.stop();   		
-           // PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(160,192, "player/test_player.png"), -1);
+          
           loadNewGame();
           }
 	});
@@ -237,7 +233,7 @@ public class PartyHard_ScreenSplash implements Screen{
 								 
 								 int idSave = list.getSelectedIndex();
 								 
-								  PartyHard_MapScreen map = new PartyHard_MapScreen(game,"mainlevel", new PartyHard_Player_Map(idSave), idSave);
+								  PartyHard_MapScreen map = new PartyHard_MapScreen(game, new PartyHard_Player_Map(idSave), idSave);
 								 					 
 								 //disposing the map and the music
 								 tiledmap.dispose();

@@ -719,6 +719,11 @@ XmlReader xml = new XmlReader();
 		
 	}
 	
+	public void pay(int amount)
+	{
+		Money -= amount;
+	}
+	
 	public void save()
 	{
 		try {

@@ -653,10 +653,9 @@ public class PartyHard_Fight implements Screen {
 			/*
 			 * setting the position( dividing the screen width by the number of player then multiply by i)
 			 */
-			
-			labelLife.setPosition((Gdx.graphics.getWidth() / playerSquad.size()) * i + 100, 0);
-			labelName.setPosition(labelLife.getX() - labelLife.getWidth(), 30);
-			
+						
+			labelName.setPosition(labelName.getWidth() + (i * 100), 30);
+			labelLife.setPosition(labelName.getX(), labelName.getY() + 20);
 			
 			labelLife.setWidth(100f);
 			labelLife.setHeight(20f);
@@ -1295,18 +1294,10 @@ public class PartyHard_Fight implements Screen {
 				
 			//updating the table without the function addActor(object,index) the delete/insert is needed
 		
-			//because the array doesn't let me remove the last actor
-			if(turn == tableTurn.getChildren().size)
-			{
-				tableTurn.getChildren().removeIndex(turn - 1);
-				tableTurn.getChildren().insert(turn - 1, labelTurn);
-			}
-				
-			else
-			{
-				tableTurn.getChildren().removeIndex(turn);
-				tableTurn.getChildren().insert(turn, labelTurn);				
-			}
+			
+				tableTurn.getChildren().removeIndex(0);
+				tableTurn.getChildren().insert(0, labelTurn);				
+			
 			
 		}
 	}

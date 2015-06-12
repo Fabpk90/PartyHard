@@ -94,12 +94,11 @@ public class PartyHard_Player_Fight{
 					 
 					 Array<Element> items =	arrayOfPlayer.get(i).getChildByName("bag").getChildrenByName("item");
 					 
-					 //if ther is items
+					 //if there is items
 					 if(items.size > 0)					 
 					//populating the inventory
-					for(int p = 0; p != bagSpace; p++)
-					{
-						
+					for(int p = 0; p != items.size; p++)
+					{						
 						switch(items.get(p).getInt("type"))
 						{
 							case 0: //weapon
@@ -129,18 +128,8 @@ public class PartyHard_Player_Fight{
 						{
 							
 							if(y == arrayPlayerCap.get(m).getInt("id"))
-							{
-								String capName = arrayOfCap.get(y).getChildByName("name").getAttribute("value");
-								String capDescription = arrayOfCap.get(y).getChildByName("description").getAttribute("value");
-								
-								int job = Integer.parseInt(arrayOfCap.get(y).getChildByName("job").getAttribute("value"));
-								int mana = Integer.parseInt(arrayOfCap.get(y).getChildByName("mana").getAttribute("value"));
-								boolean isHeal = arrayOfCap.get(y).getChildByName("isheal").getBoolean("value");
-								int atk = Integer.parseInt(arrayOfCap.get(y).getChildByName("power").getAttribute("value"));
-								int percent = Integer.parseInt(arrayOfCap.get(y).getChildByName("percent").getAttribute("value"));
-								
-								capacity.add(new PartyHard_Capacity(capName, capDescription, percent, isHeal, atk, mana, this.Class,y)); 
-							
+							{																
+								capacity.add(new PartyHard_Capacity(y)); 							
 							}
 													
 						}
@@ -510,6 +499,8 @@ public class PartyHard_Player_Fight{
 	{
 		for(int i = 0; i < bag.size(); i++)
 		{
+			System.out.println(bag.get(i).Name);
+			
 			if(bag.get(i).getItemId() == id)
 				return i;
 		}
