@@ -1398,7 +1398,9 @@ public class PartyHard_Fight implements Screen {
 				if(playerSquad.get(i).getExp() >= playerSquad.get(i).levelUp.expToUp)
 				{
 					playerSquad.get(i).LevelUp();
-					playerSquad.get(i).setExp(0);					
+					playerSquad.get(i).setExp(0);	
+					
+					
 					
 					/*
 					 * Creating animated label that shows above the player name
@@ -1411,7 +1413,29 @@ public class PartyHard_Fight implements Screen {
 					labelLevelUp.setPosition(tableName.getChildren().get(i).getX(), tableName.getChildren().get(i).getY()+ 150);
 					
 					Tween.set(labelLevelUp, LabelAccessor.Y).target(labelLevelUp.getY()).start(tweenManager);
+					Tween.set(labelLevelUp, LabelAccessor.ALPHA).target(labelLevelUp.getColor().a).start(tweenManager);
+					
+					Tween.to(labelLevelUp,  LabelAccessor.ALPHA, 1f).target(0).delay(1.5f).start(tweenManager);
 					Tween.to(labelLevelUp,  LabelAccessor.Y, 1f).target(labelLevelUp.getY() + 100).start(tweenManager);
+					
+					//the player learn a cap when it level up
+					if(playerSquad.get(i).levelUp.cap != null)
+					{
+						playerSquad.get(i).capacity.add(playerSquad.get(i).levelUp.cap);
+						
+						Label lblCap = new Label(playerSquad.get(i).Name +" has learn " +playerSquad.get(i).levelUp.cap.Name, labelstyle);
+						lblCap.setPosition(labelLevelUp.getX(), labelLevelUp.getY());
+						
+						stage.addActor(lblCap);
+						
+						//setting the animation, need to animate after the level up animation
+						
+						Tween.set(lblCap, LabelAccessor.Y).target(lblCap.getY()).start(tweenManager);
+						Tween.set(lblCap, LabelAccessor.ALPHA).target(lblCap.getColor().a).start(tweenManager);
+						
+						Tween.to(lblCap,  LabelAccessor.ALPHA, 1f).target(0).delay(3.5f).start(tweenManager);
+						Tween.to(lblCap,  LabelAccessor.Y, 1f).target(lblCap.getY() + 100).delay(1.5f).start(tweenManager);
+					}
 					
 				}
 			}
@@ -1469,6 +1493,8 @@ public class PartyHard_Fight implements Screen {
 	
 	private void save() {
 	
+		playerSquad.get(0).prepareForSave();
+		
 		/*
 		 * resetting the stats back before the items buff was applies
 		 */
@@ -1543,6 +1569,8 @@ public class PartyHard_Fight implements Screen {
 				   xml.close();                   
 			
 				   file.writeString(stringwriter.toString(), false);
+				   
+				   playerSquad.get(0).finishFile();
 				   			 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

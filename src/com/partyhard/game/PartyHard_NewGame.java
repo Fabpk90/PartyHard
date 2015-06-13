@@ -311,7 +311,7 @@ public class PartyHard_NewGame implements Screen {
 									//the fighter is a clerck
 									if(playerFight.get(i).getclass() == 1)
 									{
-										playerFight.get(i).capacity.add(new PartyHard_Capacity(PartyHard_Capacity.HEAL));
+										//playerFight.get(i).capacity.add(new PartyHard_Capacity(PartyHard_Capacity.HEAL));
 										playerFight.get(i).bag.add(database.getItem(database.ARMOR, 0));
 									}
 									else//warrior

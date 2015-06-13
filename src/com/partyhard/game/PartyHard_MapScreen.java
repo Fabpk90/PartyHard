@@ -53,6 +53,7 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
+import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weareable;
 
@@ -122,8 +123,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	 */
 	
 	//of which inventory we are?
-	private int playerSelected;
-	private int itemIndex;
+	private int playerSelected = -1;
+	private int itemIndex = -1;
+	private int playerSelectedForObject = -1;
 	
 	private boolean enterEquip = false;
 	private boolean enterBuy = false;
@@ -503,7 +505,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		Gdx.input.setInputProcessor(inputMultiplexer);
 		
-		stage.setDebugAll(true);
+		//stage.setDebugAll(true);
 		load();
 	}
 
@@ -1152,10 +1154,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 											 			// if wep is equip
 											 			if(playerSquad.get(playerSelected).weaponEquipped != -1)
 											 			{
-											 				Label Wep = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).weaponEquipped).Name, labelStyle);
+											 				Label Wep = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped)).Name, labelStyle);
 											 				Wep.setPosition(labelWep.getX(), labelWep.getY()  - Wep.getHeight());
 											 				
-											 				Label amountWep = new Label(""+((PartyHard_Weareable) playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).weaponEquipped)).getAmount()+" Atk", labelStyle);
+											 				Label amountWep = new Label("+"+((PartyHard_Weareable)playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped))).getAmount()+" Atk", labelStyle);
 											 				amountWep.setPosition(Wep.getX(), Wep.getY() - amountWep.getHeight());
 											 				
 											 				tableEquip.addActor(amountWep);
@@ -1164,10 +1166,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 											 			
 											 			if(playerSquad.get(playerSelected).armorEquipped != -1)
 											 			{
-											 				Label Arm = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).armorEquipped).Name, labelStyle);
+											 				Label Arm = new Label(playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped)).Name, labelStyle);
 											 				Arm.setPosition(labelArmor.getX(), labelArmor.getY()  - Arm.getHeight());
 											 				
-											 				Label amountArm = new Label(""+((PartyHard_Weareable) playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped))).getAmount()+" Def", labelStyle);
+											 				Label amountArm = new Label("+"+((PartyHard_Weareable)playerSquad.get(playerSelected).bag.get(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped))).getAmount()+" Def", labelStyle);
 											 				amountArm.setPosition(Arm.getX(), Arm.getY() - amountArm.getHeight());
 											 				
 											 				tableEquip.addActor(Arm);
@@ -1307,6 +1309,14 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 				listInventory.getItems().add(item);
 			}
 			
+			if(listInventory.getItems().size == 0)
+			{
+				Label lblNoItem = new Label ("", labelStyle);
+				lblNoItem.setName("No Item left !");
+				
+				listInventory.getItems().add(lblNoItem);
+			}
+			
 			listInventory.addListener(new ClickListener(){
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
@@ -1314,45 +1324,55 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 						stage.getActors().removeIndex(getTableIndex("tableSellObject"));
 					
 					playerInventory = Integer.parseInt(event.getTarget().getName());
+					if(playerSquad.get(playerInventory).bag.size() != 0)
+					{
+							Table tableSellObject = new Table();
+						tableSellObject.setName("tableSellObject");
+						
+						tableSellObject.setPosition(10, stage.getHeight() / 2);
+						tableSellObject.setSize(stage.getWidth() / 2, stage.getHeight() / 4);										
+						
+						Label Sell = new Label("Sell", labelStyle);
+						Sell.setPosition(event.getTarget().getX() + event.getTarget().getWidth(), event.getTarget().getY() + Sell.getHeight() / 2);
+						
+						Sell.setName(""+((List<Label>)event.getTarget()).getSelectedIndex());
+						
+						Sell.addListener(new ClickListener(){
+							@Override
+							public void clicked(InputEvent event, float x, float y) {
+								//adding the money, then removing it and setting back to default the var													
+								playerMap.addMoney(playerSquad.get(playerInventory).bag.get(Integer.parseInt(event.getTarget().getName())).price / 2);
+								
+								playerSquad.get(playerInventory).bag.remove(Integer.parseInt(event.getTarget().getName()));
+								
+								playerInventory = -1;
+								toggleSellInventory();
+								refreshMoneyShop();
+							}
+						});
+						
+						tableSellObject.addActor(Sell);
+						
+						stage.addActor(tableSellObject);
+					}
 					
-					Table tableSellObject = new Table();
-					tableSellObject.setName("tableSellObject");
+				}});
 					
-					tableSellObject.setPosition(10, stage.getHeight() / 2);
-					tableSellObject.setSize(stage.getWidth() / 2, stage.getHeight() / 4);										
 					
-					Label Sell = new Label("Sell", labelStyle);
-					Sell.setPosition(event.getTarget().getX() + event.getTarget().getWidth(), event.getTarget().getY());
-					
-					Sell.setName(""+((List<Label>)event.getTarget()).getSelectedIndex());
-					
-					Sell.addListener(new ClickListener(){
-						@Override
-						public void clicked(InputEvent event, float x, float y) {
-							//adding the money, then removing it and setting back to default the var													
-							playerMap.addMoney(playerSquad.get(playerInventory).bag.get(Integer.parseInt(event.getTarget().getName())).price / 2);
-							
-							playerSquad.get(playerInventory).bag.remove(Integer.parseInt(event.getTarget().getName()));
-							
-							playerInventory = -1;
-							toggleSellInventory();
-							refreshMoneyShop();
-						}
-					});
-					
-					tableSellObject.addActor(Sell);
-					
-					stage.addActor(tableSellObject);
-				}
-			});
 			
 			listInventory.setSize(150, 100);
 			
+			ScrollPane scroll = new ScrollPane(listInventory, new ScrollPaneStyle());
+			scroll.setPosition(listInventory.getX(), listInventory.getY());
+			
+			scroll.setHeight(listInventory.getHeight());
+			
 			Label lblName = new Label(playerSquad.get(i).Name, labelStyle);
-			lblName.setPosition(listInventory.getX() + listInventory.getWidth() / 2 - lblName.getWidth() / 2, listInventory.getY() + listInventory.getHeight());
+			lblName.setPosition(scroll.getX() + scroll.getWidth() / 2 - lblName.getWidth() / 2, scroll.getY() + scroll.getHeight());
 			
 			tableSell.addActor(lblName);
-			tableSell.addActor(listInventory);
+			tableSell.addActor(scroll);
+			
 		}
 		
 		Label lblDescription = new Label("Select an item to sell", labelStyle);
@@ -1365,6 +1385,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private void toggleInventory()
 	{
+		if(getTableIndex("tableInventory") != -1)
+			stage.getActors().removeIndex(getTableIndex("tableInventory"));
+		
 		//creating the table that will holds the inventory
  		Table inventory = new Table();
  		inventory.setName("tableInventory");
@@ -1393,7 +1416,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
  			listItem.setHeight(100);
  			listItem.setPosition(labelNamePlayer.getX(), labelNamePlayer.getY() - 40);
  			listItem.setName(""+i);//used for knowing of who the inventory is
- 			
+ 				
  			
  			for(int p = 0; p < playerSquad.get(i).bag.size(); p++)
  			{						 				
@@ -1448,14 +1471,26 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	 						 * 2 - use 						 
 	 						 */
 					 		
-	 						List<Label> listChoice = new List<Label>(listStyle);				 											 										 								 						
+	 						List<Label> listChoice = new List<Label>(listStyle);	
+	 						
+	 						//getting the pos of the itemList
+	 						Table tableItem = searchTable("tableInventory");					 						
+	 							listChoice.setWidth(50);
+	 							listChoice.setHeight(50);
+	 							
+	 						listChoice.setPosition(tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getX() + 100, tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getY());
+	 					
+	 						System.out.println(itemIndex);
 	 						
 	 						switch(playerSquad.get(playerSelected).bag.get(itemIndex).type)
 			 				{
 			 					case 0: //weapon
 			 						//itemEquipped
 			 						//unequip
-			 						if(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped) == itemIndex )
+			 						
+			 						System.out.println(playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped)+" asdas");
+			 						
+			 						if(playerSquad.get(playerSelected).weaponEquipped != -1 &&  playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).weaponEquipped) == itemIndex )
 			 						{
 			 							Label unequip = new Label("3", labelStyle);
 			 							unequip.setName("Unequip");
@@ -1472,7 +1507,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 						
 			 						break;
 			 					case 1: //armor
-			 						if( playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped) == itemIndex )
+			 						if(playerSquad.get(playerSelected).armorEquipped != -1 &&  playerSquad.get(playerSelected).getItemIndex(playerSquad.get(playerSelected).armorEquipped) == itemIndex)
 			 						{
 			 							Label unequip = new Label("3", labelStyle);
 			 							unequip.setName("Unequip");
@@ -1494,11 +1529,38 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			 					use.setName("Use");
 			 						
 			 					listChoice.getItems().add(use);
+			 					
+			 					List<Label> listChara = new List<Label>(listStyle);
+		 						
+		 						for(int i = 0; i < playerSquad.size(); i++)
+		 						{
+		 							Label lblName = new Label("",labelStyle);
+		 							lblName.setName(playerSquad.get(i).Name);
+		 							
+		 							listChara.getItems().add(lblName);
+		 						}
+		 						
+		 						listChara.addListener(new ClickListener(){
+		 							@Override
+		 							public void clicked(InputEvent event, float x, float y) {
+		 								playerSelectedForObject = ((List<Label>) event.getTarget()).getSelectedIndex();	 								
+		 							}
+		 						});
+		 						
+		 						listChara.setWidth(100);
+		 						listChara.setHeight(100);
+		 						listChara.setPosition(listChoice.getX() + listChoice.getWidth(), listChoice.getY());
+		 						
+		 						Label lblChara = new Label("Select a player!", labelStyle);
+		 						lblChara.setPosition(listChara.getX() , listChara.getY() + listChara.getHeight());
+		 						
+		 						tableChoice.addActor(lblChara);
+		 						tableChoice.addActor(listChara);
 			 						break;
 			 				}
 	 						
 	 						//adding default behavior 
-	 						Label labelDrop = new Label(""+itemIndex, labelStyle);
+	 						Label labelDrop = new Label("0", labelStyle);
 	 						labelDrop.setName("Drop");
 	 						
 	 						listChoice.getItems().add(labelDrop);					 						
@@ -1508,78 +1570,74 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	 							
 	 								int choice = Integer.parseInt(((List<Label>) event.getTarget()).getSelected().getText().toString());					 								
 		 							
+	 								System.out.println(choice+" choice");
+	 								
+	 								//checking for the choice, deleting the tableChoice only if the action has been done(the conditions have been checked)
+	 								
 		 							switch(choice)
 		 							{
 		 								case 0://drop
 		 									//Removing from inventory
-		 									if(playerSelected != -1)
+		 									if(playerSelected != -1 && itemIndex != -1 )
 		 									{
 		 										playerSquad.get(playerSelected).removeObjectFromInventory(itemIndex);	
 		 										
 		 										stage.getActors().removeIndex(getTableIndex("tableInventory"));
 		 										toggleInventory();
-		 									}
-		 																					 																											 							
+		 										
+		 										itemIndex = -1;
+		 										
+		 										stage.getActors().removeIndex(getTableIndex("tableChoice"));
+		 									}		 																					 																											 							
 		 									
 		 									break;
 		 								case 1: //equip, then erase the choices
-		 									if(playerSelected != -1)
-		 									playerSquad.get(playerSelected).setEquipSlot(itemIndex);				 																 							
+		 									if(playerSelected != -1 && itemIndex != -1)
+		 									{
+		 										playerSquad.get(playerSelected).setEquipSlot(itemIndex);	
+		 										toggleInventory();
+		 										
+		 										itemIndex = -1;
+		 										
+		 										stage.getActors().removeIndex(getTableIndex("tableChoice"));
+		 									}
+		 												 																 							
 		 									break;
 		 								case 2: //use	
-		 									if(playerSelected != -1)
+		 									if(playerSelected != -1 && itemIndex != -1 && playerSelectedForObject != -1)
 		 									{		 										
 		 											playerSquad.get(playerSelected).setLife(((PartyHard_Potion)playerSquad.get(playerSelected).bag.get(itemIndex)).getAmount());
 			 										playerSquad.get(playerSelected).bag.remove(itemIndex);
 			 									
 			 										stage.getActors().removeIndex(getTableIndex("tableInventory"));
-			 										toggleInventory();		 												 												 										
+			 										toggleInventory();	
+			 										
+			 										itemIndex = -1;
+			 										playerSelectedForObject = -1;
+			 										
+			 										stage.getActors().removeIndex(getTableIndex("tableChoice"));
 		 									}		 									
 		 									break;
 		 									
 		 								case 3: //unequip
-		 									if(playerSelected != -1)
-		 									playerSquad.get(playerSelected).unequipItem(itemIndex);						 															 									
+		 									if(playerSelected != -1 && itemIndex != -1)
+		 									{
+		 										playerSquad.get(playerSelected).unequipItem(itemIndex);		
+		 										
+		 										itemIndex = -1;
+		 										
+		 										stage.getActors().removeIndex(getTableIndex("tableChoice"));
+		 									}
+		 													 															 									
 		 									break;
 		 							}
 		 							//erasing the choices table
-		 							stage.getActors().removeIndex(getTableIndex("tableChoice"));
+		 							
 	 						}});
 	 									 						 												
-	 						//getting the pos of the itemList
-	 						Table tableItem = searchTable("tableInventory");					 						
-	 							listChoice.setWidth(50);
-	 							listChoice.setHeight(50);
-	 							
-	 						listChoice.setPosition(tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getX() + 100, tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getY());
 	 											 				 
 	 						
-	 						List<Label> listChara = new List<Label>(listStyle);
 	 						
-	 						for(int i = 0; i < playerSquad.size(); i++)
-	 						{
-	 							Label lblName = new Label("",labelStyle);
-	 							lblName.setName(playerSquad.get(i).Name);
-	 							
-	 							listChara.getItems().add(lblName);
-	 						}
-	 						
-	 						listChara.addListener(new ClickListener(){
-	 							@Override
-	 							public void clicked(InputEvent event, float x, float y) {
-	 								playerSelected = ((List<Label>) event.getTarget()).getSelectedIndex();	 								
-	 							}
-	 						});
-	 						
-	 						listChara.setWidth(100);
-	 						listChara.setHeight(100);
-	 						listChara.setPosition(listChoice.getX() + listChoice.getWidth(), listChoice.getY());
-	 						
-	 						Label lblChara = new Label("Select a player!", labelStyle);
-	 						lblChara.setPosition(listChara.getX() , listChara.getY() + listChara.getHeight());
-	 						
-	 						tableChoice.addActor(lblChara);
-	 						tableChoice.addActor(listChara);
 	 						tableChoice.addActor(listChoice);
 	 						
 	 						stage.addActor(tableChoice);

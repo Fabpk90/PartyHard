@@ -154,14 +154,17 @@ public class PartyHard_Player_Fight{
 							isLevelMax = false;
 							//checking if the player is not level max  (+1 because the first level up is lvl 2)
 							if(arrayOfPlayerLevel.size + 1 >= Level)
-							{								
-								System.out.println(arrayOfPlayerLevel.size);
+							{																
 								int expToUp = arrayOfPlayerLevel.get(Level - 1).getInt("exp");
 								int hp = arrayOfPlayerLevel.get(Level - 1).getInt("hp");
 								int atk = arrayOfPlayerLevel.get(Level - 1).getInt("atk");
 								int def = arrayOfPlayerLevel.get(Level - 1).getInt("def");
 								
-								levelUp = new PartyHard_Level(this.Class, expToUp, hp, atk, def);										
+								//the character gain a cap when he level up
+								if(arrayOfPlayerLevel.get(Level - 1).getInt("cap") != -1)								
+									levelUp = new PartyHard_Level(this.Class, expToUp, hp, atk, def, new PartyHard_Capacity(arrayOfPlayerLevel.get(Level - 1).getInt("cap")));	
+								else
+									levelUp = new PartyHard_Level(this.Class, expToUp, hp, atk, def);
 								break;
 							}
 							else
@@ -396,18 +399,17 @@ public class PartyHard_Player_Fight{
 	
 	public void removeObjectFromInventory(int index)
 	{
-		bag.remove(index);	
-		
+			
 		//checkig if the object was equipped, if equipped setting back to default the slot, - 1 because of size()
-		if(index == weaponEquipped )
+		if(index == getItemIndex(weaponEquipped) )
 		{
 			weaponEquipped = -1;
-			System.out.println("asdasdasdasd");
 		}
 			
-		else if(index == armorEquipped)
+		else if(index == getItemIndex(armorEquipped))
 			armorEquipped = -1;
-			
+		
+		bag.remove(index);				
 	}
 	
 	public void useObject()
@@ -444,11 +446,11 @@ public class PartyHard_Player_Fight{
 		switch(getItemType(itemindex))
 		{
 			case 0://wep				
-				Atk -=	((PartyHard_Weareable) bag.get(weaponEquipped)).getAmount();				
+				Atk -=	((PartyHard_Weareable) bag.get(getItemIndex(weaponEquipped))).getAmount();				
 				weaponEquipped = -1;
 				break;
 			case 1: //armor
-				Def -= ((PartyHard_Weareable) bag.get(armorEquipped)).getAmount();
+				Def -= ((PartyHard_Weareable) bag.get(getItemIndex(armorEquipped))).getAmount();
 				armorEquipped = -1;
 				break;				
 		}
@@ -475,19 +477,19 @@ public class PartyHard_Player_Fight{
 	}
 	
 	/**
-	 * @param itemIndex Inde of the item in the bag
+	 * @param itemIndex Index of the item in the bag
 	 */
 	public void setEquipSlot(int itemIndex)
 	{
 		switch(getItemType(itemIndex))
 		{
 			case 0: // weapon
-				weaponEquipped = itemIndex;	
-				Atk += ((PartyHard_Weareable) bag.get(weaponEquipped)).getAmount();
+				weaponEquipped = bag.get(itemIndex).getItemId();	
+				Atk += ((PartyHard_Weareable) bag.get(itemIndex)).getAmount();
 				break;					
 			case 1: // armor
-				armorEquipped = itemIndex;
-				Def += ((PartyHard_Weareable) bag.get(armorEquipped)).getAmount();
+				armorEquipped = bag.get(itemIndex).getItemId();
+				Def += ((PartyHard_Weareable) bag.get(itemIndex)).getAmount();
 				break;					
 		}
 	}
@@ -498,9 +500,7 @@ public class PartyHard_Player_Fight{
 	public int getItemIndex(int id)
 	{
 		for(int i = 0; i < bag.size(); i++)
-		{
-			System.out.println(bag.get(i).Name);
-			
+		{						
 			if(bag.get(i).getItemId() == id)
 				return i;
 		}
@@ -510,6 +510,8 @@ public class PartyHard_Player_Fight{
 	
 	public int getItemType(int itemIndex)
 	{
+		System.out.println(bag.get(itemIndex).Name+"name");
+		
 		return bag.get(itemIndex).type;
 	}
 	
