@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import utils.PartyHard_Boss;
 import utils.PartyHard_Shop;
 import utils.PartyHard_Tp;
 
@@ -11,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -18,11 +20,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
-import com.partyhard.object.PartyHard_Armor;
-import com.partyhard.object.PartyHard_Potion;
-import com.partyhard.object.PartyHard_Weapon;
+import com.badlogic.gdx.utils.XmlWriter;
 
 public class PartyHard_Player_Map {
 	
@@ -58,6 +57,9 @@ public class PartyHard_Player_Map {
 	
 	//store tp
 	private ArrayList<PartyHard_Tp> Tp = new ArrayList<PartyHard_Tp>();
+	
+	//store the boss pos
+	public PartyHard_Boss Boss;
 	
 	//store shop, based on the map
 	private ArrayList<PartyHard_Shop> Shops = new ArrayList<PartyHard_Shop>();
@@ -520,6 +522,46 @@ XmlReader xml = new XmlReader();
 		return false; 
 	}
 	
+	public boolean isCellBoss()
+	{
+		System.out.println(Boss.position.x);
+		
+		//checking if there is a boss
+		if(Boss != null)
+		{
+			//taking a random layer just for knowing how much the width is(maybe store that in a var could be better)
+				TiledMapTileLayer layer = (TiledMapTileLayer) masterLayer.getLayers().get(0);
+				
+				
+				float x = this.x;
+				float y = this.y;
+				
+				if(movingRight)
+					x += 32;
+				if(movingLeft)
+					x -= 32;
+				if(movingTop)
+					y += 32;
+				if(movingDown)
+					y -= 32;
+				
+				//scaling the x and y
+				x = Math.round(x / layer.getTileWidth());
+				y = Math.round(y / layer.getTileHeight());		
+				
+				System.out.println(Boss.position.x);
+				
+				
+				if(Boss.position.x == x || Boss.position.y == y)
+				{
+					return true;
+				}
+				
+		}
+		
+				return false; 
+	}
+	
 	/**
 	 * 
 	 * @param direction The direction of the player on the map
@@ -606,7 +648,11 @@ XmlReader xml = new XmlReader();
 		Map = map;
 		loadTp();
 		if(isSafe)
-		loadShop();
+		{
+			loadShop();
+		}
+			loadBoss();
+		
 	}	
 	
 	//load all the tp point into an array
@@ -687,6 +733,44 @@ XmlReader xml = new XmlReader();
 			e.printStackTrace();
 		}
 	}
+	
+	private void loadBoss()
+	{
+		XmlReader xml = new XmlReader();
+		
+		/*
+		 * getting the map child, then all the shop in the map and add their id for populating the shops			  
+		 */
+
+		try
+		{
+			Element	root = xml.parse(Gdx.files.local("data/Boss.xml"));			
+			
+				Array<Element> arrayOfBoss = root.getChildrenByName("boss");
+				
+				for(int i = 0; i != arrayOfBoss.size; i++)
+				{														
+					if(arrayOfBoss.get(i).get("map").equals(Map))
+					{
+						Boss = new PartyHard_Boss();
+						
+						String id = arrayOfBoss.get(i).get("id");
+						Boss.bossSquad.add(new PartyHard_Monster(id));
+						
+						Boss.position.x = arrayOfBoss.get(i).getInt("x");
+						Boss.position.y = arrayOfBoss.get(i).getInt("y");
+						
+						Boss.musicPath = arrayOfBoss.get(i).get("music");
+					}
+					
+				}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public PartyHard_Tp Tp()
 	{
 		return Tp.get(tp);

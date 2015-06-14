@@ -7,7 +7,6 @@ import java.io.BufferedOutputStream;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.partyhard.actor.PartyHard_Capacity;
 import com.partyhard.object.PartyHard_Consumable;
 import com.partyhard.object.PartyHard_Object;
 import com.partyhard.object.PartyHard_Potion;

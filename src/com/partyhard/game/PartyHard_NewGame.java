@@ -3,6 +3,7 @@ package com.partyhard.game;
 import java.util.ArrayList;
 
 import utils.ObjectDatabase;
+import utils.PartyHard_Capacity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -31,7 +32,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.partyhard.actor.PartyHard_Capacity;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
 
@@ -57,7 +57,7 @@ public class PartyHard_NewGame implements Screen {
 
 	private Image characterImage = new Image();
 	
-	private int numberOfCharacter = -1;
+	private int numberOfCharacter = 1;
 	private int indexOfCharacter = 0;
 	private boolean isMale = true;
 	
@@ -139,8 +139,6 @@ public class PartyHard_NewGame implements Screen {
 	 * TO DO create the player (asking the name) TextBox center screen, maybe do an introduction
 	 */
 	
-	//load the number of image for the character
-	loadNumberOfCharacter();
 	
 	
 	TextField newName = new TextField("", textStyle);
@@ -176,7 +174,7 @@ public class PartyHard_NewGame implements Screen {
 	characterImage.setPosition(newName.getX() + newName.getWidth() + 30, newName.getY());
 	
 	
-	Image leftArrow = new Image(new Texture("ui_button/arrowLeft.png"));
+	Image leftArrow = new Image(new Texture(Gdx.files.internal("ui_button/arrowleft.png")));
 	leftArrow.setPosition(characterImage.getX() - 20, characterImage.getY());
 	
 	leftArrow.addListener(new ClickListener(){
@@ -192,7 +190,7 @@ public class PartyHard_NewGame implements Screen {
 		}
 	});
 	
-	Image rightArrow = new Image(new Texture("ui_button/arrowRight.png"));
+	Image rightArrow = new Image(new Texture(Gdx.files.internal("ui_button/arrowright.png")));
 	rightArrow.setPosition(characterImage.getX() + characterImage.getWidth(), characterImage.getY());
 	
 	rightArrow.addListener(new ClickListener(){
@@ -200,7 +198,7 @@ public class PartyHard_NewGame implements Screen {
 		public void clicked(InputEvent event, float x, float y) {				
 			
 			//if there is a way to go backward
-			if(indexOfCharacter != numberOfCharacter)
+			if(indexOfCharacter < numberOfCharacter)
 			{
 				indexOfCharacter++;
 				loadImage(indexOfCharacter, isMale);
@@ -425,16 +423,7 @@ public class PartyHard_NewGame implements Screen {
 		
 	}
 	
-	public void loadNumberOfCharacter()
-	{
-		//because libgdx store file in the android project, so the directory needed to be indicate like this
-		FileHandle file = Gdx.files.internal("./bin/player/");			
-		
-		for(int i = 0; i < file.list().length; i+=2)
-		{							
-			numberOfCharacter++;			
-		}	
-	}
+	
 
 	private void updateNumberOfPlayer() {
 		

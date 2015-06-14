@@ -13,7 +13,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -53,7 +53,6 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.actor.PartyHard_Player_Map;
-import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Potion;
 import com.partyhard.object.PartyHard_Weareable;
 
@@ -84,7 +83,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private PartyHard_Player_Map playerMap;
 	
-	private Sound mapSound;
+	private Music mapSound;
 	
 	private OrthographicCamera camera;
 	private TiledMap tiledmap;
@@ -137,6 +136,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int playerInventory = -1;
 	
 	private int idSave;
+	private Boolean isBoss;
 	
 	
 	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
@@ -536,37 +536,37 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 int tilePixelWidth = prop.get("tilewidth", Integer.class);
 		 int tilePixelHeight = prop.get("tileheight", Integer.class);
 		 
-		Name = prop.get("Name", String.class);
-		 
-		
+		Name = prop.get("Name", String.class);	
 		
 		 //getting if the map is safe or not
-		String safe = prop.get("Safe", String.class);
-		
-		if(safe.equals("true"))
-			isSafe = true;
-		else
-			isSafe = false;
+		 isSafe = Boolean.valueOf(prop.get("Safe", String.class));
+	     isBoss = Boolean.valueOf(prop.get("Boss", String.class));		
 		 
 		 //getting ifght info only if the map is not safe
 		 if(!isSafe)
 		 {
-			 //time for checking fight
-			 timeToFight = Integer.parseInt(prop.get("Time", String.class));
-			 //probability for a fight
-			 proba = Integer.parseInt(prop.get("Proba", String.class));
-			 			 
-			//getting the name of the monsters then splitting them(they are stored with a comma)
-			 String monsterNameRaw = prop.get("Monsters", String.class);
-			 String name[] = monsterNameRaw.split(",");
-			 
-			 //making sure that the array is clean
-			 nameMonster = new ArrayList<String>();
-			 
-			 for(int i = 0; i < name.length; i++)
+			 if(!isBoss)
 			 {
-				 nameMonster.add(name[i]);
+				 //time for checking fight
+				 timeToFight = Integer.parseInt(prop.get("Time", String.class));
+				 //probability for a fight
+				 proba = Integer.parseInt(prop.get("Proba", String.class));
+				 
+				 //getting the name of the monsters then splitting them(they are stored with a comma)
+				 String monsterNameRaw = prop.get("Monsters", String.class);
+				 String name[] = monsterNameRaw.split(",");
+				 
+				 //making sure that the array is clean
+				 nameMonster = new ArrayList<String>();
+				 
+				 for(int i = 0; i < name.length; i++)
+				 {
+					 nameMonster.add(name[i]);
+				 }
 			 }
+			
+			 			 
+			
 		 }
 		 	 	 
 		 //getting the dimension of the map
@@ -628,8 +628,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			 camera.update();
  
 		 //loading bg music
-		 mapSound = Gdx.audio.newSound(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));		
-		 mapSound.loop();
+		 mapSound = Gdx.audio.newMusic(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));
+		 mapSound.play();
+		 mapSound.setLooping(true);
 		 
 		//FileManager fileManager = new FileManager("monster.xml");
 		// fileManager.saveFile(false, Gdx.files.internal("monster.xml"));
@@ -678,6 +679,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		XmlReader xml = new XmlReader();
 		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
 		
+		playerSquad = new ArrayList<PartyHard_Player_Fight>();
+		
 		try {
 			Element root = xml.parse(file);
 			
@@ -720,6 +723,14 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 			mapSound.dispose();
 			
+	}
+	
+	private void loadBossFight()
+	{
+		fightScreen = new PartyHard_Fight(playerSquad,playerMap.Boss, this, (PartyHard_GameClass) mainGame, prop.get("Battle_Music", String.class));
+		mainGame.setScreen(fightScreen);
+			
+		mapSound.dispose();
 	}
 
 	private void loadShop(final int id)
@@ -839,8 +850,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 												playerMap.pay(Shop.getObjectPrice(itemShopSelected));
 												playerSquad.get(playerInventory).bag.add(Shop.getObject(itemShopSelected));
 												
-												refreshMoneyShop();
-												playerInventory = -1;											
+												refreshMoneyShop();																	
 											}										
 										}
 										
@@ -1250,8 +1260,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		
 					 		break;
 					 		
-					 	case 1: //inventory
-					 		
+					 	case 1: //inventory					 		
 					 		//deleting the old menu			 			
 					 			toggleSubMenu();
 					 		toggleInventory();
@@ -1259,8 +1268,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		
 					 	case 2://Quit
 					 		save();
-					 		dispose();
-					 		Gdx.app.exit();
+					 		
+					 		PartyHard_ScreenSplash screen = new PartyHard_ScreenSplash(mainGame);					 		
+					 		mainGame.setScreen(screen);
+					 		
+					 		dispose();					 							 		
 					 		break;
 					 }
 				
@@ -1709,6 +1721,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		{
 			case Input.Keys.ESCAPE:
 				toggleMenu();
+			return true;
+			
+			case Input.Keys.ENTER:
+				if(playerMap.isCellBoss())
+					loadBossFight();
 			return true;
 		}
 		return false;

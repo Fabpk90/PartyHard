@@ -1,9 +1,12 @@
 package com.partyhard.actor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import utils.PartyHard_Capacity;
 import utils.PartyHard_Level;
 
 import com.badlogic.gdx.Gdx;
@@ -629,10 +632,12 @@ public class PartyHard_Player_Fight{
 	public void prepareForSave()
 	{					 
 		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+
 		file.delete();
+		
 			
-		file = Gdx.files.local("save/"+idSave+"Fight.xml");
-		file.writeString("<root>", false);
+		//file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		file.writeString("<root>", true);
 	 
 		
 	}

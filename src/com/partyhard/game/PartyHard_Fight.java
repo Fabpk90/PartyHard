@@ -1,13 +1,12 @@
 package com.partyhard.game;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
 import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
+import utils.PartyHard_Boss;
 import utils.SpriteAccessor;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -16,8 +15,8 @@ import aurelienribon.tweenengine.TweenManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,7 +26,6 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -48,13 +46,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.actor.PartyHard_Monster;
 import com.partyhard.actor.PartyHard_Player_Fight;
-import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Consumable;
 import com.partyhard.object.PartyHard_Potion;
-import com.partyhard.object.PartyHard_Weapon;
 
 public class PartyHard_Fight implements Screen {
 	
@@ -71,10 +66,12 @@ public class PartyHard_Fight implements Screen {
 	
 	private Table tableTurn;
 		
-	private Sound backgroundMusic;
+	private Music backgroundMusic;
 	
 	private ArrayList<PartyHard_Player_Fight> playerSquad;
 	private ArrayList<PartyHard_Monster> enemySquad;
+	
+	private PartyHard_Boss Boss;
 	
 	private int turn = 0;
 	
@@ -122,6 +119,27 @@ public class PartyHard_Fight implements Screen {
 		
 		musicPath = backgroundMusicPath;
 		
+	}
+	
+	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, PartyHard_Boss boss, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath)
+	{
+	
+		this.playerSquad = playerSquad;
+		this.enemySquad = boss.bossSquad;
+		
+		mapscreen = mainScreen;
+		
+		this.game = game;
+		TweenManager w = new TweenManager();
+	
+		for(int i = 0; i < playerSquad.size(); i++)
+		{
+			if(!playerSquad.get(i).isDead())
+					playerAlive++;
+		}
+		
+		musicPath = backgroundMusicPath;
+		Boss = boss;
 	}
 
 
@@ -192,18 +210,21 @@ public class PartyHard_Fight implements Screen {
     	/*
     	 * checking the music to play
     	 */
-    	backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/"+musicPath+".mp3"));
+    	
 		
 		//searching if it's a boss fight
 			for(int i = 0; i < enemySquad.size(); i++)
 			{
 				if(enemySquad.get(i).isBoss())
 				{
-					backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("sound/battle_boss.mp3"));
+					backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/"+Boss.musicPath+".mp3"));
 					break;
 				}					 				
 			}
 		
+			if(backgroundMusic == null)
+				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/"+musicPath+".mp3"));
+			
 		/*
 		 * list of actions
 		 */
@@ -216,21 +237,26 @@ public class PartyHard_Fight implements Screen {
 		
 		buttonFlee.addListener(new ClickListener(){
             @Override 
-            public void clicked(InputEvent event, float x, float y){
-            	
-              Random r = new Random();
+            public void clicked(InputEvent event, float x, float y)
+            {
+	            if(Boss == null)
+	            {
+		            Random r = new Random();
+		              
+		              if(r.nextInt(101) > 5)
+		              {      
+		            	  save();
+		            	  game.setScreen(mapscreen);
+		            	  backToMap();
+		              }
+		              else//flee failed, player gonna be attacked by monsters
+		              {
+		            	  //turn = playerAlive -1;
+		            	 // fight();
+		              }
+		             
+	            }
               
-              if(r.nextInt(101) > 5)
-              {       	          	 
-            	  game.setScreen(mapscreen);
-            	  backToMap();
-              }
-              else//flee failed, player gonna be attacked by monsters
-              {
-            	  turn = playerAlive -1;
-            	  fight();
-              }
-             
               
             }
         });
@@ -834,7 +860,8 @@ public class PartyHard_Fight implements Screen {
        
         Gdx.input.setInputProcessor(stage);		
         
-        backgroundMusic.setVolume(backgroundMusic.loop(), 0.5f);
+        backgroundMusic.play();
+        backgroundMusic.setLooping(true);
         
         /*
          * Fade in
@@ -842,20 +869,7 @@ public class PartyHard_Fight implements Screen {
         //set alpha to 0 and then go to 1
               
         stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));    
-        
-        /*
-         * Applying the stuff that the player has equipped
-         */
-        
-        for(int i = 0; i < playerSquad.size(); i++)
-        {       	
-        	//first checking if something is equipped then apply
-        	if(playerSquad.get(i).isEquipSlot(0))//wep       	
-        		playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() + ((PartyHard_Weapon) playerSquad.get(i).bag.get(playerSquad.get(i).weaponEquipped)).getAmount());      	
-        		
-        	if(playerSquad.get(i).isEquipSlot(1))//arm
-        		playerSquad.get(i).setDef(playerSquad.get(i).getDef() + ((PartyHard_Armor) playerSquad.get(i).bag.get(playerSquad.get(i).armorEquipped)).getAmount());        	
-        }
+   
 	}
 
 	/*
@@ -926,14 +940,15 @@ public class PartyHard_Fight implements Screen {
 				
 				for(int p = 0; p < enemySquad.size();)
 				{
+										
 					Random r = new Random();
 					
 					int random = r.nextInt(playerSquad.size());
 					
 					if(!playerSquad.get(random).isDead())
 					{
-						playerSquad.get(random).setDamageTaken(enemySquad.get(p).actualAtk);
-						p++;
+						enemySquad.get(p).setIdTarget(random);
+						p++;						
 					}				
 				}				
 				/*
@@ -1325,11 +1340,12 @@ public class PartyHard_Fight implements Screen {
 		TextButton btnWin = new TextButton("Ok",buttonStyle);
 		btnWin.addListener(new ClickListener(){
             @Override 
-            public void clicked(InputEvent event, float x, float y){
-            	save();
+            public void clicked(InputEvent event, float x, float y){           	
             	
-            	dispose();
-            	Gdx.app.exit();
+            	PartyHard_ScreenSplash screen = new PartyHard_ScreenSplash(game);
+            	game.setScreen(screen);
+            	
+            	dispose();          	
             }
         });
 		win.button(btnWin);
@@ -1386,6 +1402,7 @@ public class PartyHard_Fight implements Screen {
 	
 	private void win()
 	{
+		
 		//adding exp to player and checking for level up
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
@@ -1467,6 +1484,12 @@ public class PartyHard_Fight implements Screen {
             public void clicked(InputEvent event, float x, float y){
             	save();
             	
+            	//finished the game
+            	if(Boss != null)
+            	{
+            		
+            	}
+            	
             	 game.setScreen(mapscreen);
            	  	backToMap();
             }
@@ -1495,87 +1518,15 @@ public class PartyHard_Fight implements Screen {
 	
 		playerSquad.get(0).prepareForSave();
 		
-		/*
-		 * resetting the stats back before the items buff was applies
-		 */
-		 for(int i = 0; i < playerSquad.size(); i++)
-	        {
-			 if(playerSquad.get(i).isEquipSlot(0))//wep       	
-	        	playerSquad.get(i).setAtk(playerSquad.get(i).getAtk() - ((PartyHard_Weapon) playerSquad.get(i).bag.get(playerSquad.get(i).weaponEquipped)).getAmount());      	
-	        		
-	        if(playerSquad.get(i).isEquipSlot(1))//arm
-	        	playerSquad.get(i).setDef(playerSquad.get(i).getDef() - ((PartyHard_Armor) playerSquad.get(i).bag.get(playerSquad.get(i).armorEquipped)).getAmount());        	     
-	        }
+		System.out.println(playerSquad.size());
 		
-		try {
-		//FileManager file = new FileManager("player_Fight.xml");
-			FileHandle file = Gdx.files.local("player_Fight.xml");
 				
-			 StringWriter stringwriter = new StringWriter();
-			 XmlWriter xml = new XmlWriter(stringwriter);
-		 
-				xml.element("root");	
-				for(int i = 0;i < playerSquad.size(); i++)
-				{
-					xml.element("player_Fight").attribute("num", i)	       
-	                .element("name").attribute("value", playerSquad.get(i).Name).pop()
-	                .element("class").attribute("value", playerSquad.get(i).getclass()).pop()
-	                .element("hpmax").attribute("value", playerSquad.get(i).getHpMax()).pop()
-	                .element("hp").attribute("value", playerSquad.get(i).getLife()).pop()
-	                .element("def").attribute("value", playerSquad.get(i).getDef()).pop()
-	                .element("atk").attribute("value", playerSquad.get(i).getAtk()).pop()
-	                .element("exp").attribute("value", playerSquad.get(i).getExp()).pop()
-	                .element("level").attribute("value", playerSquad.get(i).getLevel()).pop()
-	                .element("bag").attribute("space", playerSquad.get(i).getBagSpace());
-					
-					//populating the bag
-					for(int p = 0; p < playerSquad.get(i).bag.size(); p++)
-					{
-						xml.element("item").attribute("type", playerSquad.get(i).bag.get(p).type);	
-						
-						switch(playerSquad.get(i).bag.get(p).type)
-		        		{
-		        			case 0: //weapon
-		        				PartyHard_Weapon wep = (PartyHard_Weapon) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", wep.getId()).pop();
-		        			break;
-		        			case 1: //armor
-		        				PartyHard_Armor armor = (PartyHard_Armor) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", armor.getId()).pop();
-		        			break;
-		        			case 2: //potion
-		        				PartyHard_Potion pot = (PartyHard_Potion) playerSquad.get(i).bag.get(p);
-		        				xml.attribute("id", pot.getId()).pop();
-		        			break;
-		        		}
-					}
-					xml.pop();//closing the bag
-					xml.element("capacity").attribute("value", playerSquad.get(i).capacity.size());
-					
-					for(int p = 0; p < playerSquad.get(i).capacity.size(); p++)
-					{
-						xml.element("cap").attribute("id", playerSquad.get(i).capacity.get(p).id).pop();				
-					}
-					//closing cap and then the player
-					xml.pop();
-					xml.pop();
-			
-					/*
-					 * updating the inventory with (class, object)
-					 */
-					             
-				}
-				      //to be sure that all the element has been closed 
-				   xml.close();                   
-			
-				   file.writeString(stringwriter.toString(), false);
+		for(int i = 0; i < playerSquad.size(); i++)
+		{
+			playerSquad.get(i).save(i);
+		}
 				   
-				   playerSquad.get(0).finishFile();
-				   			 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}					
+		playerSquad.get(0).finishFile();		   			 						
 	}
 
 	private int getAlivePlayer()
