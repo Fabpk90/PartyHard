@@ -81,6 +81,7 @@ public class PartyHard_Player_Fight{
 				{
 					Name = arrayOfPlayer.get(i).getChildByName("name").getAttribute("value");
 					setHpMax(Integer.parseInt(arrayOfPlayer.get(i).getChildByName("hpmax").getAttribute("value")));
+					imagePath = arrayOfPlayer.get(i).getChildByName("imagePath").getAttribute("value");
 					Hp = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("hp").getAttribute("value"));
 					Def = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("def").getAttribute("value"));
 					Atk = Integer.parseInt(arrayOfPlayer.get(i).getChildByName("atk").getAttribute("value"));
@@ -575,6 +576,7 @@ public class PartyHard_Player_Fight{
 				
 					xml.element("player_Fight").attribute("num", id)	       
 	                .element("name").attribute("value",  Name).pop()
+	                .element("imagePath").attribute("value",  imagePath).pop()
 	                .element("class").attribute("value",  getclass()).pop()
 	                .element("hpmax").attribute("value",  getHpMax()).pop()
 	                .element("hp").attribute("value",  getLife()).pop()

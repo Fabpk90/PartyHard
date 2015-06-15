@@ -523,9 +523,7 @@ XmlReader xml = new XmlReader();
 	}
 	
 	public boolean isCellBoss()
-	{
-		System.out.println(Boss.position.x);
-		
+	{		
 		//checking if there is a boss
 		if(Boss != null)
 		{
@@ -547,10 +545,7 @@ XmlReader xml = new XmlReader();
 				
 				//scaling the x and y
 				x = Math.round(x / layer.getTileWidth());
-				y = Math.round(y / layer.getTileHeight());		
-				
-				System.out.println(Boss.position.x);
-				
+				y = Math.round(y / layer.getTileHeight());								
 				
 				if(Boss.position.x == x || Boss.position.y == y)
 				{
@@ -795,11 +790,8 @@ XmlReader xml = new XmlReader();
 	{
 		if(Money - amount < 0)
 			return false;
-		else
-		{
-			Money -= amount;
+		else					
 			return true;
-		}
 		
 	}
 	

@@ -84,13 +84,11 @@ public class PartyHard_ScreenSplash implements Screen{
 	@Override
 	public void show() {
 		
-		 TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
+		TextureAtlas tex = new TextureAtlas((Gdx.files.internal("ui_button/button.pack")));
 			
-			skin = new Skin(tex);
-			
-			//tex.dispose();
+		skin = new Skin(tex);
 		 
-		 NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
+		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/menu.9.png"))));
 			
 		final NinePatchDrawable drawable = new NinePatchDrawable(patch);
 		 
@@ -110,7 +108,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		
 		buttonStyle.font = font;
 		
-		labelStyle.font = new BitmapFont();
+		labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		labelStyle.fontColor = Color.WHITE;
 		
 		
@@ -169,10 +167,7 @@ public class PartyHard_ScreenSplash implements Screen{
           
           loadNewGame();
           }
-	});
-
-	
-	
+	});	
 	
 	 TextButton quitButton = new TextButton("Quit", buttonStyle);
 	
@@ -186,8 +181,7 @@ public class PartyHard_ScreenSplash implements Screen{
 			  dispose();
 			  Gdx.app.exit();    
           }
-	});
-	
+	});	
 	
 	//if there is saved games
 		if(file.list().length > 0)
@@ -218,9 +212,14 @@ public class PartyHard_ScreenSplash implements Screen{
 						 
 						 //populating the list with save game
 						 for(int i = 0; i < file.list().length;i+=2)
-						 {													 
-							 Label save = new Label(""+i, labelStyle);
-							 save.setName("Save n."+i/2);
+						 {	
+							 //cleaning up the name of the path
+							 String name = file.list()[i].nameWithoutExtension();
+							 name = name.replace("save/", "");
+							 name = name.replace("Fight", "");
+							 
+							 Label save = new Label(""+name, labelStyle);
+							 save.setName("Save n."+name);
 							 
 							 listSave.getItems().add(save);
 						 }
@@ -271,11 +270,10 @@ public class PartyHard_ScreenSplash implements Screen{
 	 * creating the title animation
 	 */
 		
-	LabelStyle labelStyle = new LabelStyle();
-	labelStyle.font = new BitmapFont();
+
 	
 	Label labelTitle = new Label("Party Hard!",labelStyle);
-	labelTitle.setFontScale(6, 4);
+	labelTitle.setFontScale(4, 2);
 	
 	labelTitle.setPosition(Gdx.graphics.getWidth() / 2 - (labelTitle.getWidth() * labelTitle.getFontScaleX()) / 2, (float) ((Gdx.graphics.getHeight() - (labelTitle.getHeight() * labelTitle.getFontScaleY())) ) );
 	/*

@@ -7,6 +7,7 @@ import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
 import utils.PartyHard_Boss;
+import utils.PartyHard_EndScreen;
 import utils.SpriteAccessor;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -185,11 +186,8 @@ public class PartyHard_Fight implements Screen {
 		buttonStyle.pressedOffsetX = 1;
 		buttonStyle.pressedOffsetY = -1;
 		
-		BitmapFont font = new BitmapFont();		
-		font.setColor(Color.BLUE);
-		buttonStyle.font = font;
-		//smoothing the font
-		buttonStyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		buttonStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		
 		/*
 		 * label style
@@ -657,8 +655,7 @@ public class PartyHard_Fight implements Screen {
         * Creating the label that show the life of the characters
         */	
 		
-		labelstyle.font = new BitmapFont();
-		labelstyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		labelstyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
        
 
 		Table tableLabelName = new Table();
@@ -669,19 +666,17 @@ public class PartyHard_Fight implements Screen {
 		{
 			Label labelLife = new Label(""+playerSquad.get(i).getLife(), labelstyle);
 			labelLife.setName(playerSquad.get(i).Name);
-			labelLife.setFontScale(2f);
 			labelLife.setName(""+i);
 			
 			Label labelName = new Label(playerSquad.get(i).Name, labelstyle);
 			labelName.setName(playerSquad.get(i).Name+"name");
-			labelName.setFontScale(2f);
 				
 			/*
 			 * setting the position( dividing the screen width by the number of player then multiply by i)
 			 */
 						
 			labelName.setPosition(labelName.getWidth() + (i * 100), 30);
-			labelLife.setPosition(labelName.getX(), labelName.getY() + 20);
+			labelLife.setPosition(labelName.getX(), labelName.getY() - labelLife.getHeight());
 			
 			labelLife.setWidth(100f);
 			labelLife.setHeight(20f);
@@ -716,6 +711,7 @@ public class PartyHard_Fight implements Screen {
 		for(int i = 0; i != enemySquad.size(); i++)
 		{
 			Label monsterName = new Label(enemySquad.get(i).Name, labelstyle);
+			monsterName.setColor(Color.RED);
 			Image monsterImage = new Image(new Texture(Gdx.files.internal(enemySquad.get(i).imagePath)));
 			
 			//scaling
@@ -1487,11 +1483,16 @@ public class PartyHard_Fight implements Screen {
             	//finished the game
             	if(Boss != null)
             	{
-            		
+            		PartyHard_EndScreen screen = new PartyHard_EndScreen(game);
+            		game.setScreen(screen);
             	}
-            	
-            	 game.setScreen(mapscreen);
-           	  	backToMap();
+            	else
+            	{
+            		game.setScreen(mapscreen);
+           	  		backToMap();
+            	}          	
+            	 backgroundMusic.dispose();
+            	 
             }
         });
 		win.button(btnWin);

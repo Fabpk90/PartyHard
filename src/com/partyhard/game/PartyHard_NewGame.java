@@ -7,6 +7,7 @@ import utils.PartyHard_Capacity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -57,7 +58,7 @@ public class PartyHard_NewGame implements Screen {
 
 	private Image characterImage = new Image();
 	
-	private int numberOfCharacter = 1;
+	private int numberOfCharacter = 4;
 	private int indexOfCharacter = 0;
 	private boolean isMale = true;
 	
@@ -66,28 +67,29 @@ public class PartyHard_NewGame implements Screen {
 
 	private Skin skin;
 	
+	private Music music;
+	
 	public PartyHard_NewGame(PartyHard_GameClass game, PartyHard_ScreenSplash screenSplash)
 	{
 		this.game = game;
 		this.screenSplash = screenSplash;
 		
-		labelStyle.font = new BitmapFont();
+		labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		
 		textStyle.font = new BitmapFont();
-		textStyle.fontColor = Color.BLACK;	
+		textStyle.fontColor = Color.WHITE;	
 		textStyle.cursor = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/cursor.9.png")))));	
 			
 		scrollPaneStyle.background = drawable;
 		
-		listStyle.font = new BitmapFont();
-		listStyle.fontColorSelected = Color.BLACK;
+		listStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		listStyle.fontColorSelected = Color.PINK;
 		listStyle.fontColorUnselected = Color.WHITE;
 		listStyle.selection = drawable;
 		listStyle.background = drawable;
 		
-		
 		selectStyle.font = new BitmapFont();
-		selectStyle.fontColor = Color.BLUE;
+		selectStyle.fontColor = Color.WHITE;
 		selectStyle.scrollStyle = scrollPaneStyle;
 		selectStyle.listStyle = listStyle;
 		
@@ -99,7 +101,8 @@ public class PartyHard_NewGame implements Screen {
 		
 		buttonStyle.pressedOffsetX = 1;
 		buttonStyle.pressedOffsetY = -1;		
-		buttonStyle.font = new BitmapFont();
+		buttonStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		buttonStyle.font.setScale(0.7f);
 		
 	}
 	
@@ -108,10 +111,14 @@ public class PartyHard_NewGame implements Screen {
 	public void show() {
 	Gdx.input.setInputProcessor(stage);
 	
-	Image background = new Image(new Texture(Gdx.files.internal("battleground.png")));
+	music = Gdx.audio.newMusic(Gdx.files.internal("sound/waitMusic.mp3"));
+	music.play();
+	music.setLooping(true);
 	
-	background.setPosition(0, 0);
-	background.setFillParent(true);
+	//Image background = new Image(new Texture(Gdx.files.internal("battleground.png")));
+	
+	//background.setPosition(0, 0);
+	//background.setFillParent(true);
 	
 	Label welcome = new Label("Welcome to Party Hard!", labelStyle);
 	welcome.setFontScale(2);
@@ -152,8 +159,7 @@ public class PartyHard_NewGame implements Screen {
 	newName.setBlinkTime(1f);
 	
 	Label lblName = new Label("Name:", labelStyle);
-	lblName.setPosition(newName.getX() - lblName.getWidth(), newName.getY());
-	
+	lblName.setPosition(newName.getX() - lblName.getWidth(), newName.getY());	
 	
 	SelectBox<String> newClass = new SelectBox<String>(selectStyle);
 	
@@ -207,8 +213,9 @@ public class PartyHard_NewGame implements Screen {
 		}
 	});
 	
-	Label male = new Label("Male", labelStyle);
-	male.setPosition(characterImage.getX(), characterImage.getY() - male.getHeight());
+	TextButton male = new TextButton("Male", buttonStyle);
+	male.setPosition(leftArrow.getX(), characterImage.getY() - male.getHeight());
+	male.setWidth(70);
 	
 	male.addListener(new ClickListener(){
 		@Override
@@ -218,8 +225,9 @@ public class PartyHard_NewGame implements Screen {
 		}
 	});
 	
-	Label female = new Label("Female", labelStyle);
-	female.setPosition(characterImage.getX() + female.getWidth(), characterImage.getY() - female.getHeight());
+	TextButton female = new TextButton("Female", buttonStyle);
+	female.setPosition(male.getX() + male.getWidth(), characterImage.getY() - female.getHeight());
+	female.setWidth(male.getWidth());
 	
 	female.addListener(new ClickListener(){
 		@Override
@@ -237,6 +245,8 @@ public class PartyHard_NewGame implements Screen {
 	back.addListener(new ClickListener(){
 		@Override
 		public void clicked(InputEvent event, float x, float y) {
+			music.dispose();
+			stage.dispose();
 			game.setScreen(screenSplash);
 		}
 	});
@@ -282,6 +292,11 @@ public class PartyHard_NewGame implements Screen {
 						confirm.addListener(new ClickListener(){
 							@Override
 							public void clicked(InputEvent event, float x, float y) {
+								
+								//stopping the music and disposing
+								music.dispose();
+								stage.dispose();
+								
 								//getting the id for the save
 								int id = getNextSaveId();
 								
@@ -382,7 +397,7 @@ public class PartyHard_NewGame implements Screen {
 	
 	numberPlayer.addActor(numPlayer);
 	
-	stage.addActor(background);
+	//stage.addActor(background);
 	stage.addActor(newPlayer);
 	stage.addActor(welcome);	
 	stage.addActor(imgCharacter);
@@ -481,7 +496,8 @@ public class PartyHard_NewGame implements Screen {
 
 	@Override
 	public void dispose() {
-		stage.dispose();		
+		stage.dispose();	
+		music.dispose();
 	}
 	
 	/**
