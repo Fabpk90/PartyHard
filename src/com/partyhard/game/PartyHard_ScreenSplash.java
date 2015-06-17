@@ -7,7 +7,6 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -230,7 +228,7 @@ public class PartyHard_ScreenSplash implements Screen{
 								
 								 List<Label> list = (List<Label>) event.getTarget();
 								 
-								 int idSave = list.getSelectedIndex();
+								 int idSave = Integer.parseInt(list.getSelected().getText().toString());
 								 
 								  PartyHard_MapScreen map = new PartyHard_MapScreen(game, new PartyHard_Player_Map(idSave), idSave);
 								 					 
@@ -397,11 +395,6 @@ public class PartyHard_ScreenSplash implements Screen{
        	game.setScreen(map);
 	}
 	
-	private void toggleMenu()
-	{
-		
-	}
-	
 	private void generateDirection()
 	{
 			//random number to see where will move
@@ -413,23 +406,6 @@ public class PartyHard_ScreenSplash implements Screen{
 				{
 					generateDirection();
 				}
-	}
-	
-	/**
-	 * @param name the name of the table (setName)
-	 * 
-	 * @return The table or null
-	 */
-	private Table searchTable(String name)
-	{
-		for(int i = 0; i < stage.getActors().size; i++)
-		{
-			if(stage.getActors().get(i).getName() == name)
-				return (Table) stage.getActors().get(i);
-		}
-		
-		//hopefully will never be 
-		return null;
 	}
 	
 	/**

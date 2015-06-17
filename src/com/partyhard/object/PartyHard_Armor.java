@@ -17,11 +17,11 @@ public class PartyHard_Armor extends PartyHard_Object implements PartyHard_Weare
 	 */
 	
 	private int amount;
-	private boolean equip = false;
+	private boolean isEquip = false;
 	private int armorType;
 	private int id;
 	public PartyHard_Armor(int id) {
-		//ginving 1 to super constructor because it's an armor
+		//giving 1 to super constructor because it's an armor
 super("", "", "", 1, 0);
 
 		
@@ -72,12 +72,12 @@ super("", "", "", 1, 0);
 
 	@Override
 	public boolean isEquiped() {
-		return equip;
+		return isEquip;
 	}
 
 	@Override
 	public void setEquip(boolean equip) {
-		this.equip = equip;
+		this.isEquip = equip;
 
 	}
 

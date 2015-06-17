@@ -17,9 +17,9 @@ public class ObjectDatabase {
 	 * TO DO: load all the items (wep, arm , potion)
 	 */
 	
-	public static final int WEAPON = 0;
-	public static final int ARMOR = 1;
-	public static final int POTION = 2;
+	public final static int WEAPON = 0;
+	public final static int ARMOR = 1;
+	public final static int POTION = 2;
 	
 	Array<PartyHard_Object> Objects = new Array<PartyHard_Object>();
 	

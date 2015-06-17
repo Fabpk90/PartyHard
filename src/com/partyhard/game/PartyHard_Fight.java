@@ -7,7 +7,6 @@ import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
 import utils.PartyHard_Boss;
-import utils.PartyHard_EndScreen;
 import utils.SpriteAccessor;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -68,6 +67,8 @@ public class PartyHard_Fight implements Screen {
 	private Table tableTurn;
 		
 	private Music backgroundMusic;
+	private Sound gameOver;
+	private Sound soundWin;
 	
 	private ArrayList<PartyHard_Player_Fight> playerSquad;
 	private ArrayList<PartyHard_Monster> enemySquad;
@@ -91,7 +92,7 @@ public class PartyHard_Fight implements Screen {
 	private LabelStyle labelstyle = new LabelStyle();
 	
 	private boolean win = false;
-	private boolean loose = false;
+	private boolean lose = false;
 	
 	//used for animation
 	private TweenManager tweenManager = new TweenManager();
@@ -110,7 +111,6 @@ public class PartyHard_Fight implements Screen {
 		mapscreen = mainScreen;
 		
 		this.game = game;
-		TweenManager w = new TweenManager();
 	
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
@@ -131,7 +131,6 @@ public class PartyHard_Fight implements Screen {
 		mapscreen = mainScreen;
 		
 		this.game = game;
-		TweenManager w = new TweenManager();
 	
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
@@ -241,7 +240,7 @@ public class PartyHard_Fight implements Screen {
 	            {
 		            Random r = new Random();
 		              
-		              if(r.nextInt(101) > 5)
+		              if(r.nextInt(101) > 10)
 		              {      
 		            	  save();
 		            	  game.setScreen(mapscreen);
@@ -249,8 +248,8 @@ public class PartyHard_Fight implements Screen {
 		              }
 		              else//flee failed, player gonna be attacked by monsters
 		              {
-		            	  //turn = playerAlive -1;
-		            	 // fight();
+		            	  turn = playerAlive -1;
+		            	  fleeFail();
 		              }
 		             
 	            }
@@ -447,7 +446,7 @@ public class PartyHard_Fight implements Screen {
 				 	
 				 				 			 
 				 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
-				 if(!win && !loose && playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
+				 if(!win && !lose && playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
 				 {
 					 fight();
 				 }
@@ -601,7 +600,7 @@ public class PartyHard_Fight implements Screen {
 				stage.addActor(tableItem);
 				
 				 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
-				 if(!win && !loose && playerSquad.get(getAlivePlayer()).getObjectUsed() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
+				 if(!win && !lose && playerSquad.get(getAlivePlayer()).getObjectUsed() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
 				 {
 					 fight();
 				 }
@@ -928,399 +927,401 @@ public class PartyHard_Fight implements Screen {
 			/*
 			 * FIGHT!!
 			 */
-			if(turn == playerAlive - 1)
+			
+			trueFight();
+		}
+	}
+	
+	private void trueFight()
+	{
+		if(turn == playerAlive - 1)
+		{
+			/*
+			 *Calculating which player monsters have to attack randomly
+			 */
+
+			for(int p = 0; p < enemySquad.size();)
 			{
-				/*
-				 *Calculating which player monsters have to attack randomly
-				 */
-				
-				for(int p = 0; p < enemySquad.size();)
+
+				Random r = new Random();
+
+				int random = r.nextInt(playerSquad.size());
+
+				if(!playerSquad.get(random).isDead())
 				{
-										
-					Random r = new Random();
-					
-					int random = r.nextInt(playerSquad.size());
-					
-					if(!playerSquad.get(random).isDead())
-					{
-						enemySquad.get(p).setIdTarget(random);
-						p++;						
-					}				
+					enemySquad.get(p).setIdTarget(random);
+					p++;						
 				}				
-				/*
-				 * TO DO calculate type damages
-				 */				
-				for(int i = 0; i < playerSquad.size(); i++)
+			}				
+			/*
+			 * TO DO calculate type damages
+			 */				
+			for(int i = 0; i < playerSquad.size(); i++)
+			{
+				if(!playerSquad.get(i).isDead())
 				{
-					if(!playerSquad.get(i).isDead())
-					{
-						//checking if the player is using a cap
-						if(playerSquad.get(i).getCapacitySelected() != -1)
+					//checking if the player is using a cap
+					if(playerSquad.get(i).getCapacitySelected() != -1)
 						//if the cap doesn't heals 				
 						if(!playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).isHeal)
 						{																									
 							//getting the index in the table of the monster and the index in the array									
 							int monsterIndex = -1;
-							
+
 							for(int y = 0; y != enemySquad.size(); y++)
 							{
 								if(enemySquad.get(y).monsterId == playerSquad.get(i).getTarget())
 									monsterIndex = y;
 							}				
-							
+
 							//if there is still monster to kill 
-								if(monsterIndex != -1)
-								{
-									int damage = playerSquad.get(i).getAtk() - enemySquad.get(monsterIndex).actualDef;
-									if(damage <= 0)						
-										damage = 1;
-																				
-									enemySquad.get(monsterIndex).setDamageTaken(damage);																				
-								}																												
-							}//closing if not heal
+							if(monsterIndex != -1)
+							{
+								int damage = playerSquad.get(i).getAtk() - enemySquad.get(monsterIndex).actualDef;
+								if(damage <= 0)						
+									damage = 1;
+
+								enemySquad.get(monsterIndex).setDamageTaken(damage);																				
+							}																												
+						}//closing if not heal
 						else
 						{					
 							playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount((playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).amount));														
 						}
-						
-				//the player is using an object, for now only heal
+
+					//the player is using an object, for now only heal
 					if(playerSquad.get(i).getObjectUsed() != -1)
 					{						
 						//healing player
 						playerSquad.get(playerSquad.get(i).getTarget()).setHealAmount( ((PartyHard_Potion) playerSquad.get(i).bag.get(playerSquad.get(i).getObjectUsed())).getAmount());
-												
+
 						//deleting the used object from bag and setting back the objectused var to -1(default)
 						playerSquad.get(i).useObject();;
 						playerSquad.get(i).setObjectUsed(-1);												
 					}
-									
+
 				}
-					/*
-					 * Monster turn
-					 */				
-					for(int o = 0; o < enemySquad.size(); o++)
-					{			
-						playerSquad.get(enemySquad.get(o).getIdTarget()).setDamageTaken(enemySquad.get(o).actualAtk);						
-					}					
-			}
-				
 				/*
-				 * showing damage and dealing them
-				 */
-				
-				//first player
-				
-				for(int i = 0; i < playerSquad.size(); i++)
+				 * Monster turn
+				 */				
+				for(int o = 0; o < enemySquad.size(); o++)
+				{			
+					playerSquad.get(enemySquad.get(o).getIdTarget()).setDamageTaken(enemySquad.get(o).actualAtk);						
+				}					
+			}
+
+			/*
+			 * showing damage and dealing them
+			 */
+
+			//first player
+
+			for(int i = 0; i < playerSquad.size(); i++)
+			{
+				if(!playerSquad.get(i).isDead())
 				{
-					if(!playerSquad.get(i).isDead())
+					//checking if the player is using a cap
+					if(playerSquad.get(i).getCapacitySelected() != -1)
 					{
-						//checking if the player is using a cap
-						if(playerSquad.get(i).getCapacitySelected() != -1)
-						{
 						if(!playerSquad.get(i).capacity.get(playerSquad.get(i).getCapacitySelected()).isHeal)
 						{
 							//searching the monster
 							Table monsterTable = searchTable("monsterTable");
-							
+
 							//used for finding the monster in the table
 							int monsterIndexTable = -1;
 							//finding the monster in the array
 							int monsterIndex = -1;
-							
-							//searching the right monster				
-								for(int x = 0; x != monsterTable.getChildren().size; x++)
-								{
-									if(Integer.parseInt(monsterTable.getChildren().get(x).getName()) == playerSquad.get(i).getTarget())
-									{
-										monsterIndexTable = x;
-									}
-								}																			
-										//getting the index in the table of the monster and the index in the array
-										
-										for(int y = 0; y != enemySquad.size(); y++)
-										{
-											if(enemySquad.get(y).monsterId == playerSquad.get(i).getTarget())
-												monsterIndex = y;
-										}
-										
-										
-										//if the dealt damages has been shown
-										if(enemySquad.get(monsterIndex).getDamage() != 0)
-										{
-											/*
-											 * Animating the damage
-											 */
-											Label labelDamage = new Label(""+enemySquad.get(monsterIndex).getDamage(), labelstyle);
-											labelDamage.setFontScale(scale * 2);
-											labelDamage.setColor(Color.RED);
-											
-											//setting the value before animation
-											Image monsterimage = (Image) monsterTable.getChildren().get(monsterIndexTable);		
-											labelDamage.setPosition(monsterimage.getX() + (monsterimage.getWidth() / 2), monsterimage.getY() + monsterimage.getHeight());
-											
-											stage.addActor(labelDamage);
-											
-											/*
-											 * Animations work like that: value SET to value TO in x seconds
-											 */
-											
-											Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).start(tweenManager);
-											Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).start(tweenManager);
-											
-											Tween.to(labelDamage, LabelAccessor.Y, 2f).target(monsterimage.getY() + monsterimage.getHeight() + 100).start(tweenManager);
-											Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
-											
-											//dealing damage and setting back to default the damage taken
-											enemySquad.get(monsterIndex).actualHp -= enemySquad.get(monsterIndex).getDamage();
-											enemySquad.get(monsterIndex).damage = 0;
-											
-											//the monster is dead
-											if(enemySquad.get(monsterIndex).actualHp <= 0)
-											{																										
-												expgained += enemySquad.get(monsterIndex).actualExp; 																																
-												
-												Table monsterName = searchTable("monsterTableName");									
-												
-												/*
-												 * fading out the monster that has been kill
-												 */
-												
-												Tween.set((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA).target(1).start(tweenManager);
-												
-												Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBackTween(enemySquad.get(monsterIndex).monsterId){										
-													@Override
-													public void onEvent(int callbackType, BaseTween<?> callback) {	
 
-														/*
-														 * recalculating indexes
-														 */
-														
-														Table monsterTable = searchTable("monsterTable");
-														Table monsterName = searchTable("monsterTableName");
-														
-														//used for finding the monster in the table
-														int monsterIndexTable = -1;
-														//finding the monster in the array
-														int monsterIndex = -1;
-														
-														//searching the right monster				
-															for(int x = 0; x != monsterTable.getChildren().size; x++)
-															{
-																if(Integer.parseInt(monsterTable.getChildren().get(x).getName()) == idMonster)
-																{
-																	monsterIndexTable = x;
-																}
-															}
-															
-															//getting the index in the table of the monster and the index in the array
-															
-															for(int y = 0; y != enemySquad.size(); y++)
-															{
-																if(enemySquad.get(y).monsterId == idMonster)
-																	monsterIndex = y;
-															}
-															
-															//checking if the monster is not already dead
-														if(monsterIndexTable != -1 || monsterIndex != 1 )
-														{
-															switch(callbackType)
-															{
-																//animation finishes
-																case TweenCallback.COMPLETE:
-																	//removing the killed monster
-																	monsterTable.getChildren().removeIndex(monsterIndexTable);
-																	monsterName.getChildren().removeIndex(monsterIndex);
-																			
-																	//used for the update
-																 int index = getTableIndex("monsterTableName");
-																		
-																	//updating the table
-																	stage.getActors().removeIndex(index);								
-																	stage.getActors().removeIndex(index);
-																			
-																	stage.getActors().insert(index, monsterTable);
-																	stage.getActors().insert(index, monsterName);
-																		
-																	//deleting the killed monster from the array
-																	enemySquad.remove(monsterIndex);		
-																			
-																	//win
-																	if(enemySquad.size() == 0)
-																	{
-																		win();
-																	}								
-																	break;											
-															}
-														}
-														
-													}							
-												}).start(tweenManager);
-																																							
+							//searching the right monster				
+							for(int x = 0; x != monsterTable.getChildren().size; x++)
+							{
+								if(Integer.parseInt(monsterTable.getChildren().get(x).getName()) == playerSquad.get(i).getTarget())
+								{
+									monsterIndexTable = x;
+								}
+							}																			
+							//getting the index in the table of the monster and the index in the array
+
+							for(int y = 0; y != enemySquad.size(); y++)
+							{
+								if(enemySquad.get(y).monsterId == playerSquad.get(i).getTarget())
+									monsterIndex = y;
+							}
+
+
+							//if the dealt damages has been shown
+							if(enemySquad.get(monsterIndex).getDamage() != 0)
+							{
+								/*
+								 * Animating the damage
+								 */
+								Label labelDamage = new Label(""+enemySquad.get(monsterIndex).getDamage(), labelstyle);
+								labelDamage.setFontScale(scale * 2);
+								labelDamage.setColor(Color.RED);
+
+								//setting the value before animation
+								Image monsterimage = (Image) monsterTable.getChildren().get(monsterIndexTable);		
+								labelDamage.setPosition(monsterimage.getX() + (monsterimage.getWidth() / 2), monsterimage.getY() + monsterimage.getHeight());
+
+								stage.addActor(labelDamage);
+
+								/*
+								 * Animations work like that: value SET to value TO in x seconds
+								 */
+
+								Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).start(tweenManager);
+								Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).start(tweenManager);
+
+								Tween.to(labelDamage, LabelAccessor.Y, 2f).target(monsterimage.getY() + monsterimage.getHeight() + 100).start(tweenManager);
+								Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
+
+								//dealing damage and setting back to default the damage taken
+								enemySquad.get(monsterIndex).actualHp -= enemySquad.get(monsterIndex).getDamage();
+								enemySquad.get(monsterIndex).damage = 0;
+
+								//the monster is dead
+								if(enemySquad.get(monsterIndex).actualHp <= 0)
+								{																										
+									expgained += enemySquad.get(monsterIndex).actualExp; 																																								
+
+									/*
+									 * fading out the monster that has been kill
+									 */
+
+									Tween.set((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA).target(1).start(tweenManager);
+
+									Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBackTween(enemySquad.get(monsterIndex).monsterId){										
+										@Override
+										public void onEvent(int callbackType, BaseTween<?> callback) {	
+
+											/*
+											 * recalculating indexes
+											 */
+
+											Table monsterTable = searchTable("monsterTable");
+											Table monsterName = searchTable("monsterTableName");
+
+											//used for finding the monster in the table
+											int monsterIndexTable = -1;
+											//finding the monster in the array
+											int monsterIndex = -1;
+
+											//searching the right monster				
+											for(int x = 0; x != monsterTable.getChildren().size; x++)
+											{
+												if(Integer.parseInt(monsterTable.getChildren().get(x).getName()) == idMonster)
+												{
+													monsterIndexTable = x;
+												}
 											}
-											
-											enemySquad.get(monsterIndex).damage = 0;
-										}
-										
-										
+
+											//getting the index in the table of the monster and the index in the array
+
+											for(int y = 0; y != enemySquad.size(); y++)
+											{
+												if(enemySquad.get(y).monsterId == idMonster)
+													monsterIndex = y;
+											}
+
+											//checking if the monster is not already dead
+											if(monsterIndexTable != -1 || monsterIndex != 1 )
+											{
+												switch(callbackType)
+												{
+												//animation finishes
+												case TweenCallback.COMPLETE:
+													//removing the killed monster
+													monsterTable.getChildren().removeIndex(monsterIndexTable);
+													monsterName.getChildren().removeIndex(monsterIndex);
+
+													//used for the update
+													int index = getTableIndex("monsterTableName");
+
+													//updating the table
+													stage.getActors().removeIndex(index);								
+													stage.getActors().removeIndex(index);
+
+													stage.getActors().insert(index, monsterTable);
+													stage.getActors().insert(index, monsterName);
+
+													//deleting the killed monster from the array
+													enemySquad.remove(monsterIndex);		
+
+													//win
+													if(enemySquad.size() == 0)
+													{
+														win();
+													}								
+													break;											
+												}
+											}
+
+										}							
+									}).start(tweenManager);
+
+								}
+
+								enemySquad.get(monsterIndex).damage = 0;
+							}
+
+
 						}//cap atk
 					}//if using a cap			
-						//healing(potion or cap)
-					
-							//if the player is really getting healed
-							if(playerSquad.get(i).getHealAmount() > 0)
-							{
-								//creating label with the heal amount
-								Label labelHealth = new Label(""+playerSquad.get(i).getHealAmount(), labelstyle);
-								labelHealth.setFontScale(scale * 2);
-								labelHealth.setColor(Color.GREEN);
-								
-								//healing the player and set back to default the heal amount
-								playerSquad.get(i).setLife(playerSquad.get(i).healAmount);
-								playerSquad.get(i).healAmount = 0;
-								
-								/*
-								 * getting the coordinate of the player's label healed
-								 */
-								
-								Table tableName = searchTable("tableName");
-								
-								Label labelName = (Label) tableName.getChildren().get(i);
-								
-								labelHealth.setPosition(labelName.getX(), labelName.getY() + 150);
-								
-								Tween.set(labelHealth, LabelAccessor.Y).target(labelHealth.getY()).start(tweenManager);
-								Tween.set(labelHealth, LabelAccessor.ALPHA).target(1).start(tweenManager);
-								
-								Tween.to(labelHealth, LabelAccessor.Y, 2f).target(labelHealth.getY() + 100).start(tweenManager);
-								Tween.to(labelHealth, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
-								
-								stage.addActor(labelHealth);
-							}
-														
-							//setting the fight setting back to default
-							playerSquad.get(i).setCapacitySelected(-1);	
-							playerSquad.get(i).setTarget(-1);
-						
-					}//and if player not dead				
-				}
-				
-				/*
-				 * monster turn to show damage
-				 */
-				
-				for(int i = 0; i < playerSquad.size(); i++)
-				{
-					//if the player is not dead and have received damages
-					if(!playerSquad.get(i).isDead() && playerSquad.get(i).getDamageTaken() > 0)
-					{						
-						//getting the damage dealt to the player
-						int damageToPlayer = playerSquad.get(i).getDamageTaken();
-						
-						//dealing damage and setting them back to 0
-						playerSquad.get(i).Damage(damageToPlayer);
-						playerSquad.get(i).damageTaken = 0;
-						
-						
-						Label labelDamage = new Label(""+damageToPlayer, labelstyle);
-						labelDamage.setFontScale(scale * 2);
-						labelDamage.setColor(Color.RED);
-						
-						/*
-						 * animating the damage
-						 */
-						
-						Table tableName = searchTable("tableName");
-						
-						Label labelName = (Label) tableName.getChildren().get(i);
-						
-						labelDamage.setPosition(labelName.getX(), labelName.getY() + 150);
-						
-						Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(1).start(tweenManager);
-						Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(2).start(tweenManager);
-						
-						Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(2).start(tweenManager);
-						Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(3).start(tweenManager);
-						
-						stage.addActor(labelDamage);
-						
-						//controlling if the player is not already dead						
-							if(playerSquad.get(i).getLife() <= 0)
-							{												
-								playerSquad.get(i).setDead(true);
-								playerAlive--;
-								
-								if(playerAlive == 0)
-								{
-									gameOver();
-									loose = true;
-								}							
-							}								
-					}
-								
-				}
-				
-				/*
-				 * Updating the label that show the life
-				 */
-				
-				Table tableLife = searchTable("tableLife");
+					//healing(potion or cap)
 
-				//update table
-				/*
-				 * getting the label, updating and setting back to the array
-				 */
-				for(int p = 0; p < playerSquad.size(); p++)
-				{
-					Label labelLife = (Label) tableLife.getChildren().get(p);
-					labelLife.setText(""+playerSquad.get(p).getLife());
-				 
-					tableLife.getChildren().items[p] = labelLife;
-				}							
-				
-				//update stage
-				stage.getActors().removeIndex(getTableIndex("tableLife"));
-				stage.addActor(tableLife);							
-							
+					//if the player is really getting healed
+					if(playerSquad.get(i).getHealAmount() > 0)
+					{
+						//creating label with the heal amount
+						Label labelHealth = new Label(""+playerSquad.get(i).getHealAmount(), labelstyle);
+						labelHealth.setFontScale(scale * 2);
+						labelHealth.setColor(Color.GREEN);
+
+						//healing the player and set back to default the heal amount
+						playerSquad.get(i).setLife(playerSquad.get(i).healAmount);
+						playerSquad.get(i).healAmount = 0;
+
+						/*
+						 * getting the coordinate of the player's label healed
+						 */
+
+						Table tableName = searchTable("tableName");
+
+						Label labelName = (Label) tableName.getChildren().get(i);
+
+						labelHealth.setPosition(labelName.getX(), labelName.getY() + 150);
+
+						Tween.set(labelHealth, LabelAccessor.Y).target(labelHealth.getY()).start(tweenManager);
+						Tween.set(labelHealth, LabelAccessor.ALPHA).target(1).start(tweenManager);
+
+						Tween.to(labelHealth, LabelAccessor.Y, 2f).target(labelHealth.getY() + 100).start(tweenManager);
+						Tween.to(labelHealth, LabelAccessor.ALPHA, 2).target(0).delay(1).start(tweenManager);
+
+						stage.addActor(labelHealth);
+					}
+
+					//setting the fight setting back to default
+					playerSquad.get(i).setCapacitySelected(-1);	
+					playerSquad.get(i).setTarget(-1);
+
+				}//and if player not dead				
+			}
+
+			/*
+			 * monster turn to show damage
+			 */
+
+			for(int i = 0; i < playerSquad.size(); i++)
+			{
+				//if the player is not dead and have received damages
+				if(!playerSquad.get(i).isDead() && playerSquad.get(i).getDamageTaken() > 0)
+				{						
+					//getting the damage dealt to the player
+					int damageToPlayer = playerSquad.get(i).getDamageTaken();
+
+					//dealing damage and setting them back to 0
+					playerSquad.get(i).Damage(damageToPlayer);
+					playerSquad.get(i).damageTaken = 0;
+
+
+					Label labelDamage = new Label(""+damageToPlayer, labelstyle);
+					labelDamage.setFontScale(scale * 2);
+					labelDamage.setColor(Color.RED);
+
+					/*
+					 * animating the damage
+					 */
+
+					Table tableName = searchTable("tableName");
+
+					Label labelName = (Label) tableName.getChildren().get(i);
+
+					labelDamage.setPosition(labelName.getX(), labelName.getY() + 150);
+
+					Tween.set(labelDamage, LabelAccessor.Y).target(labelDamage.getY()).delay(1).start(tweenManager);
+					Tween.set(labelDamage, LabelAccessor.ALPHA).target(1).delay(2).start(tweenManager);
+
+					Tween.to(labelDamage, LabelAccessor.Y, 2f).target(labelDamage.getY() + 100).delay(2).start(tweenManager);
+					Tween.to(labelDamage, LabelAccessor.ALPHA, 2).target(0).delay(3).start(tweenManager);
+
+					stage.addActor(labelDamage);
+
+					//controlling if the player is not already dead						
+					if(playerSquad.get(i).getLife() <= 0)
+					{												
+						playerSquad.get(i).setDead(true);
+						playerAlive--;
+
+						if(playerAlive == 0)
+						{
+							gameOver();
+							lose = true;
+						}							
+					}								
+				}
+
+			}
+
+			/*
+			 * Updating the label that show the life
+			 */
+
+			Table tableLife = searchTable("tableLife");
+
+			//update table
+			/*
+			 * getting the label, updating and setting back to the array
+			 */
+			for(int p = 0; p < playerSquad.size(); p++)
+			{
+				Label labelLife = (Label) tableLife.getChildren().get(p);
+				labelLife.setText(""+playerSquad.get(p).getLife());
+
+				tableLife.getChildren().items[p] = labelLife;
+			}							
+
+			//update stage
+			stage.getActors().removeIndex(getTableIndex("tableLife"));
+			stage.addActor(tableLife);							
+
 			turn = -1;			
 		}
-			//next turn
-			turn++;
-			
-			Label labelTurn = (Label) tableTurn.getChildren().get(0);
-			
-			//if the character that should have atk is dead then look for another alive character
-			if(playerSquad.get(turn).isDead())
+		//next turn
+		turn++;
+
+		Label labelTurn = (Label) tableTurn.getChildren().get(0);
+
+		//if the character that should have atk is dead then look for another alive character
+		if(playerSquad.get(turn).isDead())
+		{
+			for(int y = 0; y < playerSquad.size(); y++)
 			{
-				for(int y = 0; y < playerSquad.size(); y++)
-				{
-					if(!playerSquad.get(y).isDead())
-					{					
-						labelTurn.setText(playerSquad.get(y).Name+"'s turn");					
-						break;
-					}
-				}	
-			}
-			else
-				labelTurn.setText(playerSquad.get(turn).Name+"'s turn");	
-				
-			//updating the table without the function addActor(object,index) the delete/insert is needed
-		
-			
-				tableTurn.getChildren().removeIndex(0);
-				tableTurn.getChildren().insert(0, labelTurn);				
-			
-			
+				if(!playerSquad.get(y).isDead())
+				{					
+					labelTurn.setText(playerSquad.get(y).Name+"'s turn");					
+					break;
+				}
+			}	
 		}
+		else
+			labelTurn.setText(playerSquad.get(turn).Name+"'s turn");	
+
+		//updating the table without the function addActor(object,index) the delete/insert is needed		
+		tableTurn.getChildren().removeIndex(0);
+		tableTurn.getChildren().insert(0, labelTurn);				
+
 	}
 	
 	private void fleeFail()
 	{
-		
+		trueFight();
 	}
 	
 	private void gameOver() {
 		
-		//Sound gameOver = Gdx.audio.newSound()
+	    gameOver = Gdx.audio.newSound(Gdx.files.internal("lose.mp3"));
+		gameOver.play();
 		WindowStyle style = new WindowStyle();
 		
 		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/blue_panel.9.png"))));
@@ -1355,8 +1356,7 @@ public class PartyHard_Fight implements Screen {
 		 */
 		LabelStyle labelstyle = new LabelStyle();
 		
-		labelstyle.font = new BitmapFont();
-		labelstyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		labelstyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
        
 		win.text("Game Over!", labelstyle);
 		
@@ -1457,7 +1457,7 @@ public class PartyHard_Fight implements Screen {
 		
 		win = true;
 		
-		Sound soundWin = Gdx.audio.newSound(Gdx.files.internal("sound/win.mp3"));
+	    soundWin = Gdx.audio.newSound(Gdx.files.internal("sound/win.mp3"));
 		soundWin.play();
 		/*
 		 * Prepares the dialog with the vars
@@ -1517,10 +1517,7 @@ public class PartyHard_Fight implements Screen {
 	
 	private void save() {
 	
-		playerSquad.get(0).prepareForSave();
-		
-		System.out.println(playerSquad.size());
-		
+		playerSquad.get(0).prepareForSave();				
 				
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
@@ -1573,6 +1570,8 @@ public class PartyHard_Fight implements Screen {
 		stage.dispose();
 		skin.dispose();
 		backgroundMusic.dispose();
+		gameOver.dispose();
+		soundWin.dispose();
 		game.dispose();		
 	}	
 }

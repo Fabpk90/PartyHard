@@ -1,7 +1,5 @@
 package com.partyhard.game;
 
-import utils.ObjectDatabase;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;

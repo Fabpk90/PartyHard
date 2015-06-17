@@ -1,11 +1,10 @@
 package com.partyhard.actor;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import utils.FileManager;
 import utils.PartyHard_Capacity;
 import utils.PartyHard_Level;
 
@@ -13,8 +12,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import com.badlogic.gdx.utils.XmlWriter;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.partyhard.object.PartyHard_Armor;
 import com.partyhard.object.PartyHard_Object;
 import com.partyhard.object.PartyHard_Potion;
@@ -61,6 +60,8 @@ public class PartyHard_Player_Fight{
 	
 	private int idSave;
 	
+	private FileManager fileManager = new FileManager();
+	
 	public PartyHard_Player_Fight(int idplayer, int idSave) 
 	{
 		this.idSave = idSave;
@@ -70,9 +71,10 @@ public class PartyHard_Player_Fight{
 		
 		try
 		{
-			//FileManager fileManager = new FileManager("player_Fight.xml");
+			fileManager.loadFile("save/"+idSave+"Fight.xml");
 			
-			root = xml.parse(Gdx.files.local("save/"+idSave+"Fight.xml"));
+			root = xml.parse(fileManager.getFile());
+			
 			Array<Element> arrayOfPlayer =	root.getChildrenByName("player_Fight");	
 			for(int i = 0; i < arrayOfPlayer.size; i++)
 			{
@@ -568,8 +570,8 @@ public class PartyHard_Player_Fight{
 			 * Saving the player 
 			 */		
 			
-		//FileManager file = new FileManager("player_Fight.xml");
-			FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+			fileManager.loadFile("save/"+idSave+"Fight.xml");
+			FileHandle file = fileManager.getDecodedFile();
 				
 			 StringWriter stringwriter = new StringWriter();
 			 XmlWriter xml = new XmlWriter(stringwriter);	
@@ -619,36 +621,42 @@ public class PartyHard_Player_Fight{
 					//closing cap and then the player
 					xml.pop();
 					xml.pop();
-					             								                   
+					         
+					xml.close();
 			
 				   file.writeString(stringwriter.toString(), true);
+				   
+				   fileManager.saveFile(true, file);
 	}
 		catch(IOException e)
 		{
 			e.printStackTrace();
-			System.out.println("erroror");
 		}
 	
 	}
 	
 	public void prepareForSave()
-	{					 
-		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+	{					
+		fileManager.loadFile("save/"+idSave+"Fight.xml");
+		
+		FileHandle file = fileManager.getDecodedFile();
 
 		file.delete();
 		
-			
-		//file = Gdx.files.local("save/"+idSave+"Fight.xml");
 		file.writeString("<root>", true);
-	 
 		
+		fileManager.saveFile(true, file);
 	}
 	
 	public void finishFile()
 	{
-		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		fileManager.loadFile("save/"+idSave+"Fight.xml");
 		 
+		FileHandle file = fileManager.getDecodedFile();
+		
 		 file.writeString("</root>", true);
+		 
+		 fileManager.saveFile(true, file);
 	}
 	
 }

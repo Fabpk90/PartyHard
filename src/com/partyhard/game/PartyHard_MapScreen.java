@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import utils.FileManager;
 import utils.ObjectDatabase;
 import utils.PartyHard_Shop;
 
@@ -60,7 +61,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	public PartyHard_GameClass mainGame;
 	private SpriteBatch spriteBatch;  
-	private ObjectDatabase Database = new ObjectDatabase();
 	
 	private Stage stage;	
 	
@@ -98,8 +98,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private boolean blockedx = false;
 	
-	private float scale = 2f;
-	
 	private ListStyle listStyle = new ListStyle();
 	private TextButtonStyle buttonStyle = new TextButtonStyle();
 	private LabelStyle labelStyle = new LabelStyle();
@@ -127,7 +125,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int playerSelectedForObject = -1;
 	
 	private boolean enterEquip = false;
-	private boolean enterBuy = false;
 	
 	//used for knowing which item has been selected for buy
 	private int itemShopSelected = -1;
@@ -138,6 +135,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int idSave;
 	private Boolean isBoss;
 	
+	private FileManager fileManager = new FileManager();
 	
 	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
 	{	
@@ -176,7 +174,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         spriteBatch.begin();      
         
        if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT) )
-        playerMap.update(delta + 1);
+        playerMap.update(delta + 2);
        else
     	   playerMap.update(delta);
         
@@ -257,7 +255,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         	 //for desktop
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
-        	scale = 4f;
         	  if(!playerMap.isMoving() && !playerMap.isShopping)
           {	    
 		    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -582,6 +579,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			 labelName.setText(Name + " (Safe)");
 		 else
 			 labelName.setText(Name);	
+		 
+		 if(isBoss)
+			 labelName.setColor(Color.CYAN);
 		 				 
 		 //updating the table where the label is
 		 Table name = searchTable("name");
@@ -661,6 +661,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		buttonStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		
+		//saving if is not the boss map
+		if(!isBoss)
+			save();
+		
 	}
 
 	@Override
@@ -674,7 +678,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	private void loadSquad() {
 		XmlReader xml = new XmlReader();
-		FileHandle file = Gdx.files.local("save/"+idSave+"Fight.xml");
+		
+		fileManager.loadFile("save/"+idSave+"Fight.xml");
+		
+		FileHandle file = fileManager.getDecodedFile();
+		
 		
 		playerSquad = new ArrayList<PartyHard_Player_Fight>();
 		
@@ -688,7 +696,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 				playerSquad.add(new PartyHard_Player_Fight(i, idSave));
 			}
 			
-			
+			fileManager.saveFile(true, file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

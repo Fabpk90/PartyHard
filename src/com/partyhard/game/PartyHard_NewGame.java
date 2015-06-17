@@ -143,20 +143,17 @@ public class PartyHard_NewGame implements Screen {
 	numPlayer.setPosition(welcome.getX() , welcome.getY() - 100);
 	
 	/*
-	 * TO DO create the player (asking the name) TextBox center screen, maybe do an introduction
+	 * TO DO: maybe do an introduction
 	 */
-	
-	
 	
 	TextField newName = new TextField("", textStyle);
 	newName.setPosition(stage.getWidth() / 2 - newName.getWidth() / 2, stage.getHeight() / 2);
 	
 	
 	newName.setMessageText("Enter a Name");
-	newName.setBlinkTime(0.15f);
+	newName.setBlinkTime(0.40f);
 	
-	newName.setMaxLength(10);
-	newName.setBlinkTime(1f);
+	newName.setMaxLength(5);
 	
 	Label lblName = new Label("Name:", labelStyle);
 	lblName.setPosition(newName.getX() - lblName.getWidth(), newName.getY());	
@@ -517,9 +514,7 @@ public class PartyHard_NewGame implements Screen {
 	
 	private int getNextSaveId()
 	{
-		FileHandle save = Gdx.files.internal("save/");
-		
-		System.out.println("asdasd"+save.list().length/2);
+		FileHandle save = Gdx.files.internal("save/");		
 		
 		return save.list().length/2;
 	}

@@ -3,8 +3,6 @@ package utils;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.TweenCallback;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-
 
 public class SimpleCallBack implements TweenCallback {
 

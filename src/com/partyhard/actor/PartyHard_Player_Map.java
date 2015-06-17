@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import utils.FileManager;
 import utils.PartyHard_Boss;
 import utils.PartyHard_Shop;
 import utils.PartyHard_Tp;
@@ -85,6 +86,8 @@ public class PartyHard_Player_Map {
 	
 	private int idSave;
 	
+	private FileManager fileManager = new FileManager();
+	
 	/**
 	 * 
 	 * @param x
@@ -132,9 +135,10 @@ public class PartyHard_Player_Map {
 		
 		try
 		{
-			//FileManager fileManager = new FileManager("player_Fight.xml");
+			//deconding the file before reading it
+			fileManager.loadFile("save/"+idSave+"Map.xml");
 			
-			root = xml.parse(Gdx.files.internal("save/"+idSave+"Map.xml"));
+			root = xml.parse(fileManager.getDecodedFile());
 			Element Player = root.getChildByName("player_Map");	
 			
 			float x = Player.getFloatAttribute("x");
@@ -148,6 +152,10 @@ public class PartyHard_Player_Map {
 			this.Map = Player.getAttribute("Map");
 			this.imagePath = Player.getAttribute("imagePath");
 			this.Money = Player.getIntAttribute("Money");
+			
+			//saving back the file, encoding before
+			fileManager.saveFile(true, fileManager.getFile());
+			
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,7 +336,7 @@ XmlReader xml = new XmlReader();
 				
 			if(movingDown)
 			{
-				setY((int)(getY() + (-2 + -delta)));
+				setY((int)(getY() + (-2 -delta)));
 				if(getY() < destination.y)
 				{					
 					stopMovement();
@@ -803,8 +811,8 @@ XmlReader xml = new XmlReader();
 	public void save()
 	{
 		try {
-		//FileManager file = new FileManager("player_Fight.xml");
-		FileHandle file = Gdx.files.local("save/"+idSave+"Map.xml");
+		 fileManager.loadFile("save/"+idSave+"Map.xml");
+		FileHandle file = fileManager.getDecodedFile();
 				
 		 StringWriter stringwriter = new StringWriter();
 		 XmlWriter xml = new XmlWriter(stringwriter);
@@ -819,10 +827,11 @@ XmlReader xml = new XmlReader();
 			.attribute("Money", getMoney()).pop();
 			
 			//make sure that all has been closed
-			xml.close();   
+			xml.close();   			
 			
-					
 			file.writeString(stringwriter.toString(), false);
+			//encoding and saving the file
+			fileManager.saveFile(true, file);	
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
