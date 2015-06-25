@@ -11,6 +11,7 @@ public class ImageAccessor implements TweenAccessor<Image> {
 	public static final int ALPHA = 0;
 	public static final int Y = 1;
 	public static final int X = 2;
+	public static final int ROTATION = 3;
 	
 	public ImageAccessor() {
 		// TODO Auto-generated constructor stub
@@ -29,6 +30,10 @@ public class ImageAccessor implements TweenAccessor<Image> {
 			case X:
 				returnValues[0] = image.getX();
 				return 1;
+			case ROTATION:
+				returnValues[0] = image.getRotation();
+				return 1;
+				
 		}
 		
 		return -1;
@@ -46,6 +51,9 @@ public class ImageAccessor implements TweenAccessor<Image> {
 				break;
 			case X:
 				image.setX(returnValues[0]);
+				break;
+			case ROTATION:
+				image.rotateBy(returnValues[0]);
 				break;
 		}
 		

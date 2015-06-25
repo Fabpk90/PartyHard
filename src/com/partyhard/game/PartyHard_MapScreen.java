@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import utils.CallBackFight;
 import utils.FileManager;
+import utils.ImageAccessor;
 import utils.ObjectDatabase;
 import utils.PartyHard_Shop;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
@@ -36,6 +40,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -80,6 +85,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	 */
 	
 	private float animationTime = 0f;
+	private float animationFightTime = 1.1f;
 	
 	private PartyHard_Player_Map playerMap;
 	
@@ -133,9 +139,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int playerInventory = -1;
 	
 	private int idSave;
-	private Boolean isBoss;
+	private boolean isBoss;
 	
 	private FileManager fileManager = new FileManager();
+	
+	private TweenManager tweenManager = new TweenManager();
 	
 	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
 	{	
@@ -169,6 +177,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         
         stage.act(delta);
        
+        tweenManager.update(delta);
         
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();      
@@ -200,7 +209,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
             		//if pseudo-randomly the fight is happening
             		if(r.nextInt(101) < proba)
             		{
-            			playerMap.stopMovement();
+            			playerMap.stopMovement(true);
+            			playerMap.isFighting = true;
             		        		
             			loadFight();
             		}
@@ -255,7 +265,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         	 //for desktop
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
-        	  if(!playerMap.isMoving() && !playerMap.isShopping)
+        	  if(!playerMap.isMoving() && !playerMap.isShopping && !playerMap.isFighting)
           {	    
 		    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 		    	{
@@ -326,7 +336,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	@Override
 	public void show() {
-		
+		playerMap.isFighting = false;
 	loadSquad();
 		
 	camera = new OrthographicCamera();
@@ -335,10 +345,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	camera.viewportHeight = camera.viewportHeight / 1.2f;
 	camera.viewportWidth = camera.viewportWidth / 1.2f;
 	
-	camera.position.set(playerMap.getX(), playerMap.getY(), 0);
-		
+	camera.position.set(playerMap.getX(), playerMap.getY(), 0);		
 	camera.update();
 	
+	Tween.registerAccessor(Image.class, new ImageAccessor());
 	
 	Table mapNameTable = new Table();
 	stage = new Stage();
@@ -575,7 +585,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 //updating the label
 		 Label labelName = (Label) searchTable("name").getChildren().get(0);
 		 
-		 if(isSafe)
+		 if(isSafe && !isBoss)
 			 labelName.setText(Name + " (Safe)");
 		 else
 			 labelName.setText(Name);	
@@ -629,8 +639,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 mapSound.play();
 		 mapSound.setLooping(true);
 		 
-		//FileManager fileManager = new FileManager("monster.xml");
-		// fileManager.saveFile(false, Gdx.files.internal("monster.xml"));
 		 
 		 /*
 		  * loading the styles
@@ -721,22 +729,36 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 			/*
 			 * TO DO: maybe make the loading dynamic
-			 */								
-			 
-		    fightScreen = new PartyHard_Fight(playerSquad, monster, this, (PartyHard_GameClass) mainGame, prop.get("Battle_Music", String.class));
-			mainGame.setScreen(fightScreen);
-			
-			mapSound.dispose();
-			
+			 */		
+			animFight(monster, prop.get("Battle_Music").toString(), false);
 	}
 	
 	private void loadBossFight()
 	{
-		fightScreen = new PartyHard_Fight(playerSquad,playerMap.Boss, this, (PartyHard_GameClass) mainGame, prop.get("Battle_Music", String.class));
-		mainGame.setScreen(fightScreen);
-			
-		mapSound.dispose();
+		animFight(playerMap.Boss.bossSquad, playerMap.Boss.musicPath, true);
 	}
+	
+	private void animFight(ArrayList<PartyHard_Monster> monsters, String musicPath, boolean isBoss) 
+	{	
+		//making sure that the player will not move during the animation
+		playerMap.isFighting = true;
+		
+		//loading the image for the animation
+		Image animationFight = new Image(new Texture(Gdx.files.internal("animation/transe.png")));
+		animationFight.setWidth(stage.getWidth());
+		animationFight.setHeight(stage.getHeight());
+		animationFight.setOrigin(animationFight.getWidth() / 2, animationFight.getHeight()/ 2);
+		
+		//setting the image completely transparent
+		animationFight.setColor(animationFight.getColor().g, animationFight.getColor().g, animationFight.getColor().b, 0);
+		
+		Tween.set(animationFight, ImageAccessor.ALPHA).target(0).start(tweenManager);
+		
+		Tween.to(animationFight, ImageAccessor.ALPHA, animationFightTime).target(1).start(tweenManager).setCallback(new CallBackFight(playerSquad, monsters, this, mainGame, musicPath, mapSound, isBoss));
+		
+		stage.addActor(animationFight);
+	}
+
 
 	private void loadShop(final int id)
 	{	
@@ -749,7 +771,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		//for disabling movements
 		playerMap.isShopping = true;
-		playerMap.stopMovement();
+		playerMap.stopMovement(false);
 		
 		Table tableShop = new Table();
 		tableShop.setName("tableShop");
@@ -978,28 +1000,28 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	
 	public void moveRight()
 	{	
-        		playerMap.stopMovement();
+        		playerMap.stopMovement(false);
         		direction = 2;
         		playerMap.moveRight();
 	}
 	
 	public void moveLeft()
 	{
-				playerMap.stopMovement();
+				playerMap.stopMovement(false);
 				direction = 1;
 				playerMap.moveLeft();
 	}
 	
 	public void moveTop()
 	{
-			playerMap.stopMovement();
+			playerMap.stopMovement(false);
     		direction = 3;
     		playerMap.moveTop();
 	}
 	
 	public void moveDown()
 	{
-			playerMap.stopMovement();
+			playerMap.stopMovement(false);
     		direction = 0;
     		playerMap.moveDown();
 	}

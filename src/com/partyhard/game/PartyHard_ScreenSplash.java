@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -91,10 +92,12 @@ public class PartyHard_ScreenSplash implements Screen{
 		final NinePatchDrawable drawable = new NinePatchDrawable(patch);
 		 
 		listStyle.selection = drawable;
-		listStyle.font = new BitmapFont();
+		listStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		//listStyle.font.getData().setScale(0.7f);
 	    listStyle.fontColorSelected = Color.BLACK;
 	    listStyle.fontColorUnselected = Color.WHITE;
 	    listStyle.background = drawable;
+	 
 	    
 	    
 	    buttonStyle.up = skin.getDrawable("button.up");
@@ -102,7 +105,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		
 		buttonStyle.pressedOffsetX = 1;
 		buttonStyle.pressedOffsetY = -1;
-		BitmapFont font = new BitmapFont();
+		BitmapFont font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		
 		buttonStyle.font = font;
 		
@@ -119,11 +122,28 @@ public class PartyHard_ScreenSplash implements Screen{
 		
 	backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/map_sound_relax.mp3"));
 	backgroundMusic.play();
+	backgroundMusic.setLooping(true);
+	
 	camera = new OrthographicCamera();
 	camera.setToOrtho(false, Gdx.graphics.getWidth() , Gdx.graphics.getHeight());
 	
+	Random r = new Random();
 	
-	tiledmap = new TmxMapLoader().load("mainlevel.tmx");
+	//choosing randomly the map to load
+	switch(r.nextInt(3))
+	{
+		case 0:
+			tiledmap = new TmxMapLoader().load("mainlevel.tmx");
+			break;
+		case 1:
+			tiledmap = new TmxMapLoader().load("test1.tmx");
+			break;
+		case 2:
+			tiledmap = new TmxMapLoader().load("dungeonlv2.tmx");
+			break;
+	}
+	
+	
 	//setting the camera on the middle of the screen
 	
 	maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
@@ -242,6 +262,7 @@ public class PartyHard_ScreenSplash implements Screen{
 						 });
 						 
 						 ScrollPaneStyle style = new ScrollPaneStyle();
+						 style.vScrollKnob = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/cursor.9.png")))));
 						 ScrollPane scroll = new ScrollPane(listSave, style);
 						 scroll.setForceScroll(false, true);
 						 											 
@@ -266,12 +287,11 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	/*
 	 * creating the title animation
-	 */
-		
-
+	 */	
 	
 	Label labelTitle = new Label("Party Hard!",labelStyle);
 	labelTitle.setFontScale(4, 2);
+	labelTitle.getStyle().font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 	
 	labelTitle.setPosition(Gdx.graphics.getWidth() / 2 - (labelTitle.getWidth() * labelTitle.getFontScaleX()) / 2, (float) ((Gdx.graphics.getHeight() - (labelTitle.getHeight() * labelTitle.getFontScaleY())) ) );
 	/*

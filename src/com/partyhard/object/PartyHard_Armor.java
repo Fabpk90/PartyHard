@@ -23,7 +23,6 @@ public class PartyHard_Armor extends PartyHard_Object implements PartyHard_Weare
 	public PartyHard_Armor(int id) {
 		//giving 1 to super constructor because it's an armor
 super("", "", "", 1, 0);
-
 		
 		this.setId(id);
 			

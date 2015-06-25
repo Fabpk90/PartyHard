@@ -6,7 +6,7 @@ import java.util.Random;
 import utils.ImageAccessor;
 import utils.LabelAccessor;
 import utils.MonsterCallBackTween;
-import utils.PartyHard_Boss;
+import utils.PartyHard_ExitDialog;
 import utils.SpriteAccessor;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -14,6 +14,9 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -51,7 +54,7 @@ import com.partyhard.actor.PartyHard_Player_Fight;
 import com.partyhard.object.PartyHard_Consumable;
 import com.partyhard.object.PartyHard_Potion;
 
-public class PartyHard_Fight implements Screen {
+public class PartyHard_Fight implements Screen, InputProcessor {
 	
 	private PartyHard_MapScreen mapscreen;
 	
@@ -73,7 +76,7 @@ public class PartyHard_Fight implements Screen {
 	private ArrayList<PartyHard_Player_Fight> playerSquad;
 	private ArrayList<PartyHard_Monster> enemySquad;
 	
-	private PartyHard_Boss Boss;
+	//private PartyHard_Boss Boss;
 	
 	private int turn = 0;
 	
@@ -101,10 +104,12 @@ public class PartyHard_Fight implements Screen {
 	
 	private String musicPath;
 
+	private boolean isBoss = false;
+
 	
-	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, ArrayList<PartyHard_Monster> enemySquad, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath)
+	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, ArrayList<PartyHard_Monster> enemySquad, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath, boolean isBoss)
 	{
-	
+				
 		this.playerSquad = playerSquad;
 		this.enemySquad = enemySquad;
 		
@@ -119,29 +124,16 @@ public class PartyHard_Fight implements Screen {
 		}
 		
 		musicPath = backgroundMusicPath;
-		
-	}
-	
-	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, PartyHard_Boss boss, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath)
-	{
-	
-		this.playerSquad = playerSquad;
-		this.enemySquad = boss.bossSquad;
-		
-		mapscreen = mainScreen;
-		
-		this.game = game;
-	
-		for(int i = 0; i < playerSquad.size(); i++)
-		{
-			if(!playerSquad.get(i).isDead())
-					playerAlive++;
-		}
-		
-		musicPath = backgroundMusicPath;
-		Boss = boss;
-	}
+		this.isBoss  = isBoss;
 
+		//loading the bg music
+		
+		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/"+musicPath+".mp3"));
+		
+		 backgroundMusic.play();
+	     backgroundMusic.setLooping(true);
+		
+	}	
 
 	@Override
 	public void show() {		
@@ -204,23 +196,6 @@ public class PartyHard_Fight implements Screen {
     	listStyle.fontColorUnselected = Color.WHITE;
     	listStyle.background = drawable;
     	
-    	/*
-    	 * checking the music to play
-    	 */
-    	
-		
-		//searching if it's a boss fight
-			for(int i = 0; i < enemySquad.size(); i++)
-			{
-				if(enemySquad.get(i).isBoss())
-				{
-					backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/"+Boss.musicPath+".mp3"));
-					break;
-				}					 				
-			}
-		
-			if(backgroundMusic == null)
-				backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sound/"+musicPath+".mp3"));
 			
 		/*
 		 * list of actions
@@ -236,15 +211,16 @@ public class PartyHard_Fight implements Screen {
             @Override 
             public void clicked(InputEvent event, float x, float y)
             {
-	            if(Boss == null)
+	            if(!isBoss)
 	            {
 		            Random r = new Random();
 		              
 		              if(r.nextInt(101) > 10)
 		              {      
 		            	  save();
-		            	  game.setScreen(mapscreen);
 		            	  backToMap();
+		            	  game.setScreen(mapscreen);
+		            	  
 		              }
 		              else//flee failed, player gonna be attacked by monsters
 		              {
@@ -853,10 +829,11 @@ public class PartyHard_Fight implements Screen {
        stage.addActor(tableLabelName);
        stage.addActor(tableCap);
        
-        Gdx.input.setInputProcessor(stage);		
-        
-        backgroundMusic.play();
-        backgroundMusic.setLooping(true);
+       InputMultiplexer inputMultiplexer = new InputMultiplexer();
+	   inputMultiplexer.addProcessor(stage);
+	   inputMultiplexer.addProcessor(this);		 
+		
+		Gdx.input.setInputProcessor(inputMultiplexer);	     
         
         /*
          * Fade in
@@ -1320,7 +1297,7 @@ public class PartyHard_Fight implements Screen {
 	
 	private void gameOver() {
 		
-	    gameOver = Gdx.audio.newSound(Gdx.files.internal("lose.mp3"));
+	    gameOver = Gdx.audio.newSound(Gdx.files.internal("sound/lose.mp3"));
 		gameOver.play();
 		WindowStyle style = new WindowStyle();
 		
@@ -1339,10 +1316,10 @@ public class PartyHard_Fight implements Screen {
             @Override 
             public void clicked(InputEvent event, float x, float y){           	
             	
-            	PartyHard_ScreenSplash screen = new PartyHard_ScreenSplash(game);
+            	PartyHard_EndScreen screen = new PartyHard_EndScreen(game);
             	game.setScreen(screen);
             	
-            	dispose();          	
+            	backgroundMusic.dispose();          	
             }
         });
 		win.button(btnWin);
@@ -1481,7 +1458,7 @@ public class PartyHard_Fight implements Screen {
             	save();
             	
             	//finished the game
-            	if(Boss != null)
+            	if(!isBoss)
             	{
             		PartyHard_EndScreen screen = new PartyHard_EndScreen(game);
             		game.setScreen(screen);
@@ -1570,8 +1547,66 @@ public class PartyHard_Fight implements Screen {
 		stage.dispose();
 		skin.dispose();
 		backgroundMusic.dispose();
-		gameOver.dispose();
-		soundWin.dispose();
-		game.dispose();		
+		if(gameOver != null)gameOver.dispose();
+		if(soundWin != null)soundWin.dispose();
+		mapscreen.dispose();	
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+			switch(keycode)
+			{
+				case Input.Keys.ESCAPE:
+					if(!isBoss)
+					{
+					   PartyHard_ExitDialog dialog = new PartyHard_ExitDialog(this, game);
+					   dialog.dialog.show(stage);
+					}
+					
+					break;
+			}
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}	
 }

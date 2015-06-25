@@ -2,6 +2,7 @@ package com.partyhard.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -22,15 +23,17 @@ public class PartyHard_GameClass extends Game {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		/*
-		 * loading the fancy blue cursor
+		 * loading the fancy blue cursor only if the client is on android
 		 */
-		Pixmap pm = new Pixmap(Gdx.files.internal("ui/cursorHand.png"));
-		Gdx.input.setCursorImage(pm, 0, 0);
-		pm.dispose();
-		
+		if(Gdx.app.getType() == ApplicationType.Desktop)
+		{
+			Pixmap pm = new Pixmap(Gdx.files.internal("ui/cursorHand.png"));
+			Gdx.input.setCursorImage(pm, 0, 0);
+			pm.dispose();
+		}
+			
 		PartyHard_ScreenSplash screensplash = new PartyHard_ScreenSplash(this);
-		this.setScreen(screensplash);
-		
+		this.setScreen(screensplash);	
 		
 	}
 

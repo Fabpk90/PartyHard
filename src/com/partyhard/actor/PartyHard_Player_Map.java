@@ -81,6 +81,7 @@ public class PartyHard_Player_Map {
 	private boolean moving = false;
 	
 	public boolean isShopping = false;
+	public boolean isFighting = false;
 	
 	private int Money = 0;
 	
@@ -217,7 +218,7 @@ XmlReader xml = new XmlReader();
 	public void moveRight()
 	{	
 			//stopping all previous movement before the new one
-			stopMovement();
+		stopMovement(false);
 			moving = true;
 			movingRight = true;	
 			destination.x += 32;		
@@ -225,7 +226,7 @@ XmlReader xml = new XmlReader();
 	
 	public void moveLeft()
 	{
-		stopMovement();
+		stopMovement(false);
 		moving = true;
 		movingLeft = true;
 		//setting the position of the destination
@@ -234,7 +235,7 @@ XmlReader xml = new XmlReader();
 	
 	public void moveDown()
 	{
-		stopMovement();
+		stopMovement(false);
 		moving = true;
 		movingDown = true;
 		//setting the position of the destination
@@ -243,7 +244,7 @@ XmlReader xml = new XmlReader();
 	
 	public void moveTop()
 	{
-		stopMovement();
+		stopMovement(false);
 		moving = true;
 		movingTop = true;
 		//setting the position of the destination
@@ -275,14 +276,14 @@ XmlReader xml = new XmlReader();
 		if(isCellTp(x, y))
 		{
 			isTp = true;
-			stopMovement();
+			stopMovement(false);
 		}
 		
 		collisionX = collidesX();
 		
 		if(collisionX) 
 		{
-			stopMovement();
+			stopMovement(false);
 			destination.x = getX();
 			destination.y = getY();
 			
@@ -294,7 +295,7 @@ XmlReader xml = new XmlReader();
 				setX((int)(getX() + (2+delta)));
 				if(getX() > destination.x)
 				{
-					stopMovement();
+					stopMovement(false);
 					setX(destination.x);
 				}					
 			}
@@ -304,7 +305,7 @@ XmlReader xml = new XmlReader();
 				setX((int)(getX() + (-2 + -delta)));
 				if(getX() < destination.x)
 				{					
-					stopMovement();
+					stopMovement(false);
 					setX(destination.x);
 				}
 			}	
@@ -317,7 +318,7 @@ XmlReader xml = new XmlReader();
 		// react to y collision
 		if(collisionY) 
 		{
-			stopMovement();
+			stopMovement(false);
 			destination.x = getX();
 			destination.y = getY();			
 		}
@@ -328,7 +329,7 @@ XmlReader xml = new XmlReader();
 				setY((int)(getY() + (2+delta)));
 				if(getY() > destination.y)
 				{
-					stopMovement();
+					stopMovement(false);;
 					setY(destination.y);
 				}			
 				
@@ -339,7 +340,7 @@ XmlReader xml = new XmlReader();
 				setY((int)(getY() + (-2 -delta)));
 				if(getY() < destination.y)
 				{					
-					stopMovement();
+					stopMovement(false);
 					setY(destination.y);
 				}
 			}	
@@ -382,8 +383,13 @@ XmlReader xml = new XmlReader();
 		collisionY = false;
 	}
 
-	public void stopMovement()
+	public void stopMovement(boolean fight)
 	{
+		if(fight)
+		{
+			setX(destination.x);
+			setY(destination.y);
+		}				
 		movingRight = false;
 		movingLeft = false;
 		movingTop = false;
@@ -393,12 +399,11 @@ XmlReader xml = new XmlReader();
 
 	public  void createPlayerAnimation()
 	{
-		Texture walkSheet = new Texture(Gdx.files.internal(getSprite())); 
-		walkSheet.bind();
+	  Texture walkSheet = new Texture(Gdx.files.internal(getSprite())); 
 		
-        TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/4, walkSheet.getHeight()/4);             
+      TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/4, walkSheet.getHeight()/4);             
         
-       TextureRegion[] walkFrames = new TextureRegion[4 * 4];
+      TextureRegion[] walkFrames = new TextureRegion[4 * 4];
       
        setWidth(walkSheet.getWidth() / 4);
        setHeight(walkSheet.getHeight() / 8);
@@ -433,9 +438,7 @@ XmlReader xml = new XmlReader();
             }     
            
             walkFrames = new TextureRegion[4 * 4];
-        }
-              
-            
+        }                      
 	}
 	/**
 	 * @param direction 0 for backward, 1 for left, 2 for right, 3 for toward
@@ -675,9 +678,10 @@ XmlReader xml = new XmlReader();
 			for(int i = 0; i != arrayOfMapTp.size; i++)
 			{		
 				//found the right tps
-				if(arrayOfMapTp.get(i).get("name").equals(Map))
+				if(arrayOfMapTp.get(i).getAttribute("nameMap").equals(Map))
 				{					
-					Array<Element> arrayOfTp =  arrayOfMapTp.get(i).getChildrenByName("tp");	
+					Array<Element> arrayOfTp = arrayOfMapTp.get(i).getChildrenByName("tp");			
+					
 					//getting all the tp
 					for(int p = 0; p< arrayOfTp.size; p++)
 					{									
