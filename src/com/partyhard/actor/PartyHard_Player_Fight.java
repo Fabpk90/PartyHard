@@ -268,6 +268,11 @@ public class PartyHard_Player_Fight{
 		return Atk;
 	}
 	
+	public void addAtk(int amount)
+	{
+		this.Atk += amount;
+	}
+	
 	public void setTarget(int idTarget)
 	{
 		this.targetCapacity = idTarget;
@@ -348,6 +353,12 @@ public class PartyHard_Player_Fight{
 	public int getLife()
 	{
 		return Hp;
+	}
+	
+	public void addLife(int amount)
+	{
+		Hp += amount;
+		HpMax += amount;
 	}
 	
 	public boolean isDead() {

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import utils.ImageAccessor;
 import utils.LabelAccessor;
-import utils.MonsterCallBackTween;
+import utils.MonsterCallBack;
 import utils.PartyHard_ExitDialog;
 import utils.SpriteAccessor;
 import aurelienribon.tweenengine.BaseTween;
@@ -105,8 +105,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	private String musicPath;
 
 	private boolean isBoss = false;
-
-	
+		
 	public PartyHard_Fight(ArrayList<PartyHard_Player_Fight> playerSquad, ArrayList<PartyHard_Monster> enemySquad, PartyHard_MapScreen mainScreen, PartyHard_GameClass game, String backgroundMusicPath, boolean isBoss)
 	{
 				
@@ -136,7 +135,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	}	
 
 	@Override
-	public void show() {		
+	public void show() {			
 		tableLife = new Table();
 		tableLife.setName("tableLife");
 		
@@ -204,7 +203,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		final TextButton buttonFlee = new TextButton("Flee!", buttonStyle);
 		
 		buttonFlee.pad(20);		
-		buttonFlee.setSize(Gdx.graphics.getWidth()/2, 100);		
+		buttonFlee.setSize(stage.getWidth()/2, 100);		
 		buttonFlee.setHeight(100);	
 		
 		buttonFlee.addListener(new ClickListener(){
@@ -242,7 +241,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
       final TextButton buttonFight = new TextButton("Fight", buttonStyle);
       
       	buttonFight.pad(20);		
-		buttonFight.setWidth(Gdx.graphics.getWidth()/2);
+		buttonFight.setWidth(stage.getWidth()/2);
 		buttonFight.setHeight(100);
 		
 		/*
@@ -258,13 +257,13 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	            }
 	        });
 		
-       tableFirst.add(buttonFight).width(Gdx.graphics.getWidth() / 2);
-       tableFirst.add(buttonFlee).width(Gdx.graphics.getWidth() / 2);
+       tableFirst.add(buttonFight).width(stage.getWidth() / 2);
+       tableFirst.add(buttonFlee).width(stage.getWidth() / 2);
       
        
        tableFirst.right().bottom();
        tableFirst.setHeight(100);
-       tableFirst.setWidth(Gdx.graphics.getWidth());
+       tableFirst.setWidth(stage.getWidth());
        
        
        
@@ -272,7 +271,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
        
        final TextButton buttonAtk = new TextButton("Atk!", buttonStyle);
        	buttonAtk.pad(10);		
-       	buttonAtk.setWidth(Gdx.graphics.getWidth()/3);
+       	buttonAtk.setWidth(stage.getWidth()/3);
 		buttonAtk.setHeight(100);		
        	
 		buttonAtk.setPosition(0, 0);		
@@ -617,12 +616,12 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	        });
 
 		
-		tableFight.add(buttonAtk).width(Gdx.graphics.getWidth() / 3);
-		tableFight.add(buttonItem).width(Gdx.graphics.getWidth() / 3);
-	    tableFight.add(buttonBack).width(Gdx.graphics.getWidth() / 3);
+		tableFight.add(buttonAtk).width(stage.getWidth() / 3);
+		tableFight.add(buttonItem).width(stage.getWidth() / 3);
+	    tableFight.add(buttonBack).width(stage.getWidth() / 3);
 		
        tableFight.setVisible(false);
-       tableFight.setSize(Gdx.graphics.getWidth(), 100);
+       tableFight.setSize(stage.getWidth(), 100);
        tableFight.right().bottom();
        tableFight.setPosition(0, 0);
        
@@ -661,11 +660,11 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		}
 		
 		tableLife.setHeight(100);
-		tableLife.setWidth(Gdx.graphics.getWidth());
+		tableLife.setWidth(stage.getWidth());
 		tableLife.setPosition(0, 100);
 		
 		tableLabelName.setHeight(100);
-		tableLabelName.setWidth(Gdx.graphics.getWidth());
+		tableLabelName.setWidth(stage.getWidth());
 		tableLabelName.setPosition(0, 100);
 		
 		tableLabelName.center();
@@ -682,6 +681,8 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		Table monsterTableName = new Table();
 		monsterTableName.setName("monsterTableName");
 		monsterTableName.center();
+		
+		
 		
 		for(int i = 0; i != enemySquad.size(); i++)
 		{
@@ -769,9 +770,17 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	            	 */
 	            }
 		        }});
+				if(enemySquad.get(i).isBoss())
+				{
+					monsterImage.setPosition(stage.getWidth() / 2 - monsterImage.getWidth() / 2  , stage.getHeight() / 2);
+					monsterName.setPosition(monsterImage.getX(), monsterImage.getY() + monsterImage.getHeight() + 10);
+				}
+				else
+				{
+					monsterImage.setPosition(monsterImage.getWidth()  + (i * 100), stage.getHeight() / 2);
+					monsterName.setPosition(monsterImage.getX(), monsterImage.getY() + monsterImage.getHeight() + 10);
+				}
 				
-				monsterImage.setPosition(monsterImage.getWidth()  + (i * 100), Gdx.graphics.getHeight() / 2);
-				monsterName.setPosition(monsterImage.getX(), monsterImage.getY() + monsterImage.getHeight() + 10);
 				
 				monsterTable.addActor(monsterImage);
 				monsterTableName.addActor(monsterName);
@@ -792,7 +801,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		labelTurn.setName("labelTurn");
 		
 		labelTurn.setFontScale(2f);
-		labelTurn.setPosition(Gdx.graphics.getWidth() / 2 - labelTurn.getWidth(), 150);//setting at the middle
+		labelTurn.setPosition(stage.getWidth() / 2 - labelTurn.getWidth(), 150);//setting at the middle
 		
 		tableTurn.center();
 		tableTurn.addActor(labelTurn);
@@ -919,7 +928,6 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 
 			for(int p = 0; p < enemySquad.size();)
 			{
-
 				Random r = new Random();
 
 				int random = r.nextInt(playerSquad.size());
@@ -1068,7 +1076,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 
 									Tween.set((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA).target(1).start(tweenManager);
 
-									Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBackTween(enemySquad.get(monsterIndex).monsterId){										
+									Tween.to((Image) monsterTable.getChildren().get(monsterIndexTable), SpriteAccessor.ALPHA, 1).target(0).setCallback(new MonsterCallBack(enemySquad.get(monsterIndex).monsterId){										
 										@Override
 										public void onEvent(int callbackType, BaseTween<?> callback) {	
 
@@ -1287,7 +1295,6 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		//updating the table without the function addActor(object,index) the delete/insert is needed		
 		tableTurn.getChildren().removeIndex(0);
 		tableTurn.getChildren().insert(0, labelTurn);				
-
 	}
 	
 	private void fleeFail()
@@ -1326,7 +1333,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		
 		//set res and pos
 		
-		win.setPosition(Gdx.graphics.getWidth() / 2 - (win.getWidth() / 2), Gdx.graphics.getHeight() / 2  - (win.getHeight() / 2));
+		win.setPosition(stage.getWidth() / 2 - (win.getWidth() / 2), stage.getHeight() / 2  - (win.getHeight() / 2));
 		win.setResizable(true);
 		/*
 		 * Creating the text with the exp gained
@@ -1388,9 +1395,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 				if(playerSquad.get(i).getExp() >= playerSquad.get(i).levelUp.expToUp)
 				{
 					playerSquad.get(i).LevelUp();
-					playerSquad.get(i).setExp(0);	
-					
-					
+					playerSquad.get(i).setExp(0);										
 					
 					/*
 					 * Creating animated label that shows above the player name
@@ -1458,7 +1463,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
             	save();
             	
             	//finished the game
-            	if(!isBoss)
+            	if(isBoss)
             	{
             		PartyHard_EndScreen screen = new PartyHard_EndScreen(game);
             		game.setScreen(screen);
@@ -1476,7 +1481,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		
 		//set res and pos
 		
-		win.setPosition(Gdx.graphics.getWidth() / 2 - (win.getWidth() / 2), Gdx.graphics.getHeight() / 2  - (win.getHeight() / 2));
+		win.setPosition(stage.getWidth() / 2 - (win.getWidth() / 2), stage.getHeight() / 2  - (win.getHeight() / 2));
 		win.setResizable(true);
 		/*
 		 * Creating the text with the exp gained
@@ -1556,13 +1561,9 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 	public boolean keyDown(int keycode) {
 			switch(keycode)
 			{
-				case Input.Keys.ESCAPE:
-					if(!isBoss)
-					{
+				case Input.Keys.ESCAPE:			
 					   PartyHard_ExitDialog dialog = new PartyHard_ExitDialog(this, game);
-					   dialog.dialog.show(stage);
-					}
-					
+					   dialog.dialog.show(stage);					
 					break;
 			}
 		return false;

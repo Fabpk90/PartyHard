@@ -157,7 +157,7 @@ public class PartyHard_NewGame implements Screen {
 		newName.setMessageText("Enter a Name");
 		newName.setBlinkTime(0.40f);
 
-		newName.setMaxLength(5);
+		newName.setMaxLength(7);
 
 		Label lblName = new Label("Name:", labelStyle);
 		lblName.setPosition(newName.getX() - lblName.getWidth(), newName.getY());
@@ -222,7 +222,7 @@ public class PartyHard_NewGame implements Screen {
 		TextButton male = new TextButton("Male", buttonStyle);
 		male.setPosition(leftArrow.getX(),
 				characterImage.getY() - male.getHeight());
-		male.setWidth(70);
+		male.setWidth(80);
 
 		male.addListener(new ClickListener() {
 			@Override
@@ -235,7 +235,7 @@ public class PartyHard_NewGame implements Screen {
 		TextButton female = new TextButton("Female", buttonStyle);
 		female.setPosition(male.getX() + male.getWidth(), characterImage.getY()
 				- female.getHeight());
-		female.setWidth(male.getWidth());
+		female.setWidth(male.getWidth() + 20);
 
 		female.addListener(new ClickListener() {
 			@Override
@@ -268,7 +268,7 @@ public class PartyHard_NewGame implements Screen {
 				if (numberOfPlayer != numberMaxOfPlayer) {
 					TextField Name = (TextField) ((Table) stage.getActors().items[getTableIndex("newPlayer")])
 							.getChildren().get(6);
-					if (Name.getText() != "" && !Name.getText().isEmpty()) {
+					if (Name.getText() != "" && !Name.getText().isEmpty() && Name.getText().toString().length() > 2) {
 						SelectBox<String> Class = (SelectBox<String>) ((Table) stage
 								.getActors().items[getTableIndex("newPlayer")])
 								.getChildren().get(7);

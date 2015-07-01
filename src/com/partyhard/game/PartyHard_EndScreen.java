@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,7 +27,9 @@ public class PartyHard_EndScreen implements Screen {
 	
 	@Override
 	public void show() {
-		 labelStyle.font = new BitmapFont(Gdx.files.internal("font/font.fnt"),Gdx.files.internal("font/font_0.png"), false);
+		 labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		 labelStyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		 labelStyle.fontColor = Color.BLACK;
 		 
 		 Table tableFinal = new Table();
 		 
@@ -34,18 +37,14 @@ public class PartyHard_EndScreen implements Screen {
 		 lblThanks.setFontScale(2f);
 		 lblThanks.setPosition(stage.getWidth() / 2 - lblThanks.getWidth(), stage.getHeight() / 2);		 
 		 
-		 lblThanks.setColor(Color.WHITE);
-		 
 		 Label lblExit = new Label("Exit", labelStyle);
 		 lblExit.setPosition(stage.getWidth() / 2 - lblExit.getWidth(), 0);
 		 
 		 lblExit.addListener(new ClickListener(){
 		 @Override
-		public void clicked(InputEvent event, float x, float y) {
-			
+		public void clicked(InputEvent event, float x, float y) {			
 			 PartyHard_ScreenSplash screen = new PartyHard_ScreenSplash(game);
-			 game.setScreen(screen);
-			 
+			 game.setScreen(screen);		 
 		}
 		 });
 		 

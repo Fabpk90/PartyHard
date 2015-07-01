@@ -7,7 +7,9 @@ import java.util.Random;
 import utils.CallBackFight;
 import utils.FileManager;
 import utils.ImageAccessor;
+import utils.LabelAccessor;
 import utils.ObjectDatabase;
+import utils.PartyHard_GameDialogue;
 import utils.PartyHard_Shop;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
@@ -141,9 +143,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	private int idSave;
 	private boolean isBoss;
 	
-	private FileManager fileManager = new FileManager();
-	
+	private FileManager fileManager = new FileManager();	
 	private TweenManager tweenManager = new TweenManager();
+	
+	private ArrayList<PartyHard_GameDialogue> dialogueSpeech = new ArrayList<PartyHard_GameDialogue>();
 	
 	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, String mapName, PartyHard_Player_Map playerMap, int idSave)
 	{	
@@ -154,6 +157,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		this.playerMap.setCollisionLayer(tiledmap);	
 		this.idSave = idSave;
 		
+		this.Name = mapName;
 	}
 	
 	public PartyHard_MapScreen(PartyHard_GameClass gameToKeep, PartyHard_Player_Map playerMap, int idSave)
@@ -164,6 +168,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		this.playerMap.setMap(playerMap.getMap(), isSafe);
 		this.playerMap.setCollisionLayer(tiledmap);	
 		this.idSave = idSave;
+		
+		this.Name = playerMap.getMap();
 	}
 	
 	@Override
@@ -265,7 +271,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
         	 //for desktop
         if(Gdx.app.getType() == Gdx.app.getType().Desktop)
         {
-        	  if(!playerMap.isMoving() && !playerMap.isShopping && !playerMap.isFighting)
+        	  if(!playerMap.isMoving() && !playerMap.isShopping && !playerMap.isFighting && !playerMap.isTalking)
           {	    
 		    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 		    	{
@@ -336,7 +342,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	@Override
 	public void show() {
-		playerMap.isFighting = false;
+		
+	playerMap.isFighting = false;
 	loadSquad();
 		
 	camera = new OrthographicCamera();
@@ -592,6 +599,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 
 		 if(isBoss)
 			 labelName.setColor(Color.CYAN);
+		 
+		 //recentering the label
+		 labelName.setPosition(stage.getWidth() / 2 - labelName.getWidth() / 2, stage.getHeight() - labelName.getHeight());
 		 				 
 		 //updating the table where the label is
 		 Table name = searchTable("name");
@@ -671,12 +681,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		//saving if is not the boss map
 		if(!isBoss)
-			save();
+			save();	
 		
+		//load the dialogue for the map and show them if there is at least one
+		loadDialogue();
+		showDialogue();
 	}
 
 	@Override
 	public void dispose() {
+		save();
 		tiledmap.dispose();
 		mapSound.dispose();
 		spriteBatch.dispose();	
@@ -738,6 +752,105 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		animFight(playerMap.Boss.bossSquad, playerMap.Boss.musicPath, true);
 	}
 	
+	private void loadDialogue()
+	{
+		
+		//resetting the dialogue array
+		dialogueSpeech.clear();
+		
+		XmlReader xml = new XmlReader();
+		
+		try {
+			Element root = xml.parse(Gdx.files.internal("data/Dialog.xml"));
+			
+			Array<Element> arrayOfDialogue = root.getChildrenByName("dialog");
+			
+			int id;
+			String message;
+			
+			for(int i = 0; i != arrayOfDialogue.size; i++)
+			{
+				//if the dialogue is for this map
+				if(arrayOfDialogue.get(i).get("map").toString().equals(Name))
+				{
+					id = arrayOfDialogue.get(i).getInt("id");
+					message = arrayOfDialogue.get(i).get("message");
+				
+					dialogueSpeech.add(new PartyHard_GameDialogue(id, message));
+				}
+				
+			}			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void showDialogue()
+	{
+		
+		if(getTableIndex("dialog") != -1)
+			stage.getActors().removeIndex(getTableIndex("dialog"));
+		
+		
+		//checking if the player has seen all the dialogues or if the map doesn't contains any dialogue
+		if(dialogueSpeech.size() != 0 && playerMap.getIdDialogue() - 1 < dialogueSpeech.get(dialogueSpeech.size() - 1).id)
+		{
+			//disable player movement input
+			playerMap.isTalking = true;
+			
+			Table tableDialog = new Table();
+			tableDialog.setName("dialog");
+			
+			//setting the table 1/4 of the screen
+			tableDialog.setWidth(stage.getWidth());
+			tableDialog.setHeight(stage.getHeight() / 4);	
+			
+			TextButton dialogueHolder = new TextButton(dialogueSpeech.get(getPosIdDialogue(playerMap.getIdDialogue())).message, buttonStyle);
+			dialogueHolder.setSize(tableDialog.getWidth(), tableDialog.getHeight());
+			
+			dialogueHolder.pad(5);
+			
+			dialogueHolder.getLabelCell().width(dialogueHolder.getWidth());
+			dialogueHolder.getLabelCell().pad(5f);
+			dialogueHolder.getLabel().setWrap(true);
+			dialogueHolder.invalidate();			
+			
+			//when the player click on the dialogue the next dialogue shows up or not
+			dialogueHolder.addListener(new ClickListener()
+			{
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					playerMap.isTalking = false;
+					playerMap.dialogueRed();
+					showDialogue();
+				}
+			});
+			
+			tableDialog.addActor(dialogueHolder);
+			
+			stage.addActor(tableDialog);
+			
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param id the id of the dialogue you are looking for
+	 * @return -1 if not found or the index of the dialogue in the arraylist
+	 */
+	private int getPosIdDialogue(int id)
+	{
+		for(int i = 0; i < dialogueSpeech.size(); i++)
+		{
+			if(id == dialogueSpeech.get(i).id)
+				return i;
+		}
+		
+		return -1;
+	}
+	
 	private void animFight(ArrayList<PartyHard_Monster> monsters, String musicPath, boolean isBoss) 
 	{	
 		//making sure that the player will not move during the animation
@@ -762,12 +875,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 
 	private void loadShop(final int id)
 	{	
-		//loading the background for the table
-		 
-		NinePatch patch = new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/Shop.9.png"))));
-			
-		NinePatchDrawable drawable = new NinePatchDrawable(patch);	
-		
+		//loading the background for the table		 		 		
+		NinePatchDrawable drawable = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/Shop.9.png")))));		
 		
 		//for disabling movements
 		playerMap.isShopping = true;
@@ -1796,6 +1905,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 				if(playerMap.isCellBoss())
 					loadBossFight();
 			return true;
+			
+			case Input.Keys.N:
+				SUPERAWESOMECHEAT();
+			return true;
 		}
 		return false;
 	}
@@ -1854,5 +1967,30 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		playerSquad.get(0).finishFile();
 		//the the player map		   			 
 		playerMap.save();				
+	}
+	
+	private void SUPERAWESOMECHEAT()
+	{
+		//creating the label for letting know the super mean user that the cheat has been activated
+		Label lblCheat = new Label("Cheat activated! You cheater!", labelStyle);
+		
+		//centering the label
+		lblCheat.setPosition(stage.getWidth() / 2 - lblCheat.getWidth() / 2, stage.getHeight() / 2 - 100);
+		
+		//animating
+		Tween.set(lblCheat, LabelAccessor.Y).target(lblCheat.getY()).start(tweenManager);
+		Tween.set(lblCheat, LabelAccessor.ALPHA).target(1).start(tweenManager);
+		
+		Tween.to(lblCheat, LabelAccessor.Y, 1f).target(lblCheat.getY() + 100).start(tweenManager);
+		Tween.to(lblCheat, LabelAccessor.ALPHA, 1f).delay(1f).target(0).start(tweenManager);
+		
+		stage.addActor(lblCheat);
+		
+		//adding atk and life to the squad
+		for(int i = 0; i < playerSquad.size(); i++)
+		{
+			playerSquad.get(i).addAtk(100);
+			playerSquad.get(i).addLife(100);
+		}
 	}
 }

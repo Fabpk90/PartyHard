@@ -110,6 +110,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		buttonStyle.font = font;
 		
 		labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		labelStyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		labelStyle.fontColor = Color.WHITE;
 		
 		
@@ -130,7 +131,7 @@ public class PartyHard_ScreenSplash implements Screen{
 	Random r = new Random();
 	
 	//choosing randomly the map to load
-	switch(r.nextInt(3))
+	switch(r.nextInt(4))
 	{
 		case 0:
 			tiledmap = new TmxMapLoader().load("mainlevel.tmx");
@@ -140,6 +141,9 @@ public class PartyHard_ScreenSplash implements Screen{
 			break;
 		case 2:
 			tiledmap = new TmxMapLoader().load("dungeonlv2.tmx");
+			break;
+		case 3:
+			tiledmap = new TmxMapLoader().load("forest1.tmx");
 			break;
 	}
 	
@@ -291,7 +295,6 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	Label labelTitle = new Label("Party Hard!",labelStyle);
 	labelTitle.setFontScale(4, 2);
-	labelTitle.getStyle().font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 	
 	labelTitle.setPosition(Gdx.graphics.getWidth() / 2 - (labelTitle.getWidth() * labelTitle.getFontScaleX()) / 2, (float) ((Gdx.graphics.getHeight() - (labelTitle.getHeight() * labelTitle.getFontScaleY())) ) );
 	/*

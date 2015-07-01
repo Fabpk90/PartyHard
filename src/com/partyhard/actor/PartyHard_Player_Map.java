@@ -37,6 +37,9 @@ public class PartyHard_Player_Map {
 	private Animation walk_right;
 	private Animation walk_toward;
 	
+	//used for movement smoothness
+	private boolean moving = false;
+	
 	//used to know in which direction the player is going to
 	private boolean movingRight = false;
 	private boolean movingLeft = false;
@@ -77,17 +80,17 @@ public class PartyHard_Player_Map {
 	private String blockedKey = "block";
 	private String blockedKey2 = "blocked";
 	
-	//used for movement smoothness
-	private boolean moving = false;
-	
 	public boolean isShopping = false;
 	public boolean isFighting = false;
+	public boolean isTalking = false;
 	
 	private int Money = 0;
 	
 	private int idSave;
 	
 	private FileManager fileManager = new FileManager();
+	
+	private int idDialogue = 0;
 	
 	/**
 	 * 
@@ -153,6 +156,7 @@ public class PartyHard_Player_Map {
 			this.Map = Player.getAttribute("Map");
 			this.imagePath = Player.getAttribute("imagePath");
 			this.Money = Player.getIntAttribute("Money");
+			this.idDialogue = Integer.parseInt(Player.getAttribute("dialogue"));
 			
 			//saving back the file, encoding before
 			fileManager.saveFile(true, fileManager.getFile());
@@ -165,7 +169,7 @@ public class PartyHard_Player_Map {
 	
 	public PartyHard_Player_Map(int idSave, float x, float y)
 	{
-XmlReader xml = new XmlReader();
+		XmlReader xml = new XmlReader();
 		
 		Element root;
 		
@@ -183,6 +187,7 @@ XmlReader xml = new XmlReader();
 			
 			this.Map = Player.getAttribute("Map");
 			this.imagePath = Player.getAttribute("imagePath");
+			this.idDialogue = Integer.parseInt(Player.getAttribute("dialogue"));
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -347,8 +352,6 @@ XmlReader xml = new XmlReader();
 		}
 	}
 	
-	
-		
 	}
 	
 	public float getY() {
@@ -375,6 +378,28 @@ XmlReader xml = new XmlReader();
 	public void setHeight(float Height)
 	{
 		this.Height = Height;
+	}
+
+	/**
+	 * @return the idDialogue
+	 */
+	public int getIdDialogue() {
+		return idDialogue;
+	}
+
+	/**
+	 * @param idDialogue the idDialogue to set
+	 */
+	public void setIdDialogue(int idDialogue) {
+		this.idDialogue = idDialogue;
+	}
+	
+	/**
+	 * Use it whenever the player has talked (read a dialogue)
+	 */
+	public void dialogueRed()
+	{
+		this.idDialogue++;
 	}
 
 	private void resetCollision() {
@@ -487,7 +512,7 @@ XmlReader xml = new XmlReader();
 	
 	/**
 	 * <p>
-	 * Note:  used for knowing if the player is moving on the y axe
+	 * <b>Note</b>:  used for knowing if the player is moving on the y axe
 	 * </p>
 	 */
 	
@@ -664,6 +689,9 @@ XmlReader xml = new XmlReader();
 	//load all the tp point into an array
 	private void loadTp()
 	{
+		//flushing the array of old tps
+		Tp.clear();
+		
 		XmlReader xml = new XmlReader();
 		
 		/*
@@ -679,13 +707,12 @@ XmlReader xml = new XmlReader();
 			{		
 				//found the right tps
 				if(arrayOfMapTp.get(i).getAttribute("nameMap").equals(Map))
-				{					
-					Array<Element> arrayOfTp = arrayOfMapTp.get(i).getChildrenByName("tp");			
-					
+				{							
+					Array<Element> arrayOfTp = arrayOfMapTp.get(i).getChildrenByName("tp");	
+										
 					//getting all the tp
 					for(int p = 0; p< arrayOfTp.size; p++)
 					{									
-						
 						//first getting the position of the tp and then the destination, with the map
 						float xpos = arrayOfTp.get(p).getFloat("x");
 						float ypos = arrayOfTp.get(p).getFloat("y");
@@ -695,8 +722,7 @@ XmlReader xml = new XmlReader();
 						String nameNewMap = newMap.get("name");
 						float xDest = newMap.getFloat("x");
 						float yDest = newMap.getFloat("y");
-						
-						
+												
 						Tp.add(new PartyHard_Tp(xpos, ypos, nameNewMap, xDest, yDest));		
 					}
 				}
@@ -710,10 +736,8 @@ XmlReader xml = new XmlReader();
 
 	//load all the shops based on the map
 	private void loadShop()
-	{
-		
-		XmlReader xml = new XmlReader();
-	
+	{	
+		XmlReader xml = new XmlReader();	
 			/*
 			 * getting the map child, then all the shop in the map and add their id for populating the shops			  
 			 */
@@ -732,9 +756,7 @@ XmlReader xml = new XmlReader();
 				{					
 					Shops.add(new PartyHard_Shop(i, Map));
 				}
-			}
-			
-			
+			}		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -828,7 +850,9 @@ XmlReader xml = new XmlReader();
 			.attribute("y", getY())
 			.attribute("Map", Map)
 			.attribute("imagePath", imagePath)
-			.attribute("Money", getMoney()).pop();
+			.attribute("Money", getMoney())
+			.attribute("dialogue", getIdDialogue()).pop();
+			
 			
 			//make sure that all has been closed
 			xml.close();   			

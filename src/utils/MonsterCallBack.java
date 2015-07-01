@@ -3,11 +3,11 @@ package utils;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.TweenCallback;
 
-public class MonsterCallBackTween implements TweenCallback {
+public class MonsterCallBack implements TweenCallback {
 
 	public int idMonster;
 	
-	public MonsterCallBackTween( int idMonster) {
+	public MonsterCallBack( int idMonster) {
 		
 		this.idMonster = idMonster;
 	}
