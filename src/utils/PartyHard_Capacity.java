@@ -48,7 +48,7 @@ public class PartyHard_Capacity {
 		Element root = null;
 		
 		try {
-			root = xml.parse(Gdx.files.internal("data/capacity.xml"));
+			root = xml.parse(Gdx.files.internal("data/Capacity.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

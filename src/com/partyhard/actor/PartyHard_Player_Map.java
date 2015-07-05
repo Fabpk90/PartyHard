@@ -607,8 +607,6 @@ public class PartyHard_Player_Map {
 		
 		for(int i = 0; i < Shops.size() ;i++)
 		{
-			
-			
 			/*
 			 * 0 back
 			 * 1 left
@@ -737,11 +735,13 @@ public class PartyHard_Player_Map {
 	//load all the shops based on the map
 	private void loadShop()
 	{	
+		//flushing the array
+		Shops.clear();
+		
 		XmlReader xml = new XmlReader();	
 			/*
 			 * getting the map child, then all the shop in the map and add their id for populating the shops			  
-			 */
-	
+			 */	
 		try
 		{
 			Element	root = xml.parse(Gdx.files.local("data/Shop.xml"));

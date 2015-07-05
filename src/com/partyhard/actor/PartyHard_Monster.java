@@ -9,8 +9,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
-
-
 public class PartyHard_Monster extends Sprite {
 
 	private static int id = 0;
@@ -50,12 +48,9 @@ public class PartyHard_Monster extends Sprite {
 		XmlReader xml = new XmlReader();
 		
 		Element root = null;
-		
-			//loading the encrypted file
-			//FileManager fileManager = new FileManager("monster.xml");
 			
 			try {
-				root = xml.parse(Gdx.files.internal("data/monster.xml"));
+				root = xml.parse(Gdx.files.internal("data/Monster.xml"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -121,7 +121,7 @@ public class PartyHard_Player_Fight{
 										
 					//getting the capacities
 					
-					Element rootCap = xml.parse(Gdx.files.local("data/capacity.xml"));
+					Element rootCap = xml.parse(Gdx.files.local("data/Capacity.xml"));
 					
 					Array<Element> arrayOfCap =	rootCap.getChildrenByName("capacity");
 					Array<Element> arrayPlayerCap = arrayOfPlayer.get(i).getChildByName("capacity").getChildrenByName("cap");
@@ -142,7 +142,7 @@ public class PartyHard_Player_Fight{
 						
 					}
 					
-					rootCap = xml.parse(Gdx.files.local("data/level.xml"));
+					rootCap = xml.parse(Gdx.files.local("data/Level.xml"));
 					
 					Array<Element> arrayOfLevel = rootCap.getChildrenByName("level");
 					
@@ -210,14 +210,11 @@ public class PartyHard_Player_Fight{
 				Def = 10;
 				break;
 				
-			case 1://clerck
+			case 1://Clerk
 				HpMax = 40;
 				Hp = 40;
 				Atk = 5;
-				Def = 10;
-				
-				//adding heal cap
-				loadCapacity(1);				
+				Def = 10;			
 				break;
 		}
 	}
@@ -537,7 +534,7 @@ public class PartyHard_Player_Fight{
 		XmlReader xml = new XmlReader();
 		Element rootCap = null;
 		try {
-			rootCap = xml.parse(Gdx.files.local("data/capacity.xml"));
+			rootCap = xml.parse(Gdx.files.internal("data/Capacity.xml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

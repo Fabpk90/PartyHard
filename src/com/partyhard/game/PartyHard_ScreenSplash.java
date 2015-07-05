@@ -53,6 +53,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	
 	private TweenManager tweenManager = new TweenManager();
 	
+	//the speed of the bouncy animation
+	private int velocity = 2;
+	
 	private int movingX = 0;
 	private int movingY = 0;
 	/*
@@ -340,17 +343,17 @@ public class PartyHard_ScreenSplash implements Screen{
 		switch(movingX)
 		{
 			case 1: // +				
-				if(camera.position.x + camera.viewportWidth / 2 < mapWidthPixel)
+				if(camera.position.x + camera.viewportWidth / 2 < mapWidthPixel && camera.position.x + ((int) 1 + delta) < mapWidthPixel)
 				{
-					camera.position.x += (int) 2 + delta;
+					camera.position.x += ((int) velocity + delta);
 				}
 				else
 					generateDirection();				
 				break;
 			case 2: // -
-				if(camera.position.x - camera.viewportWidth / 2 > 0)
+				if(camera.position.x - camera.viewportWidth / 2 > 0 && camera.position.x - ((int) 1 + delta) > 0)
 				{
-					camera.position.x -= (int) 2 + delta;
+					camera.position.x -= ((int) velocity + delta);
 				}
 				else
 					generateDirection();			
@@ -360,17 +363,17 @@ public class PartyHard_ScreenSplash implements Screen{
 		switch(movingY)
 		{
 		case 1: // +				
-			if(camera.position.y + camera.viewportHeight / 2 < mapHeightPixel)
+			if(camera.position.y + camera.viewportHeight / 2 < mapHeightPixel && camera.position.y + ((int) 1 + delta) < mapHeightPixel)
 			{
-				camera.position.y += (int) 2 + delta;
+				camera.position.y += ((int) velocity + delta);
 			}
 			else
 				generateDirection();				
 			break;
 		case 2: // -
-			if(camera.position.y - camera.viewportHeight / 2 > 0)
+			if(camera.position.y - camera.viewportHeight / 2 > 0 && camera.position.y - ((int) 1 + delta) > 0)
 			{
-				camera.position.y -= (int) 2 + delta;
+				camera.position.y -= ((int) velocity + delta);
 			}
 			else
 				generateDirection();			

@@ -127,7 +127,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	 * Inventory var
 	 */
 	
-	//of which inventory we are?
+	//in which inventory we are?
 	private int playerSelected = -1;
 	private int itemIndex = -1;
 	private int playerSelectedForObject = -1;
@@ -153,7 +153,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(mapName+".tmx");
-		this.playerMap.setMap(mapName, isSafe);
 		this.playerMap.setCollisionLayer(tiledmap);	
 		this.idSave = idSave;
 		
@@ -165,7 +164,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		mainGame = gameToKeep;
 		this.playerMap = playerMap;
 		tiledmap = new TmxMapLoader().load(playerMap.getMap()+".tmx");
-		this.playerMap.setMap(playerMap.getMap(), isSafe);
 		this.playerMap.setCollisionLayer(tiledmap);	
 		this.idSave = idSave;
 		
@@ -176,7 +174,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 	public void render(float delta) {
 			
 		animationTime += delta;
-		Gdx.gl.glClearColor(255, 255, 255, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         maprenderer.setView(camera);
         maprenderer.render();
@@ -299,14 +297,6 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		        
 		        
           }
-        	  if(Gdx.input.isKeyPressed(Input.Keys.ENTER))
-		        {			        			        			        			        	
-		        	if(!playerMap.isShopping)
-		        	if(playerMap.getCellShop(direction) != -1)
-		        	{		        		
-		        		loadShop(playerMap.getCellShop(direction));
-		        	}
-		        }
         }     
 	        stage.draw();
 	        
@@ -679,9 +669,13 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		buttonStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 		
+		//updating the map of the playermap object
+		playerMap.setMap(playerMap.getMap(), isSafe);
+		
 		//saving if is not the boss map
 		if(!isBoss)
 			save();	
+		
 		
 		//load the dialogue for the map and show them if there is at least one
 		loadDialogue();
@@ -777,8 +771,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					message = arrayOfDialogue.get(i).get("message");
 				
 					dialogueSpeech.add(new PartyHard_GameDialogue(id, message));
-				}
-				
+				}				
 			}			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -809,10 +802,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			TextButton dialogueHolder = new TextButton(dialogueSpeech.get(getPosIdDialogue(playerMap.getIdDialogue())).message, buttonStyle);
 			dialogueHolder.setSize(tableDialog.getWidth(), tableDialog.getHeight());
 			
-			dialogueHolder.pad(5);
-			
+			//setting the textbutton's label settings
 			dialogueHolder.getLabelCell().width(dialogueHolder.getWidth());
-			dialogueHolder.getLabelCell().pad(5f);
+			dialogueHolder.getLabelCell().pad(10f);
 			dialogueHolder.getLabel().setWrap(true);
 			dialogueHolder.invalidate();			
 			
@@ -829,8 +821,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			
 			tableDialog.addActor(dialogueHolder);
 			
-			stage.addActor(tableDialog);
-			
+			stage.addActor(tableDialog);			
 		}
 		
 	}
@@ -898,8 +889,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		Label description = new Label(playerMap.getShopDescription(id), labelStyle);
 		description.setHeight(100);
-		description.setPosition(tableShop.getWidth() / 2 - description.getHeight(), tableShop.getHeight() - description.getHeight());		
-		
+		description.setPosition(tableShop.getWidth() / 2 - description.getWidth() / 2, tableShop.getHeight() - description.getHeight());		
+
 		Label moneyAmount = new Label("Money: "+playerMap.getMoney(),labelStyle);
 		moneyAmount.setPosition(description.getX() + description.getWidth() / 2 - moneyAmount.getWidth() / 2 , description.getY() - moneyAmount.getHeight() + stage.getHeight() / 2);
 		
@@ -951,6 +942,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 								
 								
 								Label itemDescription = new Label(""+Shop.getObjectDescription(itemShopSelected)+" +"+Shop.getObjectAmount(itemShopSelected), labelStyle);
+								itemDescription.setFontScale(.8f);
 								
 								switch(Shop.getObjectType(itemShopSelected))
 								{
@@ -1102,8 +1094,9 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			tableMoney.getChildren().items[0] = moneyAmount;
 			stage.getActors().items[getTableIndex("tableMoney")] = tableMoney;
 			
-			//removing the list of character
-			 ((Table) stage.getActors().items[getTableIndex("tableBuyChoice")]).getChildren().removeIndex(3);
+			//removing the list of character if exists
+			if(getTableIndex("tableBuyChoice") != -1)
+				((Table) stage.getActors().items[getTableIndex("tableBuyChoice")]).getChildren().removeIndex(3);
 		}
 	}
 	
@@ -1429,11 +1422,8 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			//setting the pos of the list
 			listMenu.setPosition(stage.getWidth() - listMenu.getWidth(), stage.getHeight() - listMenu.getHeight());
 			
-			labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
 			Label Money = new Label("Money: "+playerMap.getMoney(), labelStyle);
-			Money.setPosition(listMenu.getX()  - Money.getWidth(), listMenu.getY() - Money.getHeight());
-			Money.setColor(255, 255, 55, 1);
-			labelStyle.font = new BitmapFont();
+			Money.setPosition(stage.getWidth()  - Money.getWidth(), listMenu.getY() - Money.getHeight());
 				
 			tableMenu.addActor(Money);
 			tableMenu.addActor(listMenu);
@@ -1458,16 +1448,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		tableSell.setPosition(10, stage.getHeight() / 2);
 		tableSell.setSize(stage.getWidth() / 2, stage.getHeight() / 4);
 		
-		float dimension = tableSell.getWidth() / playerSquad.size();
+		final float dimension = tableSell.getWidth() / playerSquad.size();
 		
-		//populating the table with player's inventory
-		
+		//populating the table with player's inventory		
 		for(int i = 0; i < playerSquad.size(); i++)
 		{
 			List<Label> listInventory = new List<Label>(listStyle);
 			listInventory.setName(""+i);
-			listInventory.setPosition(0 + (i * dimension), 10);
+			listInventory.setPosition(i * dimension, 10);
 			
+			//populating the list
 			for(int x = 0; x < playerSquad.get(i).bag.size(); x++)
 			{
 				Label item = new Label(""+x, labelStyle);
@@ -1476,6 +1466,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 				listInventory.getItems().add(item);
 			}
 			
+			//no item added, so adding a warning
 			if(listInventory.getItems().size == 0)
 			{
 				Label lblNoItem = new Label ("", labelStyle);
@@ -1493,14 +1484,14 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					playerInventory = Integer.parseInt(event.getTarget().getName());
 					if(playerSquad.get(playerInventory).bag.size() != 0)
 					{
-							Table tableSellObject = new Table();
+						Table tableSellObject = new Table();
 						tableSellObject.setName("tableSellObject");
 						
 						tableSellObject.setPosition(10, stage.getHeight() / 2);
 						tableSellObject.setSize(stage.getWidth() / 2, stage.getHeight() / 4);										
 						
 						Label Sell = new Label("Sell", labelStyle);
-						Sell.setPosition(event.getTarget().getX() + event.getTarget().getWidth(), event.getTarget().getY() + Sell.getHeight() / 2);
+						Sell.setPosition(playerInventory * dimension + event.getTarget().getWidth(), event.getTarget().getY() + Sell.getHeight() / 2);				
 						
 						Sell.setName(""+((List<Label>)event.getTarget()).getSelectedIndex());
 						
@@ -1567,8 +1558,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
  		
  		//creating the title label (centered)
  		Label lblinventory = new Label("Inventory", labelStyle);
- 		lblinventory.setPosition(inventory.getWidth() / 2 - (lblinventory.getText().length * 10) / 2 , inventory.getHeight() - 40);
- 		lblinventory.setFontScale(2);
+ 		lblinventory.setPosition(inventory.getWidth() / 2 - lblinventory.getWidth() / 2  , inventory.getHeight() - 40);
  		
  		//showing each player -> click then show up the inventory of the player choose
  		float dimension = inventory.getWidth() / (playerSquad.size() + 1);					 							 		
@@ -1653,11 +1643,11 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 					 		
 	 						List<Label> listChoice = new List<Label>(listStyle);	
 	 						
+	 						listChoice.setWidth(50);
+	 						listChoice.setHeight(50);
+	 						
 	 						//getting the pos of the itemList
-	 						Table tableItem = searchTable("tableInventory");					 						
-	 							listChoice.setWidth(50);
-	 							listChoice.setHeight(50);
-	 							
+	 						Table tableItem = searchTable("tableInventory");					 							 									
 	 						listChoice.setPosition(tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getX() + 100, tableItem.getChildren().get(playerSelected + 1 + (1 * playerSelected)).getY());
 	 						
 	 						switch(playerSquad.get(playerSelected).bag.get(itemIndex).type)
@@ -1723,8 +1713,12 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 						listChara.setHeight(100);
 		 						listChara.setPosition(listChoice.getX() + listChoice.getWidth(), listChoice.getY());
 		 						
-		 						Label lblChara = new Label("Select a player!", labelStyle);
+		 						LabelStyle style = new LabelStyle();
+		 						style.font = new BitmapFont();
+		 						
+		 						Label lblChara = new Label("Which Player?", style);
 		 						lblChara.setPosition(listChara.getX() , listChara.getY() + listChara.getHeight());
+		 								 						
 		 						
 		 						tableChoice.addActor(lblChara);
 		 						tableChoice.addActor(listChara);
@@ -1902,8 +1896,19 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			return true;
 			
 			case Input.Keys.ENTER:
+				//if the player has the boss in front of him
 				if(playerMap.isCellBoss())
 					loadBossFight();
+				else//or a shop
+					if(!playerMap.isShopping)
+					{
+			        	if(playerMap.getCellShop(direction) != -1)
+			        	{		        		
+			        		loadShop(playerMap.getCellShop(direction));
+			        	}
+					}
+					else
+						System.out.println("yo");
 			return true;
 			
 			case Input.Keys.N:
