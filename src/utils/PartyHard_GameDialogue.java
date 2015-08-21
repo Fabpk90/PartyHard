@@ -3,6 +3,7 @@ package utils;
 public class PartyHard_GameDialogue {
 	public int id;
 	public String message;
+	public String pathImage = null;
 	
 	/**
 	 * 
@@ -15,5 +16,10 @@ public class PartyHard_GameDialogue {
 		this.message = message;
 	}
 	
-
+	public PartyHard_GameDialogue(int id, String message, String pathImage)
+	{
+		this.id = id;
+		this.message = message;
+		this.pathImage = pathImage;
+	}
 }

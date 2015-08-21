@@ -12,6 +12,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.BitmapFontData;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -77,6 +78,7 @@ public class PartyHard_NewGame implements Screen {
 		this.screenSplash = screenSplash;
 		
 		labelStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
+		labelStyle.font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		textStyle.font = new BitmapFont();
 		textStyle.fontColor = Color.WHITE;	
@@ -104,7 +106,6 @@ public class PartyHard_NewGame implements Screen {
 		buttonStyle.pressedOffsetX = 1;
 		buttonStyle.pressedOffsetY = -1;		
 		buttonStyle.font = new BitmapFont(Gdx.files.internal("font/White.fnt"));
-	//	buttonStyle.font.getData().setScale(0.7f);
 
 	}
 

@@ -15,6 +15,7 @@ public class PartyHard_GameClass extends Game {
 	private SpriteBatch batch;
 	private Texture texture;
 	private Sprite sprite;
+	public float masterVolume = 80;
 	
 	@Override
 	public void create() {		
@@ -23,14 +24,9 @@ public class PartyHard_GameClass extends Game {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		/*
-		 * loading the fancy blue cursor only if the client is on android
+		 * loading the fancy blue cursor only if the client is on android, need to find another one
 		 */
-		if(Gdx.app.getType() == ApplicationType.Desktop)
-		{
-			Pixmap pm = new Pixmap(Gdx.files.internal("ui/cursorHand.png"));
-			Gdx.input.setCursorImage(pm, 0, 0);
-			pm.dispose();
-		}
+		
 			
 		PartyHard_ScreenSplash screensplash = new PartyHard_ScreenSplash(this);
 		this.setScreen(screensplash);	

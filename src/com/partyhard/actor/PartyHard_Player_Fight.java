@@ -48,10 +48,12 @@ public class PartyHard_Player_Fight{
 	private int capacitySelected = -1;
 	
 	private int HpMax;
+	private int ManaMax;
 	
 	private int Hp;
 	private int Atk;
 	private int Def;
+	private int Mana;
 	
 	private boolean isDead = false;
 	
@@ -358,6 +360,43 @@ public class PartyHard_Player_Fight{
 		HpMax += amount;
 	}
 	
+	/**
+	 * @return the mana
+	 */
+	public int getMana() {
+		return Mana;
+	}
+
+	/**
+	 * @param mana the mana to set
+	 */
+	public void setMana(int mana) {
+		Mana = mana;
+	}
+	
+	public void addMana(int amount)
+	{
+		if(Mana + amount > ManaMax)
+			Mana = ManaMax;
+		else
+			Mana += amount;
+			
+	}
+
+	/**
+	 * @return the manaMax
+	 */
+	public int getManaMax() {
+		return ManaMax;
+	}
+
+	/**
+	 * @param manaMax the manaMax to set
+	 */
+	public void setManaMax(int manaMax) {
+		ManaMax = manaMax;
+	}
+
 	public boolean isDead() {
 		return isDead;
 	}

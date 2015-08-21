@@ -85,25 +85,3 @@ public class XmlManager {
 	        return o;
 	    }
 	}
-/*
- * <root>
-	<player_Fight num="0">
-		<name value="Pavel"/>
-		<hp value="9995"/>
-		<def value="200"/>
-		<atk value="50"/>
-		<exp value="60"/>
-		<money value="20"/>
-		<level value="10"/>
-		<bag space="5">
-			<item class="class com.partyhard.object.PartyHard_Object" object="com.partyhard.object.PartyHard_Object@7233bb11"/>
-			<item class="class com.partyhard.object.PartyHard_Object" object="com.partyhard.object.PartyHard_Object@223e93aa"/>
-			<item class="class com.partyhard.object.PartyHard_Object" object="com.partyhard.object.PartyHard_Object@3a508f76"/>
-			<item class="class com.partyhard.object.PartyHard_Object" object="com.partyhard.object.PartyHard_Object@7efaa9e2"/>
-			<item class="class com.partyhard.object.PartyHard_Object" object="com.partyhard.object.PartyHard_Object@7aa7758e"/>
-		</bag>
-	</player_Fight>
-</root>
-
- */
-

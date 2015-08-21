@@ -572,14 +572,7 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 				tableItem.addActor(scroll);
 				tableItem.center();
 								
-				stage.addActor(tableItem);
-				
-				 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
-				 if(!win && !lose && playerSquad.get(getAlivePlayer()).getObjectUsed() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
-				 {
-					 fight();
-				 }
-				
+				stage.addActor(tableItem);				
 			 }
 			             
 		});
@@ -760,6 +753,12 @@ public class PartyHard_Fight implements Screen, InputProcessor {
 		            	}
 		            	//id of the selected monster
 		            	playerSquad.get(getAlivePlayer()).setTarget(Integer.parseInt(event.getTarget().getName()));
+		            	
+		            	 //used to manage the fight	making sure that the player has not loose win or has selected a capacity	
+						 if(!win && !lose && playerSquad.get(getAlivePlayer()).getCapacitySelected() != -1 && playerSquad.get(getAlivePlayer()).getTarget() != -1)
+						 {
+							 fight();
+						 }
 		            	
 	            	}//end if not heal
 		          }//end if not cap

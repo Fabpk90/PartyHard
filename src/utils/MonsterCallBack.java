@@ -13,11 +13,9 @@ public class MonsterCallBack implements TweenCallback {
 	}
 
 	@Override
-	public void onEvent(int arg0, BaseTween<?> arg1) {
-		// TODO Auto-generated method stub
+	public void onEvent(int event, BaseTween<?> arg1) {
 		
-	}
-
-	
-
+		
+		
+	}	
 }

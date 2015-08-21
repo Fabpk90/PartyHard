@@ -220,9 +220,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
             		}
             		fightTime = 0;
             	}
-        	}
-        	
-        	
+        	}    	
         }
         	
         else
@@ -638,6 +636,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		 mapSound = Gdx.audio.newMusic(Gdx.files.internal("sound/"+ prop.get("Music", String.class)+".mp3"));
 		 mapSound.play();
 		 mapSound.setLooping(true);
+		 mapSound.setVolume(mainGame.masterVolume/100);
 		 
 		 
 		 /*
@@ -697,8 +696,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		fileManager.loadFile("save/"+idSave+"Fight.xml");
 		
-		FileHandle file = fileManager.getDecodedFile();
-		
+		FileHandle file = fileManager.getDecodedFile();	
 		
 		playerSquad = new ArrayList<PartyHard_Player_Fight>();
 		
@@ -769,8 +767,16 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 				{
 					id = arrayOfDialogue.get(i).getInt("id");
 					message = arrayOfDialogue.get(i).get("message");
-				
-					dialogueSpeech.add(new PartyHard_GameDialogue(id, message));
+					
+					//if there is an image, load it
+					if(!arrayOfDialogue.get(i).get("imagePath").isEmpty())
+					{
+						String imagePath = arrayOfDialogue.get(i).get("imagePath");
+						
+						dialogueSpeech.add(new PartyHard_GameDialogue(id, message, imagePath));
+					}
+					else
+						dialogueSpeech.add(new PartyHard_GameDialogue(id, message));
 				}				
 			}			
 		} catch (IOException e) {
@@ -806,7 +812,17 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 			dialogueHolder.getLabelCell().width(dialogueHolder.getWidth());
 			dialogueHolder.getLabelCell().pad(10f);
 			dialogueHolder.getLabel().setWrap(true);
-			dialogueHolder.invalidate();			
+			dialogueHolder.invalidate();
+			
+			//checking if the dialogue need an image
+			if(dialogueSpeech.get(playerMap.getIdDialogue()).pathImage != null)
+			{
+				//loading the image and set it to the right of the dialogue
+				Image imageDialogue = new Image(new Texture(dialogueSpeech.get(playerMap.getIdDialogue()).pathImage));
+				imageDialogue.setPosition(0, dialogueHolder.getHeight());
+				
+				tableDialog.addActor(imageDialogue);
+			}
 			
 			//when the player click on the dialogue the next dialogue shows up or not
 			dialogueHolder.addListener(new ClickListener()
@@ -1501,7 +1517,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 								//adding the money, then removing it and setting back to default the var													
 								playerMap.addMoney(playerSquad.get(playerInventory).bag.get(Integer.parseInt(event.getTarget().getName())).price / 2);
 								
-								playerSquad.get(playerInventory).bag.remove(Integer.parseInt(event.getTarget().getName()));
+								playerSquad.get(playerInventory).removeObjectFromInventory(Integer.parseInt(event.getTarget().getName()));
 								
 								playerInventory = -1;
 								toggleSellInventory();
@@ -1830,6 +1846,7 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
  		stage.addActor(tableInventorySpace);
 	}
 
+	
 	private void toggleSubMenu()
 	{
 		//deleting the other sub menu if created
@@ -1880,10 +1897,10 @@ public class PartyHard_MapScreen implements Screen, InputProcessor{
 		
 		 Table tableSpace = (Table) stage.getActors().get(getTableIndex("tableSpace"));
 		 
-		 Label lblSpace = (Label) tableSpace.getChildren().items[0];
+		 Label lblSpace = (Label) tableSpace.getChildren().items[id];
 		 lblSpace.setText("Bag space: "+playerSquad.get(id).bag.size()+"/"+playerSquad.get(id).getBagSpace());
 		 
-		 tableSpace.getChildren().items[0] = lblSpace;
+		 tableSpace.getChildren().items[id] = lblSpace;
 		 stage.getActors().items[getTableIndex("tableSpace")] =tableSpace;
 	}
 	

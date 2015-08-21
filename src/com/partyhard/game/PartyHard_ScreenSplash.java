@@ -25,6 +25,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -34,9 +35,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.partyhard.actor.PartyHard_Player_Map;
@@ -76,6 +80,9 @@ public class PartyHard_ScreenSplash implements Screen{
 	private LabelStyle labelStyle = new LabelStyle();
 
 	private Skin skin;
+	
+	private float buttonSizeWidth = 0;
+	private float buttonSizeHeight = 0;
 	
 	public PartyHard_ScreenSplash(PartyHard_GameClass gam)
 	{
@@ -134,25 +141,21 @@ public class PartyHard_ScreenSplash implements Screen{
 	Random r = new Random();
 	
 	//choosing randomly the map to load
-	switch(r.nextInt(4))
+	switch(r.nextInt(3))
 	{
 		case 0:
 			tiledmap = new TmxMapLoader().load("mainlevel.tmx");
 			break;
 		case 1:
-			tiledmap = new TmxMapLoader().load("test1.tmx");
-			break;
-		case 2:
 			tiledmap = new TmxMapLoader().load("dungeonlv2.tmx");
 			break;
-		case 3:
+		case 2:
 			tiledmap = new TmxMapLoader().load("forest1.tmx");
 			break;
 	}
 	
 	
 	//setting the camera on the middle of the screen
-	
 	maprenderer = new OrthogonalTiledMapRenderer(tiledmap);
 	
 	MapProperties prop = tiledmap.getProperties();
@@ -170,8 +173,13 @@ public class PartyHard_ScreenSplash implements Screen{
 	camera.position.set(mapWidthPixel / 2, mapHeightPixel / 2, 0);
 		
 	stage = new Stage();
+	
+	buttonSizeHeight = stage.getHeight() / 4;
+	buttonSizeWidth = stage.getWidth() / 4;
+	
 	Table buttonTable = new Table();
 	buttonTable.setName("buttonTable");
+	buttonTable.setSize(stage.getWidth(), stage.getHeight());
 	
 	/*
 	 * creating 3 buttons one for play two for load three for quit
@@ -180,9 +188,9 @@ public class PartyHard_ScreenSplash implements Screen{
 
 	 TextButton playButton = new TextButton("New Game", buttonStyle);
 	
-	playButton.setHeight(Gdx.graphics.getHeight() / 4);
-	playButton.setWidth(Gdx.graphics.getWidth() / 4);
-	playButton.setPosition((Gdx.graphics.getWidth() / 2) - playButton.getWidth() / 2, playButton.getHeight() * 2);
+	playButton.setHeight(buttonSizeHeight);
+	playButton.setWidth(buttonSizeWidth);
+	playButton.setPosition((stage.getWidth() / 2) - playButton.getWidth() / 2, playButton.getHeight() * 2);
 	
 	playButton.addListener(new ClickListener(){
 		  @Override 
@@ -207,6 +215,23 @@ public class PartyHard_ScreenSplash implements Screen{
 			  Gdx.app.exit();    
           }
 	});	
+	
+	//creating the options button
+	
+	TextButton optionsButton = new TextButton("Options", buttonStyle);
+	
+	optionsButton.setHeight(playButton.getHeight() / 2);
+	optionsButton.setWidth(playButton.getWidth() / 2);
+	
+	optionsButton.bottom().right();
+	
+	optionsButton.addListener(new ClickListener(){
+		@Override
+		public void clicked(InputEvent event, float x, float y) {
+			toggleOptions();
+		}
+	});
+	
 	
 	//if there is saved games
 		if(file.list().length > 0)
@@ -289,6 +314,7 @@ public class PartyHard_ScreenSplash implements Screen{
 		buttonTable.addActor(loadButton);
 		}
 	
+	buttonTable.addActor(optionsButton);	
 	buttonTable.addActor(playButton);
 	buttonTable.addActor(quitButton);
 	
@@ -328,7 +354,7 @@ public class PartyHard_ScreenSplash implements Screen{
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(255, 255, 255, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         
         tweenManager.update(delta);
@@ -421,6 +447,74 @@ public class PartyHard_ScreenSplash implements Screen{
        	game.setScreen(map);
 	}
 	
+	private void toggleOptions()
+	{
+		if(getTableIndex("options") != -1)
+			stage.getActors().removeIndex(getTableIndex("options"));
+		else
+		{
+			Table tableOptions = new Table();
+			tableOptions.setName("options");
+			
+			tableOptions.setSize(stage.getWidth(), stage.getHeight());
+			
+			SliderStyle style = new SliderStyle();
+			style.background = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/blue_panel.9.png")))));
+			style.knob = new NinePatchDrawable(new NinePatch(new TextureRegion(new Texture(Gdx.files.internal("ui/cursor.9.png")))));
+			
+			Slider slider = new Slider(0, 100, 0.5f, false, style);
+			slider.setValue(game.masterVolume);
+			
+			//listener that updates the label
+			slider.addListener(new ChangeListener()
+			{
+
+				@Override
+				public void changed(ChangeEvent event, Actor actor) {
+					//refresh the master volume
+					game.masterVolume = ((Slider)actor).getValue();
+					
+					//refresh the label option
+					refreshVolumeOption(game.masterVolume);					
+				}							
+			}
+			);
+					
+			slider.setPosition(0, buttonSizeHeight / 2 );
+			
+			Label lblVolume = new Label("Volume: "+slider.getValue(), labelStyle);
+			lblVolume.setPosition(0, slider.getY() + slider.getHeight());			
+			
+			
+			tableOptions.addActor(lblVolume);
+			tableOptions.addActor(slider);
+			stage.addActor(tableOptions);
+		}
+	}
+	/**
+	 * 
+	 * @param value The master volume's value
+	 */
+	private void refreshVolumeOption(float value) {
+		/*
+		 * update the label in the option and the music
+		 */
+		Table tableOption = (Table) stage.getActors().get(getTableIndex("options"));
+		
+		//update label
+		Label lblValue = (Label) tableOption.getChildren().get(0);
+		lblValue.setText("Volume: "+value);
+		
+		//update table
+		tableOption.getChildren().items[0] = lblValue;
+		stage.getActors().items[getTableIndex("options")] = tableOption;
+		
+		//update sounds
+		backgroundMusic.setVolume(value/100);
+		
+	}
+
+
 	private void generateDirection()
 	{
 			//random number to see where will move
