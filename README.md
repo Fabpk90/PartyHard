@@ -20,4 +20,4 @@ Even if the project was super cool to made, I had the best nights of my life, it
 If I ever have to a similar project again, i would certainly pick another language and another framework, maybe C++ and SFML, because Java is cool and all but, not really good performance-wise.
 
 
-If you have any question, please fell free to contact me :)
+If you have any question, please feel free to contact me :)
